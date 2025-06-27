@@ -55,4 +55,3 @@ Create a web-based multiplayer version of Zombicide with a tile-based draggable/
 
 - Game state is stored in Jotai
 - Game state is synced between server and clients using Socket.IO
-````
