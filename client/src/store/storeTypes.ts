@@ -5,4 +5,5 @@ export type PlayerStore = {
   setZoom: (zoom: number | ((prev: number) => number)) => void;
   offset: Offset;
   setOffset: (offset: Offset | ((prev: Offset) => Offset)) => void;
+  reset: () => void;
 };

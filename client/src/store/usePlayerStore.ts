@@ -13,4 +13,5 @@ export const usePlayerStore = create<PlayerStore>((set) => ({
     set((state) => ({
       offset: typeof offset === "function" ? offset(state.offset) : offset,
     })),
+  reset: () => set({ zoom: 1, offset: { x: 0, y: 0 } }),
 }));

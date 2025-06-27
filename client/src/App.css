@@ -50,4 +50,6 @@
 
 .overlay {
   padding: 1.5rem;
+  position: absolute;
+  z-index: 11;
 }
