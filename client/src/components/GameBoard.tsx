@@ -1,11 +1,16 @@
-import { useRef, useState } from "react";
+import { useRef } from "react";
+import { usePlayerStore } from "../store/usePlayerStore";
+import type { Offset } from "../store/storeTypes";
 
 const GameBoard = () => {
   const size = 2;
   const tiles = Array.from({ length: size * size }, (_, index) => index);
 
-  const [scale, setScale] = useState(1);
-  const [offset, setOffset] = useState({ x: 0, y: 0 });
+  const zoom = usePlayerStore((state) => state.zoom);
+  const setZoom = usePlayerStore((state) => state.setZoom);
+  const offset = usePlayerStore((state) => state.offset);
+  const setOffset = usePlayerStore((state) => state.setOffset);
+
   const isDragging = useRef(false);
   const lastPosition = useRef({ x: 0, y: 0 });
 
@@ -21,13 +26,13 @@ const GameBoard = () => {
     const dx = e.clientX - lastPosition.current.x;
     const dy = e.clientY - lastPosition.current.y;
     lastPosition.current = { x: e.clientX, y: e.clientY };
-    setOffset((prev) => ({ x: prev.x + dx, y: prev.y + dy }));
+    setOffset((prev: Offset) => ({ x: prev.x + dx, y: prev.y + dy }));
 
     // An attempt to make it so the grid can't be dragged out of the screen
 
     // setOffset((prev) => {
-    //   const gridWidth = size * 300 * scale;
-    //   const gridHeight = size * 300 * scale;
+    //   const gridWidth = size * 300 * zoom;
+    //   const gridHeight = size * 300 * zoom;
     //   const wrapperWidth = window.innerWidth;
     //   const wrapperHeight = window.innerHeight;
 
@@ -66,7 +71,7 @@ const GameBoard = () => {
   const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
     e.preventDefault();
     const zoomAmount = e.deltaY > 0 ? -0.005 : 0.005;
-    setScale((prev) => Math.max(0.5, Math.min(prev + zoomAmount, 2)));
+    setZoom((prev: number) => Math.max(0.5, Math.min(prev + zoomAmount, 2)));
   };
 
   return (
@@ -80,7 +85,7 @@ const GameBoard = () => {
       <div
         className="game-board-grid"
         style={{
-          transform: `translate(${offset.x}px, ${offset.y}px) scale(${scale})`,
+          transform: `translate(${offset.x}px, ${offset.y}px) scale(${zoom})`,
         }}
       >
         {tiles.map((tile) => (
