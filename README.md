@@ -10,7 +10,7 @@ Create a web-based multiplayer version of Zombicide with a tile-based draggable/
 
 ## 📁 Project Structure
 
-````bash
+```bash
 ├── client/ # React front-end
 │ ├── components/ # Board, tokens, UI, etc.
 │ ├── store/ # State management (Jotai)
@@ -22,7 +22,7 @@ Create a web-based multiplayer version of Zombicide with a tile-based draggable/
 ├── shared/ # Shared types/interfaces
 ├── railway.json # Deployment config
 └── README.md
-bash```
+```
 
 ## 📦 Tech Stack
 
