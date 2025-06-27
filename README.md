@@ -10,17 +10,7 @@ Create a web-based multiplayer version of Zombicide with a tile-based draggable/
 
 ## 📁 Project Structure
 
-├── client/ # React front-end
-│ ├── components/ # Board, tokens, UI, etc.
-│ ├── store/ # State management (Jotai)
-│ ├── assets/ # Tile images, tokens
-│ └── App.tsx
-├── server/ # Node.js backend (Socket.IO)
-│ ├── gameManager.ts # Turn logic, game state
-│ └── index.ts
-├── shared/ # Shared types/interfaces
-├── railway.json # Deployment config
-└── README.md
+<pre><code>```bash ├── client/ # React front-end │ ├── components/ # Board, tokens, UI, etc. │ ├── store/ # State management (Jotai) │ ├── assets/ # Tile images, tokens │ └── App.tsx ├── server/ # Node.js backend (Socket.IO) │ ├── gameManager.ts # Turn logic, game state │ └── index.ts ├── shared/ # Shared types/interfaces ├── railway.json # Deployment config └── README.md ```</code></pre>
 
 ## 📦 Tech Stack
 
