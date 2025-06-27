@@ -16,10 +16,47 @@ const GameBoard = () => {
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!isDragging.current) return;
+
+    // Calculate the difference between the current mouse position and the last position
     const dx = e.clientX - lastPosition.current.x;
     const dy = e.clientY - lastPosition.current.y;
     lastPosition.current = { x: e.clientX, y: e.clientY };
     setOffset((prev) => ({ x: prev.x + dx, y: prev.y + dy }));
+
+    // An attempt to make it so the grid can't be dragged out of the screen
+
+    // setOffset((prev) => {
+    //   const gridWidth = size * 300 * scale;
+    //   const gridHeight = size * 300 * scale;
+    //   const wrapperWidth = window.innerWidth;
+    //   const wrapperHeight = window.innerHeight;
+
+    //   let newX = prev.x + dx;
+    //   let newY = prev.y + dy;
+
+    //   if (gridWidth > wrapperWidth) {
+    //     const minX = wrapperWidth - gridWidth;
+    //     const maxX = 0;
+    //     newX = Math.min(maxX, Math.max(newX, minX));
+    //   }
+
+    //   if (gridHeight > wrapperHeight) {
+    //     const minY = wrapperHeight - gridHeight;
+    //     const maxY = 0;
+    //     newY = Math.min(maxY, Math.max(newY, minY));
+    //   }
+
+    //   return { x: newX, y: newY };
+    //   const maxX = 0;
+    //   const minX = wrapperWidth - gridWidth;
+    //   const maxY = 0;
+    //   const minY = wrapperHeight - gridHeight;
+
+    //   const newX = Math.min(maxX, Math.max(prev.x + dx, minX));
+    //   const newY = Math.min(maxY, Math.max(prev.y + dy, minY));
+
+    //   return { x: newX, y: newY };
+    // });
   };
 
   const handleMouseUp = () => {
