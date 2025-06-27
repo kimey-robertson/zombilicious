@@ -75,14 +75,12 @@ const GameBoard = () => {
   };
 
   return (
-    <div
-      className="game-board-wrapper"
-      onMouseDown={handleMouseDown}
-      onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp}
-      onWheel={handleWheel}
-    >
+    <div className="game-board-wrapper">
       <div
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onWheel={handleWheel}
         className="game-board-grid"
         style={{
           transform: `translate(${offset.x}px, ${offset.y}px) scale(${zoom})`,

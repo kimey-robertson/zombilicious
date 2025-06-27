@@ -8,7 +8,7 @@
 
 .game-board-wrapper {
   width: 100%;
-  height: 100%;
+  height: 100vh;
   overflow: hidden;
   background: #d7d6d6;
   cursor: grab;
@@ -23,6 +23,7 @@
   grid-template-rows: repeat(2, 300px);
   transform-origin: center;
   transition: transform 0.05s ease-out;
+  z-index: 10;
 }
 
 .game-board-tile {
@@ -36,4 +37,17 @@
   /* padding: 1rem; */
   width: 300px;
   height: 300px;
+}
+
+.overlay-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  /* padding: 1.5rem; */
+}
+
+.overlay {
+  padding: 1.5rem;
 }

@@ -1,8 +1,14 @@
 import "./App.css";
 import GameBoard from "./components/GameBoard";
+import Overlay from "./components/Overlay";
 
 function App() {
-  return <GameBoard />;
+  return (
+    <div>
+      <GameBoard />
+      <Overlay />
+    </div>
+  );
 }
 
 export default App;
