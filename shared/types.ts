@@ -1,21 +1,29 @@
-type Tile = {
+export type Tile = {
   id: string;
   position: {
     x: number;
     y: number;
   };
   cells: Cell[];
+  rotation: 0 | 1 | 2 | 3;
 };
 
-type Cell = {
+export type Cell = {
   id: string;
   tileId: string;
   row: number;
   col: number;
 };
 
-type Zone = {
+export type Zone = {
   id: string;
   cellIds: string[];
   tileIds: string[];
-}
+  room: boolean;
+};
+
+export type Map = {
+  id: string;
+  tiles: Tile[];
+  zones: Zone[];
+};
