@@ -4,19 +4,21 @@ import { usePlayerStore } from "../../store/usePlayerStore";
 const ZoneInfoPanel: React.FC = () => {
   const selectedZone = usePlayerStore((state) => state.selectedZone);
   const devMode = usePlayerStore((state) => state.devMode);
+  
   if (!selectedZone) return null;
+
   return (
-    <div className="zone-info-panel">
+    <div className="side-panel">
       <h3>Selected Zone: {selectedZone.id}</h3>
-      <div className="zone-detail">
+      <div className="side-panel-detail">
         🧟 Zombies:
         {/* <span>{zoneInfo.zombies}</span> */}
       </div>
-      <div className="zone-detail">
+      <div className="side-panel-detail">
         🧑 Survivors:
         {/* <span>{zoneInfo.survivors}</span> */}
       </div>
-      <div className="zone-detail">
+      <div className="side-panel-detail">
         🔊 Noise:
         {/* <span>{zoneInfo.noise}</span> */}
       </div>

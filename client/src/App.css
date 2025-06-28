@@ -135,12 +135,12 @@
   position: absolute;
   top: 7%;
   right: 0;
-  width: 20%;
+  margin-right: 1rem;
   height: 80%;
 }
 
-.zone-info-panel {
-  position: absolute;
+.side-panel {
+  position: relative;
   right: 1rem;
   top: 1rem;
   width: 200px;
@@ -150,20 +150,24 @@
   border-radius: 0.75rem;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
   font-family: sans-serif;
-  z-index: 100;
+  z-index: 12;
 }
 
-.zone-info-panel h3 {
+.side-panel h3 {
   margin: 0 0 1rem;
   font-size: 1.2rem;
   color: #ffcc00;
 }
 
-.zone-detail {
+.side-panel-detail {
   margin-bottom: 0.5rem;
   font-size: 1rem;
   display: flex;
   justify-content: space-between;
+}
+
+.dev-panel {
+  margin-top: 2rem;
 }
 
 .header-pan-mode {

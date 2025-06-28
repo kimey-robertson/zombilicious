@@ -16,4 +16,6 @@ export type PlayerStore = {
   setPanMode: (panMode: boolean) => void;
   devMode: boolean;
   setDevMode: (devMode: boolean) => void;
+  hideOverlay: boolean;
+  setHideOverlay: (hideOverlay: boolean) => void;
 };

@@ -23,4 +23,6 @@ export const usePlayerStore = create<PlayerStore>((set) => ({
   setPanMode: (panMode) => set({ panMode }),
   devMode: false,
   setDevMode: (devMode) => set({ devMode }),
+  hideOverlay: false,
+  setHideOverlay: (hideOverlay) => set({ hideOverlay }),
 }));
