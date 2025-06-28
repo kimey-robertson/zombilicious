@@ -5,7 +5,7 @@ export type Tile = {
     y: number;
   };
   cells: Cell[];
-  rotation: 0 | 1 | 2 | 3;
+  rotation: 0 | 90 | 180 | 270;
 };
 
 export type Cell = {

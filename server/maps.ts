@@ -7,7 +7,7 @@ const tutorialMap: Map = {
     {
       id: "2B",
       position: { x: 0, y: 0 },
-      rotation: 1,
+      rotation: 90,
       cells: getTileCells("2B"),
     },
     {

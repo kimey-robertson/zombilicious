@@ -1,12 +1,12 @@
-import TileComponent from "./Tile";
+import Tile from "./Tile";
 import { tutorialMap } from "../../../../server/maps";
 
 const Tiles = () => {
-  const map = tutorialMap;
+  const chosenMap = tutorialMap;
   return (
     <div>
-      {map.tiles.map((tile) => (
-        <TileComponent key={tile.id} tile={tile} zones={map.zones} />
+      {chosenMap.tiles.map((tile) => (
+        <Tile key={tile.id} tile={tile} zones={chosenMap.zones} />
       ))}
     </div>
   );

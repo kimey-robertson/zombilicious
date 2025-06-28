@@ -30,7 +30,12 @@ const Tile = ({ tile, zones }: TileProps) => {
 
   return (
     <div className="game-board-tile">
-      <img src={tileImage} alt="tile" className="tile-image" />
+      <img
+        src={tileImage}
+        alt="tile"
+        className="tile-image"
+        style={{ transform: `rotate(${tile.rotation}deg)` }}
+      />
       <div className="tile-grid-overlay">
         {tile.cells.map((cell) => (
           <Cell
