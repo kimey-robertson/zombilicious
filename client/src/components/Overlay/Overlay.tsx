@@ -1,6 +1,7 @@
 import { usePlayerStore } from "../../store/usePlayerStore";
 import Header from "./Header";
 import RightSidebar from "./RightSidebar";
+import "./Overlay.css";
 
 const Overlay = () => {
   const isDragging = usePlayerStore((state) => state.isDragging);

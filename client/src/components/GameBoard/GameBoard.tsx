@@ -2,6 +2,7 @@ import { useRef } from "react";
 import { usePlayerStore } from "../../store/usePlayerStore";
 import type { Offset } from "../../store/storeTypes";
 import Tiles from "./Tiles";
+import "./GameBoard.css";
 
 const GameBoard = () => {
   // Think about using a single state object instead of multiple state hooks
