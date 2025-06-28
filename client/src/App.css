@@ -166,22 +166,25 @@
   justify-content: space-between;
 }
 
-.dev-panel {
-  margin-top: 2rem;
-}
-
 .header-pan-mode {
   font-size: 1.6rem;
   color: #000000;
   margin-right: auto;
 }
 
-.header-dev-mode {
+.dev-mode-wrapper {
   position: absolute;
-  right: 20%;
+  top: 7%;
+  left: 20%;
+  margin-right: 1rem;
+  height: 80%;
+}
+
+.dev-mode-switch {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  margin-top: 1rem;
 }
 
 /* I'll keep this as a maybe for the future */
