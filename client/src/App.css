@@ -185,6 +185,8 @@
   align-items: center;
   gap: 0.5rem;
   margin-top: 1rem;
+  font-size: 1.5rem;
+  font-weight: 600;
 }
 
 /* I'll keep this as a maybe for the future */
