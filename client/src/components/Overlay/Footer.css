@@ -1,0 +1,68 @@
+.footer-toggle {
+  position: fixed;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 13;
+}
+
+.footer-toggle button {
+  background-color: #111;
+  color: #fff;
+  padding: 6px 16px;
+  border-radius: 20px;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: background 0.2s ease;
+}
+
+.footer-toggle button:hover {
+  background-color: #333;
+}
+
+.footer-panel {
+  position: fixed;
+  bottom: -300px;
+  left: 0;
+  width: 100%;
+  height: 300px;
+  background-color: rgba(0, 0, 0, 0.66);
+  color: #fff;
+  padding: 1rem;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
+  transition: bottom 0.3s ease;
+  z-index: 12;
+}
+
+.footer-panel.open {
+  bottom: 0;
+}
+
+.footer-panel-content h2 {
+  margin-top: 0;
+}
+
+.footer-panel-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+
+.footer-panel-actions button {
+  background-color: #444;
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.footer-panel-actions button:hover {
+  background-color: #666;
+}
