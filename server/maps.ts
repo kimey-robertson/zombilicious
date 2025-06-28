@@ -1,5 +1,5 @@
 import { getTileCells } from "./utils";
-import { Map } from "../shared/types";
+import type { Map } from "../shared/types";
 
 const tutorialMap: Map = {
   id: "tutorial",
@@ -104,3 +104,5 @@ const tutorialMap: Map = {
     },
   ],
 };
+
+export { tutorialMap };

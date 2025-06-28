@@ -1,12 +1,9 @@
 import { useRef } from "react";
 import { usePlayerStore } from "../../store/usePlayerStore";
 import type { Offset } from "../../store/storeTypes";
-import Tile from "./Tile";
+import Tiles from "./Tiles";
 
 const GameBoard = () => {
-  const size = 1.5;
-  const tiles = Array.from({ length: size * size }, (_, index) => index);
-
   // Think about using a single state object instead of multiple state hooks
   const zoom = usePlayerStore((state) => state.zoom);
   const setZoom = usePlayerStore((state) => state.setZoom);
@@ -60,9 +57,7 @@ const GameBoard = () => {
           transform: `translate(${offset.x}px, ${offset.y}px) scale(${zoom})`,
         }}
       >
-        {tiles.map((tile) => (
-          <Tile key={tile} tile={tile} />
-        ))}
+        <Tiles />
       </div>
     </div>
   );

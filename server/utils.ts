@@ -1,4 +1,4 @@
-import { Cell } from "../shared/types";
+import type { Cell } from "../shared/types";
 
 function getTileCells(tileId: string) {
   const cells: Cell[] = [];
