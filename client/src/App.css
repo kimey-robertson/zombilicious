@@ -44,16 +44,35 @@
   left: 0;
   width: 100%;
   height: 100vh;
-  /* padding: 1.5rem; */
+  padding: 1.5rem;
+  box-sizing: border-box;
 }
 
-.overlay {
-  padding: 1.5rem;
-  position: absolute;
+.overlay-item {
+  position: relative;
   z-index: 11;
 }
 
-.overlay-dragging {
+.overlay-dragging .overlay-item {
   opacity: 0.5;
   pointer-events: none;
+}
+
+.header-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header-title {
+  font-size: 2rem;
+  margin: auto;
+  font-weight: 600;
+  color: #8b0000;
+  text-shadow: 2px 2px 0px #4a0000, 4px 4px 0px #2a0000, 6px 6px 0px #1a0000,
+    0 0 20px rgba(139, 0, 0, 0.8), 0 0 40px rgba(139, 0, 0, 0.4),
+    inset 0 0 20px rgba(0, 0, 0, 0.5);
+  filter: drop-shadow(0 8px 4px rgba(0, 0, 0, 0.3))
+    drop-shadow(0 0 10px rgba(139, 0, 0, 0.7));
+  position: relative;
 }

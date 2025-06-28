@@ -1,13 +1,11 @@
 import { usePlayerStore } from "../../store/usePlayerStore";
-import ResetBoard from "./ResetBoard";
+import Header from "./Header";
 
 const Overlay = () => {
   const isDragging = usePlayerStore((state) => state.isDragging);
   return (
-    <div className="overlay-wrapper">
-      <div className={`overlay ${isDragging ? "overlay-dragging" : ""}`}>
-        <ResetBoard />
-      </div>
+    <div className={`overlay-wrapper ${isDragging ? "overlay-dragging" : ""}`}>
+      <Header />
     </div>
   );
 };
