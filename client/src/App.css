@@ -128,6 +128,41 @@
   position: relative;
 }
 
+.right-side-bar {
+  position: absolute;
+  top: 7%;
+  right: 0;
+  width: 20%;
+  height: 80%;
+}
+
+.zone-info-panel {
+  position: absolute;
+  right: 1rem;
+  top: 1rem;
+  width: 200px;
+  background-color: #1c1c1c;
+  color: #eee;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
+  font-family: sans-serif;
+  z-index: 100;
+}
+
+.zone-info-panel h3 {
+  margin: 0 0 1rem;
+  font-size: 1.2rem;
+  color: #ffcc00;
+}
+
+.zone-detail {
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+  display: flex;
+  justify-content: space-between;
+}
+
 /* I'll keep this as a maybe for the future */
 
 /* .grid-cell:hover {
