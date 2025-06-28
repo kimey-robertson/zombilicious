@@ -11,7 +11,6 @@
   height: 100vh;
   overflow: hidden;
   background: #d7d6d6;
-  cursor: grab;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -74,12 +73,11 @@
   margin: auto;
   font-weight: 600;
   color: #8b0000;
-  text-shadow: 2px 2px 0px #4a0000, 4px 4px 0px #2a0000, 6px 6px 0px #1a0000,
-    0 0 20px rgba(139, 0, 0, 0.8), 0 0 40px rgba(139, 0, 0, 0.4),
-    inset 0 0 20px rgba(0, 0, 0, 0.5);
   filter: drop-shadow(0 8px 4px rgba(0, 0, 0, 0.3))
     drop-shadow(0 0 10px rgba(139, 0, 0, 0.7));
-  position: relative;
+  position: absolute;
+  text-align: center;
+  width: 100%;
 }
 
 .tile-image {
@@ -112,11 +110,11 @@
   z-index: 10;
 }
 
-.grid-cell:hover {
+/* .grid-cell:hover {
   background-color: #f1f1f157;
   border-radius: 10px;
   margin: 0.75rem;
-}
+} */
 
 /* .grid-cell-inner {
   display: flex;
@@ -161,6 +159,12 @@
   font-size: 1rem;
   display: flex;
   justify-content: space-between;
+}
+
+.header-pan-mode {
+  font-size: 1.6rem;
+  color: #000000;
+  margin-right: auto;
 }
 
 /* I'll keep this as a maybe for the future */

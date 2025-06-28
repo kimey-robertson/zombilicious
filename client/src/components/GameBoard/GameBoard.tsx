@@ -11,16 +11,18 @@ const GameBoard = () => {
   const setOffset = usePlayerStore((state) => state.setOffset);
   const isDragging = usePlayerStore((state) => state.isDragging);
   const setIsDragging = usePlayerStore((state) => state.setIsDragging);
+  const panMode = usePlayerStore((state) => state.panMode);
 
   const lastPosition = useRef({ x: 0, y: 0 });
 
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!panMode) return;
     setIsDragging(true);
     lastPosition.current = { x: e.clientX, y: e.clientY };
   };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!isDragging) return;
+    if (!isDragging || !panMode) return;
 
     // Calculate the difference between the current mouse position and the last position
     const dx = e.clientX - lastPosition.current.x;
@@ -30,6 +32,7 @@ const GameBoard = () => {
   };
 
   const handleMouseUp = () => {
+    if (!panMode) return;
     setIsDragging(false);
   };
 
@@ -43,7 +46,8 @@ const GameBoard = () => {
     <div
       className="game-board-wrapper"
       style={{
-        cursor: isDragging ? "grabbing" : "grab",
+        cursor:
+          panMode && !isDragging ? "grab" : isDragging ? "grabbing" : "pointer",
       }}
     >
       <div

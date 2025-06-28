@@ -1,5 +1,6 @@
 import "./App.css";
 import GameBoard from "./components/GameBoard/GameBoard";
+import KeyboardListener from "./components/KeyboardListener";
 import Overlay from "./components/Overlay/Overlay";
 
 function App() {
@@ -7,6 +8,7 @@ function App() {
     <div>
       <GameBoard />
       <Overlay />
+      <KeyboardListener />
     </div>
   );
 }

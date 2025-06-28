@@ -12,4 +12,6 @@ export type PlayerStore = {
   setIsDragging: (isDragging: boolean) => void;
   selectedZone: Zone | undefined;
   setSelectedZone: (zone: Zone) => void;
+  panMode: boolean;
+  setPanMode: (panMode: boolean) => void;
 };

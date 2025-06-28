@@ -19,4 +19,6 @@ export const usePlayerStore = create<PlayerStore>((set) => ({
   setIsDragging: (isDragging) => set({ isDragging }),
   selectedZone: undefined,
   setSelectedZone: (zone: Zone) => set({ selectedZone: zone }),
+  panMode: false,
+  setPanMode: (panMode) => set({ panMode }),
 }));

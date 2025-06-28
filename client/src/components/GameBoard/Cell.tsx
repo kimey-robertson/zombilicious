@@ -7,10 +7,11 @@ type CellProps = {
 };
 
 const Cell: React.FC<CellProps> = ({ cell, zone }) => {
-  const { setSelectedZone } = usePlayerStore();
+  const setSelectedZone = usePlayerStore((state) => state.setSelectedZone);
+  const panMode = usePlayerStore((state) => state.panMode);
 
   const handleClick = () => {
-    if (zone) {
+    if (zone && !panMode) {
       setSelectedZone(zone);
     }
   };
