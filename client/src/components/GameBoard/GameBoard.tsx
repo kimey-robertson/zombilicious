@@ -1,9 +1,10 @@
 import { useRef } from "react";
-import { usePlayerStore } from "../store/usePlayerStore";
-import type { Offset } from "../store/storeTypes";
+import { usePlayerStore } from "../../store/usePlayerStore";
+import type { Offset } from "../../store/storeTypes";
+import Tile from "./Tile";
 
 const GameBoard = () => {
-  const size = 2;
+  const size = 1.5;
   const tiles = Array.from({ length: size * size }, (_, index) => index);
 
   // Think about using a single state object instead of multiple state hooks
@@ -60,9 +61,7 @@ const GameBoard = () => {
         }}
       >
         {tiles.map((tile) => (
-          <div key={tile} className="game-board-tile">
-            {tile}
-          </div>
+          <Tile key={tile} tile={tile} />
         ))}
       </div>
     </div>
