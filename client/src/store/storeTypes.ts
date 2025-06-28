@@ -1,3 +1,5 @@
+import { Zone } from "../../../shared/types";
+
 export type Offset = { x: number; y: number };
 
 export type PlayerStore = {
@@ -8,4 +10,6 @@ export type PlayerStore = {
   reset: () => void;
   isDragging: boolean;
   setIsDragging: (isDragging: boolean) => void;
+  selectedZone: Zone | undefined;
+  setSelectedZone: (zone: Zone) => void;
 };

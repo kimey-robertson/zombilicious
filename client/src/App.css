@@ -118,15 +118,15 @@
   margin: 0.75rem;
 }
 
-.grid-cell-inner {
+/* .grid-cell-inner {
   display: flex;
   align-items: center;
   justify-content: center;
-  /* border: 1px solid #13c543; */
+  border: 1px solid #13c543;
   height: 100%;
   width: 100%;
   position: relative;
-}
+} */
 
 .right-side-bar {
   position: absolute;

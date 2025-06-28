@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
-import type { Tile } from "../../../../shared/types";
+import type { Tile, Zone } from "../../../../shared/types";
+import Cell from "./Cell";
 
 type TileProps = {
   tile: Tile;
+  zones: Zone[];
 };
 
-const TileComponent = ({ tile }: TileProps) => {
+const Tile = ({ tile, zones }: TileProps) => {
   const [tileImage, setTileImage] = useState<string>("");
 
   useEffect(() => {
@@ -30,14 +32,16 @@ const TileComponent = ({ tile }: TileProps) => {
     <div className="game-board-tile">
       <img src={tileImage} alt="tile" className="tile-image" />
       <div className="tile-grid-overlay">
-        {Array.from({ length: 9 }, (_, index) => (
-          <div key={index} className="grid-cell">
-            <div className="grid-cell-inner"></div>
-          </div>
+        {tile.cells.map((cell) => (
+          <Cell
+            key={cell.id}
+            cell={cell}
+            zone={zones.find((zone) => zone.cellIds.includes(cell.id))}
+          />
         ))}
       </div>
     </div>
   );
 };
 
-export default TileComponent;
+export default Tile;

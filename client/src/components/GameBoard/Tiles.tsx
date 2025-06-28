@@ -6,7 +6,7 @@ const Tiles = () => {
   return (
     <div>
       {map.tiles.map((tile) => (
-        <TileComponent key={tile.id} tile={tile} />
+        <TileComponent key={tile.id} tile={tile} zones={map.zones} />
       ))}
     </div>
   );

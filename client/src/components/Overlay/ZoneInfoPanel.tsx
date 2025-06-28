@@ -1,25 +1,26 @@
 import React from "react";
+import { usePlayerStore } from "../../store/usePlayerStore";
 
-type ZoneInfo = {
-  id: string;
-  zombies: number;
-  survivors: number;
-  noise: number;
-};
-
-const ZoneInfoPanel: React.FC<{ zoneInfo: ZoneInfo }> = ({ zoneInfo }) => {
-  if (!zoneInfo) return null;
+const ZoneInfoPanel: React.FC = () => {
+  const { selectedZone } = usePlayerStore();
+  if (!selectedZone) return null;
   return (
     <div className="zone-info-panel">
-      <h3>{zoneInfo.id}</h3>
+      <h3>Selected Zone: {selectedZone.id}</h3>
+      <div>Cell Ids: {selectedZone.cellIds.map((cellId) => cellId).join(", ")}</div>
+      <div>Is a room: {selectedZone.room.toString()}</div>
+      <div>Tile ids: {selectedZone.tileIds.map((tileId) => tileId).join(", ")}</div>
       <div className="zone-detail">
-        🧟 Zombies: <span>{zoneInfo.zombies}</span>
+        🧟 Zombies:
+        {/* <span>{zoneInfo.zombies}</span> */}
       </div>
       <div className="zone-detail">
-        🧑 Survivors: <span>{zoneInfo.survivors}</span>
+        🧑 Survivors:
+        {/* <span>{zoneInfo.survivors}</span> */}
       </div>
       <div className="zone-detail">
-        🔊 Noise: <span>{zoneInfo.noise}</span>
+        🔊 Noise:
+        {/* <span>{zoneInfo.noise}</span> */}
       </div>
     </div>
   );
