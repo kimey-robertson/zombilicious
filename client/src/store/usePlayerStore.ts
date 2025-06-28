@@ -21,4 +21,6 @@ export const usePlayerStore = create<PlayerStore>((set) => ({
   setSelectedZone: (zone: Zone) => set({ selectedZone: zone }),
   panMode: false,
   setPanMode: (panMode) => set({ panMode }),
+  devMode: false,
+  setDevMode: (devMode) => set({ devMode }),
 }));

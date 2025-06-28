@@ -14,4 +14,6 @@ export type PlayerStore = {
   setSelectedZone: (zone: Zone) => void;
   panMode: boolean;
   setPanMode: (panMode: boolean) => void;
+  devMode: boolean;
+  setDevMode: (devMode: boolean) => void;
 };

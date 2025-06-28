@@ -172,6 +172,14 @@
   margin-right: auto;
 }
 
+.header-dev-mode {
+  position: absolute;
+  right: 20%;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 /* I'll keep this as a maybe for the future */
 
 /* .grid-cell:hover {
