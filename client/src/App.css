@@ -115,7 +115,7 @@
 .grid-cell:hover {
   background-color: #f1f1f157;
   border-radius: 10px;
-  margin: 0.25rem;
+  margin: 0.75rem;
 }
 
 .grid-cell-inner {
@@ -127,3 +127,40 @@
   width: 100%;
   position: relative;
 }
+
+/* I'll keep this as a maybe for the future */
+
+/* .grid-cell:hover {
+ background-color: #f1f1f157;
+  border-radius: 10px;
+  margin: 0.75rem; 
+}
+
+.grid-cell:nth-child(8) {
+ border-radius: 10px 10px 0 0;
+  margin-bottom: 0;
+  position: relative;
+  height: 185%;
+  padding: 1.5rem;
+  border-radius: 10px;
+  margin: 0.75rem;
+}
+.grid-cell:nth-child(8):hover {
+  border-radius: 10px 10px 0 0;
+  margin-bottom: 0;
+  background-color: #f1f1f157;
+}
+
+.grid-cell:nth-child(2):hover {
+  background-color: none;
+} 
+
+.grid-cell-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+   border: 1px solid #13c543; 
+  height: 100%;
+  width: 100%;
+  position: relative;
+} */

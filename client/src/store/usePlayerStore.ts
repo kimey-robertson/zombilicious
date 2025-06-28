@@ -3,7 +3,7 @@ import { create } from "zustand";
 import type { PlayerStore } from "./storeTypes";
 
 export const usePlayerStore = create<PlayerStore>((set) => ({
-  zoom: 1.35,
+  zoom: 1,
   setZoom: (zoom) =>
     set((state) => ({
       zoom: typeof zoom === "function" ? zoom(state.zoom) : zoom,

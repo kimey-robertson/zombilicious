@@ -14,9 +14,7 @@ const Tile = ({ tile }: TileProps) => {
       <div className="tile-grid-overlay">
         {Array.from({ length: 9 }, (_, index) => (
           <div key={index} className="grid-cell">
-            <div className="grid-cell-inner">
-              {index}
-            </div>
+            <div className="grid-cell-inner"></div>
           </div>
         ))}
       </div>
