@@ -29,7 +29,7 @@ Create a web-based multiplayer version of Zombicide with a tile-based draggable/
 | Feature          | Stack/Tool          | Notes                 |
 | ---------------- | ------------------- | --------------------- |
 | UI rendering     | React + CSS Grid    | Might use Konva later |
-| State management | Zustand               |
+| State management | Zustand             |
 | Multiplayer sync | Socket.IO           |
 | Backend runtime  | Node.js             |
 | Game logic       | Custom JS game loop |
@@ -41,8 +41,8 @@ Create a web-based multiplayer version of Zombicide with a tile-based draggable/
 ### 1. Tile-Based Board
 
 - Rendered with CSS Grid
-- Each tile: 3x3 zones + rooms (Zombicide standard)
-- Supports panning and zooming
+- Each tile: 3x3 cells + rooms (Zombicide standard). Zones are formed by the cells and rooms, and may span multiple tiles.
+- Supports panning and zooming. Hold space to pan, and scroll to zoom.
 
 ### 2. Survivors and Zombies
 
@@ -53,5 +53,6 @@ Create a web-based multiplayer version of Zombicide with a tile-based draggable/
 
 ### 3. Game State
 
-- Game state is stored in Zustand
+- Game state is stored in Zustand.
+- There are 2 state stores, one for the game state, which is shared between all players and synced to the server, and one for the player state, which is unique to each player.
 - Game state is synced between server and clients using Socket.IO
