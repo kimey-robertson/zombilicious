@@ -14,4 +14,6 @@ export const usePlayerStore = create<PlayerStore>((set) => ({
       offset: typeof offset === "function" ? offset(state.offset) : offset,
     })),
   reset: () => set({ zoom: 1, offset: { x: 0, y: 0 } }),
+  isDragging: false,
+  setIsDragging: (isDragging) => set({ isDragging }),
 }));

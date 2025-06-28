@@ -6,21 +6,23 @@ const GameBoard = () => {
   const size = 2;
   const tiles = Array.from({ length: size * size }, (_, index) => index);
 
+  // Think about using a single state object instead of multiple state hooks
   const zoom = usePlayerStore((state) => state.zoom);
   const setZoom = usePlayerStore((state) => state.setZoom);
   const offset = usePlayerStore((state) => state.offset);
   const setOffset = usePlayerStore((state) => state.setOffset);
-
-  const isDragging = useRef(false);
+  const isDragging = usePlayerStore((state) => state.isDragging);
+  const setIsDragging = usePlayerStore((state) => state.setIsDragging);
+  
   const lastPosition = useRef({ x: 0, y: 0 });
 
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-    isDragging.current = true;
+    setIsDragging(true);
     lastPosition.current = { x: e.clientX, y: e.clientY };
   };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!isDragging.current) return;
+    if (!isDragging) return;
 
     // Calculate the difference between the current mouse position and the last position
     const dx = e.clientX - lastPosition.current.x;
@@ -65,7 +67,7 @@ const GameBoard = () => {
   };
 
   const handleMouseUp = () => {
-    isDragging.current = false;
+    setIsDragging(false);
   };
 
   const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {

@@ -6,4 +6,6 @@ export type PlayerStore = {
   offset: Offset;
   setOffset: (offset: Offset | ((prev: Offset) => Offset)) => void;
   reset: () => void;
+  isDragging: boolean;
+  setIsDragging: (isDragging: boolean) => void;
 };
