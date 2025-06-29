@@ -4,6 +4,7 @@ import "./Footer.css";
 import XPTracker from "./XPTracker";
 import ActionsRemaining from "./ActionsRemaining";
 import PlayerCards from "./PlayerCards";
+import ActionButtons from "./ActionButtons";
 
 const Footer = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -29,6 +30,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           <ActionsRemaining />
           <PlayerCards />
+          <ActionButtons />
         </div>
         {/* <div className="footer-panel-content">
             <h2>Action Panel</h2>
