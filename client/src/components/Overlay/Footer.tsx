@@ -5,6 +5,7 @@ import XPTracker from "./XPTracker";
 import ActionsRemaining from "./ActionsRemaining";
 import PlayerCards from "./PlayerCards";
 import ActionButtons from "./ActionButtons";
+import { Button } from "../UI/Button";
 
 const Footer = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -20,9 +21,12 @@ const Footer = () => {
     <>
       {/* Toggle */}
       <div className="footer-toggle">
-        <button onClick={() => setIsOpen(!isOpen)}>
+        <Button
+          onClick={() => setIsOpen(!isOpen)}
+          className="bg-gradient-to-b from-red-900/90 to-black/95 border-2 border-red-700/60 text-red-200 hover:from-red-800/90 hover:to-red-950/95 hover:border-red-600/80 shadow-xl font-mono"
+        >
           {isOpen ? "Hide Action Panel" : "Show Action Panel"}
-        </button>
+        </Button>
       </div>
       {/* // Panel */}
       <div className={`footer-panel ${isOpen ? "open" : "closed"}`}>
