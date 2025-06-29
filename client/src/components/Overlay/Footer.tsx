@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { usePlayerStore } from "../../store/usePlayerStore";
 import "./Footer.css";
+import XPTracker from "./XPTracker";
 
 const Footer = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -22,6 +23,7 @@ const Footer = () => {
       </div>
       {/* // Panel */}
       <div className={`footer-panel ${isOpen ? "open" : "closed"}`}>
+      <XPTracker />
         <div className="footer-panel-content">
           <h2>Action Panel</h2>
           <div className="footer-panel-actions">

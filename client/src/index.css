@@ -15,7 +15,7 @@
   -moz-osx-font-smoothing: grayscale;
 
   /* CSS Variables */
-  --game-board-size: 550px;
+  --game-board-size: 400px;
 }
 
 a {
