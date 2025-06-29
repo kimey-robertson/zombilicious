@@ -34,6 +34,7 @@
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
   transition: bottom 0.3s ease;
   z-index: 12;
+  overflow-y: scroll;
 }
 
 .footer-panel.open {
