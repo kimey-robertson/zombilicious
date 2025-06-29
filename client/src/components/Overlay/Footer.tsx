@@ -3,6 +3,7 @@ import { usePlayerStore } from "../../store/usePlayerStore";
 import "./Footer.css";
 import XPTracker from "./XPTracker";
 import ActionsRemaining from "./ActionsRemaining";
+import PlayerCards from "./PlayerCards";
 
 const Footer = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -27,6 +28,7 @@ const Footer = () => {
         <XPTracker />
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           <ActionsRemaining />
+          <PlayerCards />
         </div>
         {/* <div className="footer-panel-content">
             <h2>Action Panel</h2>
