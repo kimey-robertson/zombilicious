@@ -18,6 +18,7 @@ const XPTracker = () => {
   const [pulseEffect, setPulseEffect] = useState(false);
   const [flicker, setFlicker] = useState(false);
 
+  // Consider removing this or switching to CSS animations for performance
   useEffect(() => {
     const pulseInterval = setInterval(() => {
       setPulseEffect(true);
