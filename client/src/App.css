@@ -4,6 +4,22 @@
   margin: 0;
   padding: 0;
   overflow: hidden;
+  position: relative;
+}
+
+#root::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url("./assets/grunge-wall.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0.5;
+  z-index: -1;
 }
 
 .dev-mode-wrapper {
@@ -22,4 +38,3 @@
   font-size: 1.5rem;
   font-weight: 600;
 }
-
