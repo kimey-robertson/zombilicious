@@ -20,7 +20,7 @@ export const usePlayerStore = create<PlayerStore>((set) => ({
       rotation:
         typeof rotation === "function" ? rotation(state.rotation) : rotation,
     })),
-  reset: () => set({ zoom: 1, offset: { x: 0, y: 0 } }),
+  reset: () => set({ zoom: 1, offset: { x: 0, y: 0 }, rotation: 0 }),
   isDragging: false,
   setIsDragging: (isDragging) => set({ isDragging }),
   selectedZone: undefined,
