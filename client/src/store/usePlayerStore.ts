@@ -14,6 +14,12 @@ export const usePlayerStore = create<PlayerStore>((set) => ({
     set((state) => ({
       offset: typeof offset === "function" ? offset(state.offset) : offset,
     })),
+  rotation: 0,
+  setRotation: (rotation) =>
+    set((state) => ({
+      rotation:
+        typeof rotation === "function" ? rotation(state.rotation) : rotation,
+    })),
   reset: () => set({ zoom: 1, offset: { x: 0, y: 0 } }),
   isDragging: false,
   setIsDragging: (isDragging) => set({ isDragging }),

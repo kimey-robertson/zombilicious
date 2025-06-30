@@ -1,6 +1,7 @@
 import { usePlayerStore } from "../../store/usePlayerStore";
 import ResetBoard from "./ResetBoard";
 import "./Header.css";
+import RotateBoard from "./RotateBoard";
 
 const Header = () => {
   const panMode = usePlayerStore((state) => state.panMode);
@@ -8,6 +9,7 @@ const Header = () => {
   return (
     <div className="header-wrapper overlay-item">
       <ResetBoard />
+      <RotateBoard />
       {panMode ? <div className="header-pan-mode">Pan Mode</div> : null}
       <div className="header-title">Zombilicious</div>
     </div>

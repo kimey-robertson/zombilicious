@@ -4,14 +4,14 @@ import { useEffect, useState } from "react";
 import { IoSkullOutline } from "react-icons/io5";
 
 const XPTracker = () => {
-  const xp = 10;
+  const xp = 14;
   const segments = Array.from({ length: 44 }, (_, i) => i);
   const getXPSegmentColor = (index: number) => {
     const total = 43;
     const percentage = (index / total) * 100;
     if (percentage <= 20) return "bg-blue-900";
     if (percentage <= 60) return "bg-yellow-900";
-    if (percentage <= 80) return "bg-orange-900";
+    if (percentage <= 99) return "bg-orange-900";
     return "bg-red-900";
   };
 

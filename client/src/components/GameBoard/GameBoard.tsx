@@ -10,6 +10,7 @@ const GameBoard = () => {
   const setZoom = usePlayerStore((state) => state.setZoom);
   const offset = usePlayerStore((state) => state.offset);
   const setOffset = usePlayerStore((state) => state.setOffset);
+  const rotation = usePlayerStore((state) => state.rotation);
   const isDragging = usePlayerStore((state) => state.isDragging);
   const setIsDragging = usePlayerStore((state) => state.setIsDragging);
   const panMode = usePlayerStore((state) => state.panMode);
@@ -59,7 +60,7 @@ const GameBoard = () => {
         onMouseLeave={handleMouseUp}
         className="game-board-grid"
         style={{
-          transform: `translate(${offset.x}px, ${offset.y}px) scale(${zoom})`,
+          transform: `translate(${offset.x}px, ${offset.y}px) scale(${zoom}) rotate(${rotation}deg)`,
         }}
       >
         <Tiles />

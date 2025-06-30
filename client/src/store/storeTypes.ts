@@ -7,6 +7,8 @@ export type PlayerStore = {
   setZoom: (zoom: number | ((prev: number) => number)) => void;
   offset: Offset;
   setOffset: (offset: Offset | ((prev: Offset) => Offset)) => void;
+  rotation: number;
+  setRotation: (rotation: number | ((prev: number) => number)) => void;
   reset: () => void;
   isDragging: boolean;
   setIsDragging: (isDragging: boolean) => void;
