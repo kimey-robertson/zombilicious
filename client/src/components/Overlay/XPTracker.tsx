@@ -39,7 +39,7 @@ const XPTracker = () => {
   }, []);
 
   return (
-    <div className="relative mb-6">
+    <div className="relative">
       {/* Blood splatter decoration */}
       <div className="absolute -top-2 left-6 w-3 h-3 bg-red-900/60 rounded-full blur-sm" />
       <div className="absolute -top-1 right-12 w-2 h-2 bg-red-800/40 rounded-full blur-sm" />
@@ -130,11 +130,11 @@ const XPTracker = () => {
         </div>
       </div>
 
-      <div className="text-center mt-3">
+      {/* <div className="text-center mt-3">
         <span className="text-red-400 font-bold tracking-widest font-mono">
           SURVIVAL XP: {xp}/43
         </span>
-      </div>
+      </div> */}
     </div>
   );
 };
