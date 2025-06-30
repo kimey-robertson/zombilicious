@@ -16,7 +16,7 @@ const ActionsRemaining = () => {
           {[1, 2, 3, 4].map((actionNum) => (
             <div
               key={actionNum}
-              className={`p-3 text-center font-bold transition-all duration-300 font-mono ${
+              className={`p-3 text-left font-bold transition-all duration-300 font-mono rounded-[50px] ${
                 actionNum <= actionsRemaining
                   ? "bg-gradient-to-b from-red-800/80 to-red-900/90 text-red-100 border-2 border-red-600/60 shadow-lg"
                   : "bg-gradient-to-b from-stone-800/80 to-stone-900/90 text-stone-500 border-2 border-stone-700/40"
