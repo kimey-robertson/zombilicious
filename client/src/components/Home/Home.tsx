@@ -16,7 +16,9 @@ const Home = () => {
           setJoinGameScreen={setJoinGameScreen}
         />
       ) : null}
-      {createGameScreen ? <CreateGameScreen /> : null}
+      {createGameScreen ? (
+        <CreateGameScreen setCreateGameScreen={setCreateGameScreen} />
+      ) : null}
       {joinGameScreen ? <JoinGameScreen /> : null}
     </div>
   );
