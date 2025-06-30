@@ -23,7 +23,7 @@ const Footer = () => {
       <div className="footer-toggle">
         <Button
           onClick={() => setIsOpen(!isOpen)}
-          className="bg-gradient-to-b from-red-900/90 to-black/95 border-2 border-red-700/60 text-red-200 hover:from-red-800/90 hover:to-red-950/95 hover:border-red-600/80 shadow-xl font-mono"
+          className="overlay-item bg-gradient-to-b from-red-900/90 to-black/95 border-2 border-red-700/60 text-red-200 hover:from-red-800/90 hover:to-red-950/95 hover:border-red-600/80 shadow-xl font-mono"
         >
           {isOpen ? "Hide Action Panel" : "Show Action Panel"}
         </Button>

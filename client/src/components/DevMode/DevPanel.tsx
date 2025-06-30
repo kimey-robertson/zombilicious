@@ -5,7 +5,7 @@ const DevPanel = () => {
   const hideOverlay = usePlayerStore((state) => state.hideOverlay);
   const setHideOverlay = usePlayerStore((state) => state.setHideOverlay);
   return (
-    <div className="side-panel">
+    <div className="side-panel overlay-item">
       <h3>Dev mode panel</h3>
       <div className="side-panel-detail">
         Hide overlay: <Switch onChange={() => setHideOverlay(!hideOverlay)} />
