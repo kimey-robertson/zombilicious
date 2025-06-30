@@ -1,4 +1,4 @@
-import { Zone } from "../../../shared/types";
+import { Player, Zone } from "../../../shared/types";
 
 export type Offset = { x: number; y: number };
 
@@ -20,4 +20,11 @@ export type PlayerStore = {
   setDevMode: (devMode: boolean) => void;
   hideOverlay: boolean;
   setHideOverlay: (hideOverlay: boolean) => void;
+};
+
+export type GameCreationStore = {
+  gameName: string;
+  setGameName: (gameName: string) => void;
+  players: Player[];
+  setPlayers: (players: Player[]) => void;
 };

@@ -27,3 +27,8 @@ export type Map = {
   tiles: Tile[];
   zones: Zone[];
 };
+
+export type Player = {
+  id: string;
+  name: string;
+};

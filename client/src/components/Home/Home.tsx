@@ -7,6 +7,8 @@ import "./Home.css";
 const Home = () => {
   const [createGameScreen, setCreateGameScreen] = useState(false);
   const [joinGameScreen, setJoinGameScreen] = useState(false);
+  const [playerName, setPlayerName] = useState("");
+
   return (
     <div className="flex flex-col items-center h-screen p-3 gap-4">
       <h3 className="text-4xl font-bold home-title">Zombilicious</h3>
@@ -14,10 +16,15 @@ const Home = () => {
         <HomeButtons
           setCreateGameScreen={setCreateGameScreen}
           setJoinGameScreen={setJoinGameScreen}
+          playerName={playerName}
+          setPlayerName={setPlayerName}
         />
       ) : null}
       {createGameScreen ? (
-        <CreateGameScreen setCreateGameScreen={setCreateGameScreen} />
+        <CreateGameScreen
+          setCreateGameScreen={setCreateGameScreen}
+          playerName={playerName}
+        />
       ) : null}
       {joinGameScreen ? <JoinGameScreen /> : null}
     </div>

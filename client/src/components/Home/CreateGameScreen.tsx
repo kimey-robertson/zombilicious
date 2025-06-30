@@ -11,28 +11,22 @@ interface Player {
 interface GameSettings {
   gameName: string;
   maxPlayers: number;
-  difficulty: "Easy" | "Medium" | "Hard";
-  enablePvP: boolean;
-  timeLimit: number;
-  mapSize: "Small" | "Medium" | "Large";
 }
 
 const CreateGameScreen = ({
   setCreateGameScreen,
+  playerName,
 }: {
   setCreateGameScreen: (value: boolean) => void;
+  playerName: string;
 }) => {
   const [players, setPlayers] = useState<Player[]>([
-    { id: "1", name: "You", isReady: true, isHost: true },
+        { id: "1", name: playerName, isReady: true, isHost: true },
   ]);
 
   const [settings, setSettings] = useState<GameSettings>({
     gameName: "Zombilicious Game",
     maxPlayers: 6,
-    difficulty: "Medium",
-    enablePvP: false,
-    timeLimit: 60,
-    mapSize: "Medium",
   });
 
   const removePlayer = (playerId: string) => {
