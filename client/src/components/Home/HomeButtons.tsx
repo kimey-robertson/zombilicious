@@ -25,11 +25,11 @@ const HomeButtons = ({
         if (!response.success) {
           toast.error(response.errorMessage || "Failed to create lobby");
           return;
+        } else {
+          setCreateGameScreen(true);
         }
       }
     );
-
-    setCreateGameScreen(true);
   };
 
   return (
