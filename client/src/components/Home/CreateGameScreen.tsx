@@ -1,5 +1,7 @@
 import { Button } from "../UI/Button";
 import { useLobbyStore } from "../../store/useLobbyStore";
+import { socket } from "../../socket";
+import { toast } from "react-hot-toast";
 
 // interface Player {
 //   id: string;
@@ -32,6 +34,21 @@ const CreateGameScreen = ({
   // const removePlayer = (playerId: string) => {
   //   setPlayers(players.filter((p) => p.id !== playerId));
   // };
+
+  const handleReturnToHome = () => {
+    socket.emit(
+      "delete-game-lobby",
+      lobbyId,
+      (data: { success: boolean; errorMessage?: string }) => {
+        if (data.success) {
+          setCreateGameScreen(false);
+          toast.success("Lobby deleted");
+        } else {
+          toast.error(data.errorMessage || "Failed to delete lobby");
+        }
+      }
+    );
+  };
 
   return (
     <div className="h-[80vh] w-[70vw] m-auto bg-gradient-to-br from-gray-900 to-gray-800 text-white overflow-hidden rounded-[30px]">
@@ -159,7 +176,7 @@ const CreateGameScreen = ({
             variant="outline"
             size="lg"
             className="bg-gray-700 bg-opacity-60 border-gray-600 text-gray-300 hover:bg-gray-600"
-            onClick={() => setCreateGameScreen(false)}
+            onClick={handleReturnToHome}
           >
             Cancel
           </Button>

@@ -1,5 +1,5 @@
 import { Server, Socket } from "socket.io";
-import { createLobby } from "./lobbyLogic";
+import { createLobby, deleteLobby } from "./lobbyLogic";
 
 export const handleGameEvents = (io: Server, socket: Socket) => {
   console.log("a user connected", socket.id);
@@ -23,6 +23,21 @@ export const handleGameEvents = (io: Server, socket: Socket) => {
       callback({ success: true });
 
       socket.emit("lobby-created", lobby);
+    }
+  );
+
+  socket.on(
+    "delete-game-lobby",
+    (
+      lobbyId: string,
+      callback: (data: { success: boolean; errorMessage?: string }) => void
+    ) => {
+      const success = deleteLobby(lobbyId);
+      if (success) {
+        callback({ success });
+      } else {
+        callback({ success: false, errorMessage: "Lobby not found" });
+      }
     }
   );
 };
