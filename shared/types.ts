@@ -33,8 +33,12 @@ export type Player = {
   name: string;
 };
 
+export type LobbyPlayer = Player & {
+  isHost: boolean;
+};
+
 export type Lobby = {
   id: string;
   name: string;
-  players: Player[];
-};  
+  players: LobbyPlayer[];
+};

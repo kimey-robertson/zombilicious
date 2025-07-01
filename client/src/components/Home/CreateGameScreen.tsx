@@ -1,37 +1,37 @@
-import { useState } from "react";
 import { Button } from "../UI/Button";
+import { useLobbyStore } from "../../store/useLobbyStore";
 
-interface Player {
-  id: string;
-  name: string;
-  isReady: boolean;
-  isHost: boolean;
-}
+// interface Player {
+//   id: string;
+//   name: string;
+//   isReady: boolean;
+//   isHost: boolean;
+// }
 
-interface GameSettings {
-  gameName: string;
-  maxPlayers: number;
-}
+// interface GameSettings {
+//   gameName: string;
+//   maxPlayers: number;
+// }
 
 const CreateGameScreen = ({
   setCreateGameScreen,
-  playerName,
 }: {
   setCreateGameScreen: (value: boolean) => void;
-  playerName: string;
 }) => {
-  const [players, setPlayers] = useState<Player[]>([
-        { id: "1", name: playerName, isReady: true, isHost: true },
-  ]);
+  const { lobbyPlayers, lobbyName, lobbyId } = useLobbyStore();
 
-  const [settings, setSettings] = useState<GameSettings>({
-    gameName: "Zombilicious Game",
-    maxPlayers: 6,
-  });
+  // const [players, setPlayers] = useState<Player[]>([
+  //       { id: "1", name: playerName, isReady: true, isHost: true },
+  // ]);
 
-  const removePlayer = (playerId: string) => {
-    setPlayers(players.filter((p) => p.id !== playerId));
-  };
+  // const [settings, setSettings] = useState<GameSettings>({
+  //   gameName: "Zombilicious Game",
+  //   maxPlayers: 6,
+  // });
+
+  // const removePlayer = (playerId: string) => {
+  //   setPlayers(players.filter((p) => p.id !== playerId));
+  // };
 
   return (
     <div className="h-[80vh] w-[70vw] m-auto bg-gradient-to-br from-gray-900 to-gray-800 text-white overflow-hidden rounded-[30px]">
@@ -51,21 +51,21 @@ const CreateGameScreen = ({
           <div className="bg-black bg-opacity-40 backdrop-blur-sm rounded-lg p-4 border border-gray-700 border-opacity-50 flex flex-col min-h-0">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-semibold text-yellow-400">
-                Players ({players.length}/{settings.maxPlayers})
+                Players ({lobbyPlayers.length}/{6})
               </h2>
             </div>
 
             {/* Player List */}
             <div className="space-y-2 mb-4 flex-1 overflow-y-auto">
-              {players.map((player) => (
+              {lobbyPlayers.map((player) => (
                 <div
                   key={player.id}
                   className="flex items-center justify-between bg-gray-800 bg-opacity-60 rounded-lg p-3 border border-gray-600 border-opacity-40"
                 >
                   <div className="flex items-center space-x-3">
                     <div
-                      className={`w-3 h-3 rounded-full 
-                        ${player.isReady ? "bg-green-500" : "bg-red-500"}`}
+                      className={`w-3 h-3 rounded-full `}
+                      // ${player.isReady ? "bg-green-500" : "bg-red-500"}
                     />
                     <span className="font-medium">{player.name}</span>
                     {player.isHost && (
@@ -79,19 +79,19 @@ const CreateGameScreen = ({
                       <>
                         <Button
                           size="sm"
-                          variant={player.isReady ? "destructive" : "default"}
+                          // variant={player.isReady ? "destructive" : "default"}
                           className="text-xs"
                         >
-                          {player.isReady ? "Unready" : "Ready"}
+                          {/* {player.isReady ? "Unready" : "Ready"} */}
                         </Button>
-                        <Button
+                        {/* <Button
                           size="sm"
                           variant="destructive"
                           onClick={() => removePlayer(player.id)}
                           className="text-xs bg-red-700 hover:bg-red-600"
                         >
                           ✕
-                        </Button>
+                        </Button> */}
                       </>
                     )}
                   </div>
@@ -102,9 +102,14 @@ const CreateGameScreen = ({
 
           {/* Game Settings - Right Side */}
           <div className="bg-black bg-opacity-40 backdrop-blur-sm rounded-lg p-4 border border-gray-700 border-opacity-50 flex flex-col min-h-0">
-            <h2 className="text-xl font-semibold text-yellow-400 mb-4">
-              Game Settings
-            </h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold text-yellow-400">
+                Game Settings
+              </h2>
+              <div>
+                <h4 className="text-sm text-gray-300">Lobby ID: {lobbyId}</h4>
+              </div>
+            </div>
 
             <div className="space-y-4 flex-1 overflow-y-auto">
               {/* Game Name */}
@@ -114,10 +119,10 @@ const CreateGameScreen = ({
                 </label>
                 <input
                   type="text"
-                  value={settings.gameName}
-                  onChange={(e) =>
-                    setSettings({ ...settings, gameName: e.target.value })
-                  }
+                  value={lobbyName}
+                  // onChange={(e) =>
+                  //   setSettings({ ...settings, gameName: e.target.value })
+                  // }
                   className="w-full bg-gray-700 bg-opacity-60 border border-gray-600 rounded-md px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
                 />
               </div>
@@ -128,13 +133,13 @@ const CreateGameScreen = ({
                   Max Players
                 </label>
                 <select
-                  value={settings.maxPlayers}
-                  onChange={(e) =>
-                    setSettings({
-                      ...settings,
-                      maxPlayers: parseInt(e.target.value),
-                    })
-                  }
+                  value={6}
+                  // onChange={(e) =>
+                  //   setSettings({
+                  //     ...settings,
+                  //     maxPlayers: parseInt(e.target.value),
+                  //   })
+                  // }
                   className="w-full bg-gray-700 bg-opacity-60 border border-gray-600 rounded-md px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-red-500"
                 >
                   {[2, 3, 4, 5, 6, 8].map((num) => (

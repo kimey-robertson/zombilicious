@@ -21,6 +21,8 @@ export const handleGameEvents = (io: Server, socket: Socket) => {
       }
 
       callback({ success: true });
+
+      socket.emit("lobby-created", lobby);
     }
   );
 };

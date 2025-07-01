@@ -1,4 +1,4 @@
-import { Player, Zone } from "../../../shared/types";
+import { LobbyPlayer, Zone } from "../../../shared/types";
 
 export type Offset = { x: number; y: number };
 
@@ -23,10 +23,10 @@ export type PlayerStore = {
 };
 
 export type LobbyStore = {
-  gameName: string;
-  setGameName: (gameName: string) => void;
-  gameId: string;
-  setGameId: (gameId: string) => void;
-  players: Player[];
-  setPlayers: (players: Player[]) => void;
+  lobbyId: string;
+  setLobbyId: (lobbyId: string) => void;
+  lobbyName: string;
+  setLobbyName: (lobbyName: string) => void;
+  lobbyPlayers: LobbyPlayer[];
+  setLobbyPlayers: (lobbyPlayers: LobbyPlayer[]) => void;
 };

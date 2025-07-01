@@ -23,10 +23,7 @@ const Home = () => {
           setPlayerName={setPlayerName}
         />
       ) : createGameScreen ? (
-        <CreateGameScreen
-          setCreateGameScreen={setCreateGameScreen}
-          playerName={playerName}
-        />
+        <CreateGameScreen setCreateGameScreen={setCreateGameScreen} />
       ) : joinGameScreen ? (
         <JoinGameScreen />
       ) : null}
