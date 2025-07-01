@@ -22,9 +22,11 @@ export type PlayerStore = {
   setHideOverlay: (hideOverlay: boolean) => void;
 };
 
-export type GameCreationStore = {
+export type LobbyStore = {
   gameName: string;
   setGameName: (gameName: string) => void;
+  gameId: string;
+  setGameId: (gameId: string) => void;
   players: Player[];
   setPlayers: (players: Player[]) => void;
 };

@@ -3,11 +3,14 @@ import HomeButtons from "./HomeButtons";
 import CreateGameScreen from "./CreateGameScreen";
 import JoinGameScreen from "./JoinGameScreen";
 import "./Home.css";
+import { useLobbySockets } from "../../hooks/useLobbySockets";
 
 const Home = () => {
   const [createGameScreen, setCreateGameScreen] = useState(false);
   const [joinGameScreen, setJoinGameScreen] = useState(false);
   const [playerName, setPlayerName] = useState("");
+
+  useLobbySockets();
 
   return (
     <div className="flex flex-col items-center h-screen p-3 gap-4">
