@@ -46,9 +46,9 @@ const JoinLobbiesScreen = () => {
       </div>
 
       {mockLobbies.length === 0 ? (
-        <Card className="text-center py-12 ">
+        <Card className="text-center py-12 bg-[#c7c7c7cc] ">
           <CardContent>
-            <div className="text-gray-500">
+            <div className="text-black font-bold">
               <h3 className="text-lg font-medium mb-2">No lobbies available</h3>
               <p>
                 There are no active lobbies at the moment. Create a new game to
