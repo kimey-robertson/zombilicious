@@ -2,7 +2,6 @@ import { useState } from "react";
 import HomeButtons from "./HomeButtons";
 import CreateGameScreen from "./CreateGameScreen";
 import JoinGameScreen from "./JoinGameScreen";
-import "./Home.css";
 import { useLobbySockets } from "../../hooks/useLobbySockets";
 
 const Home = () => {
@@ -14,7 +13,7 @@ const Home = () => {
 
   return (
     <div className="flex flex-col items-center h-screen p-3 gap-4">
-      <h3 className="text-4xl font-bold home-title">Zombilicious</h3>
+      <h3 className="text-4xl font-bold zombilicious">Zombilicious</h3>
       {!createGameScreen && !joinGameScreen ? (
         <HomeButtons
           setCreateGameScreen={setCreateGameScreen}

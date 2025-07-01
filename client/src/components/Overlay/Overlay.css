@@ -47,7 +47,7 @@
 .side-panel h3 {
   margin: 0 0 1rem;
   font-size: 1.2rem;
-  color: #ffcc00;
+  color: var(--secondary-color);
 }
 
 .side-panel-detail {

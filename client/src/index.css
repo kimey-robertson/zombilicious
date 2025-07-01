@@ -16,6 +16,8 @@
 
   /* CSS Variables */
   --game-board-size: 400px;
+  --primary-color: #8b0000;
+  --secondary-color: #ffcc00;
 }
 
 body {
@@ -49,4 +51,24 @@ button:hover {
 
 .cursor-pointer {
   cursor: pointer;
+}
+
+.zombilicious {
+  font-size: 3rem;
+  margin: auto;
+  font-weight: 600;
+  color: #8b0000;
+  filter: drop-shadow(0 8px 4px rgba(0, 0, 0, 0.3))
+    drop-shadow(0 0 10px rgba(139, 0, 0, 0.7));
+  position: absolute;
+  text-align: center;
+  width: 100%;
+}
+
+.user-select-none {
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
 }

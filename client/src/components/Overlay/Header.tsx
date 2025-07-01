@@ -1,6 +1,5 @@
 import { usePlayerStore } from "../../store/usePlayerStore";
 import ResetBoard from "./ResetBoard";
-import "./Header.css";
 import RotateBoard from "./RotateBoard";
 
 const Header = () => {
@@ -11,7 +10,7 @@ const Header = () => {
       <ResetBoard />
       <RotateBoard />
       {panMode ? <div className="header-pan-mode">Pan Mode</div> : null}
-      <div className="header-title">Zombilicious</div>
+      <div className="zombilicious user-select-none">Zombilicious</div>
     </div>
   );
 };
