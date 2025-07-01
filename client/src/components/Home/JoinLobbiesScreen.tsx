@@ -8,6 +8,8 @@ import {
 } from "../UI/Card";
 import { Button } from "../UI/Button";
 import { useLobbyStore } from "../../store/useLobbyStore";
+import { socket } from "../../socket";
+import { Lobby } from "../../../../shared/types";
 
 // Mock data for demonstration - replace with actual lobby data later
 // const mockLobbies = [
@@ -33,7 +35,12 @@ import { useLobbyStore } from "../../store/useLobbyStore";
 // ];
 
 const JoinLobbiesScreen = () => {
+  const setLobbies = useLobbyStore((state) => state.setLobbies);
   const lobbies = useLobbyStore((state) => state.lobbies);
+
+  socket.emit("fetch-lobbies", (data: { lobbies: Lobby[] }) => {
+    setLobbies(data.lobbies);
+  });
 
   const handleJoinLobby = (lobbyId: string) => {
     // TODO: Implement join lobby logic

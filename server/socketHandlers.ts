@@ -39,4 +39,8 @@ export const handleGameEvents = (io: Server, socket: Socket) => {
       }
     }
   );
+
+  socket.on("fetch-lobbies", (callback: (data: { lobbies: Lobby[] }) => void) => {
+    callback({ lobbies: getAllLobbies() });
+  });
 };
