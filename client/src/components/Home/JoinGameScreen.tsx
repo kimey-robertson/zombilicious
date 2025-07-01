@@ -1,9 +1,7 @@
-import React from 'react'
+import React from "react";
 
 const JoinGameScreen = () => {
-  return (
-    <div>JoinGameScreen</div>
-  )
-}
+  return <div>JoinGameScreen</div>;
+};
 
-export default JoinGameScreen
+export default JoinGameScreen;

@@ -19,14 +19,14 @@ const Home = () => {
           playerName={playerName}
           setPlayerName={setPlayerName}
         />
-      ) : null}
-      {createGameScreen ? (
+      ) : createGameScreen ? (
         <CreateGameScreen
           setCreateGameScreen={setCreateGameScreen}
           playerName={playerName}
         />
+      ) : joinGameScreen ? (
+        <JoinGameScreen />
       ) : null}
-      {joinGameScreen ? <JoinGameScreen /> : null}
     </div>
   );
 };
