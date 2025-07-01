@@ -1,3 +1,4 @@
+import { socket } from "../../socket";
 import { Button } from "../UI/Button";
 
 const HomeButtons = ({
@@ -11,6 +12,18 @@ const HomeButtons = ({
   playerName: string;
   setPlayerName: (value: string) => void;
 }) => {
+  const handleCreateLobby = () => {
+    if (!playerName) {
+      return;
+    }
+
+    setCreateGameScreen(true);
+
+    socket.emit("create-game-lobby", {
+      playerName: playerName,
+    });
+  };
+
   return (
     <div className="flex items-center justify-center gap-2 w-full h-full">
       <div className="flex flex-col gap-2 justify-center items-center w-[40vw]">
@@ -22,10 +35,7 @@ const HomeButtons = ({
           onChange={(e) => setPlayerName(e.target.value)}
         />
         <div className="flex gap-2 justify-center items-center w-full">
-          <Button
-            className="p-10 w-full"
-            onClick={() => setCreateGameScreen(true)}
-          >
+          <Button className="p-10 w-full" onClick={handleCreateLobby}>
             Create Game
           </Button>
           <Button
