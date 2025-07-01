@@ -1,6 +1,7 @@
 import toast from "react-hot-toast";
 import { socket } from "../../socket";
 import { Button } from "../UI/Button";
+import { useRef } from "react";
 
 const HomeButtons = ({
   setLobbyScreen,
@@ -13,8 +14,11 @@ const HomeButtons = ({
   playerName: string;
   setPlayerName: (value: string) => void;
 }) => {
+  const inputRef = useRef<HTMLInputElement | null>(null);
+
   const handleCreateLobby = () => {
     if (!playerName) {
+      inputRef.current?.focus();
       return;
     }
 
@@ -32,6 +36,15 @@ const HomeButtons = ({
     );
   };
 
+  const handleJoinLobbies = () => {
+    if (!playerName) {
+      inputRef.current?.focus();
+      return;
+    }
+
+    setJoinLobbiesScreen(true);
+  };
+
   return (
     <div className="flex items-center justify-center gap-2 w-full h-full">
       <div className="flex flex-col gap-2 justify-center items-center w-[40vw]">
@@ -41,15 +54,13 @@ const HomeButtons = ({
           className="w-full p-2 rounded-md text-black bg-[#8b8b8b96] font-extrabold text-center focus:outline-none focus:ring-2 focus:ring-red-500"
           value={playerName}
           onChange={(e) => setPlayerName(e.target.value)}
+          ref={inputRef}
         />
         <div className="flex gap-2 justify-center items-center w-full">
           <Button className="p-10 w-full" onClick={handleCreateLobby}>
             Create Game
           </Button>
-          <Button
-            className="text-4xl w-full"
-            onClick={() => setJoinLobbiesScreen(true)}
-          >
+          <Button className="text-4xl w-full" onClick={handleJoinLobbies}>
             Join Game
           </Button>
         </div>
