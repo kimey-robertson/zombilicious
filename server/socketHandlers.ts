@@ -1,5 +1,10 @@
 import { Server, Socket } from "socket.io";
-import { createLobby, deleteLobby, getAllLobbies } from "./lobbyLogic";
+import {
+  createLobby,
+  deleteLobby,
+  getAllLobbies,
+  joinLobby,
+} from "./lobbyLogic";
 import { Lobby } from "../shared/types";
 
 export const handleGameEvents = (io: Server, socket: Socket) => {
@@ -9,7 +14,11 @@ export const handleGameEvents = (io: Server, socket: Socket) => {
     "create-game-lobby",
     (
       { playerName }: { playerName: string },
-      callback: (data: { success: boolean; errorMessage?: string; lobby?: Lobby }) => void
+      callback: (data: {
+        success: boolean;
+        errorMessage?: string;
+        lobby?: Lobby;
+      }) => void
     ) => {
       const lobby = createLobby(socket.id, playerName);
       console.log("Lobby created with id:", lobby.id, "by", playerName);
@@ -40,7 +49,25 @@ export const handleGameEvents = (io: Server, socket: Socket) => {
     }
   );
 
-  socket.on("fetch-lobbies", (callback: (data: { lobbies: Lobby[] }) => void) => {
-    callback({ lobbies: getAllLobbies() });
-  });
+  socket.on(
+    "fetch-lobbies",
+    (callback: (data: { lobbies: Lobby[] }) => void) => {
+      callback({ lobbies: getAllLobbies() });
+    }
+  );
+
+  socket.on(
+    "join-lobby",
+    (
+      { lobbyId, playerName }: { lobbyId: string; playerName: string },
+      callback: (data: { success: boolean; errorMessage?: string }) => void
+    ) => {
+      const lobby = joinLobby(lobbyId, socket.id, playerName);
+      if (lobby) {
+        callback({ success: true });
+      } else {
+        callback({ success: false, errorMessage: "Lobby not found" });
+      }
+    }
+  );
 };

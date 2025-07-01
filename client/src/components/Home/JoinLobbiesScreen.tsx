@@ -10,6 +10,9 @@ import { Button } from "../UI/Button";
 import { useLobbyStore } from "../../store/useLobbyStore";
 import { socket } from "../../socket";
 import { Lobby } from "../../../../shared/types";
+import { toast } from "react-hot-toast";
+import { useState } from "react";
+import LobbyScreen from "./LobbyScreen";
 
 // Mock data for demonstration - replace with actual lobby data later
 // const mockLobbies = [
@@ -34,9 +37,14 @@ import { Lobby } from "../../../../shared/types";
 //   },
 // ];
 
-const JoinLobbiesScreen = () => {
+const JoinLobbiesScreen = ({ playerName }: { playerName: string }) => {
   const setLobbies = useLobbyStore((state) => state.setLobbies);
   const lobbies = useLobbyStore((state) => state.lobbies);
+  const myLobbyId = useLobbyStore((state) => state.myLobbyId);
+  const setMyLobbyId = useLobbyStore((state) => state.setMyLobbyId);
+  const [joinLobbyLoading, setJoinLobbyLoading] = useState(false);
+
+  // const [joinedLobby, setJoinedLobby] = useState<Lobby | null>(null);
 
   socket.emit("fetch-lobbies", (data: { lobbies: Lobby[] }) => {
     setLobbies(data.lobbies);
@@ -45,7 +53,35 @@ const JoinLobbiesScreen = () => {
   const handleJoinLobby = (lobbyId: string) => {
     // TODO: Implement join lobby logic
     console.log(`Joining lobby: ${lobbyId}`);
+    setJoinLobbyLoading(true);
+    socket.emit(
+      "join-lobby",
+      { lobbyId, playerName },
+      (response: { success: boolean; errorMessage?: string }) => {
+        console.log("response", response);
+        if (response.success) {
+          console.log("Joined lobby successfully");
+          setMyLobbyId(lobbyId);
+        } else {
+          console.log("Failed to join lobby:", response.errorMessage);
+          toast.error(response.errorMessage || "Failed to join lobby");
+        }
+        setJoinLobbyLoading(false);
+      }
+    );
   };
+
+  if (joinLobbyLoading) {
+    return (
+      <div className="flex justify-center items-center h-full">
+        Joining lobby...
+      </div>
+    );
+  }
+
+  if (myLobbyId) {
+    return <LobbyScreen />;
+  }
 
   return (
     <div className="m-auto p-6 flex flex-col items-center h-[80vh]">

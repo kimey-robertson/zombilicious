@@ -18,7 +18,7 @@ import { toast } from "react-hot-toast";
 const LobbyScreen = ({
   setLobbyScreen,
 }: {
-  setLobbyScreen: (value: boolean) => void;
+  setLobbyScreen?: (value: boolean) => void;
 }) => {
   const myLobbyId = useLobbyStore((state) => state.myLobbyId);
   const lobbies = useLobbyStore((state) => state.lobbies);
@@ -43,7 +43,7 @@ const LobbyScreen = ({
       myLobbyId,
       (data: { success: boolean; errorMessage?: string }) => {
         if (data.success) {
-          setLobbyScreen(false);
+          setLobbyScreen?.(false);
           toast.success("Lobby deleted");
         } else {
           toast.error(data.errorMessage || "Failed to delete lobby");

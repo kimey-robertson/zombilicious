@@ -6,7 +6,7 @@ function createLobby(playerSocketId: string, playerName: string) {
   const lobbyId = Math.random().toString(36).substring(2, 6);
   const lobby: Lobby = {
     id: lobbyId,
-    name: 'Zombilicious Game',
+    name: "Zombilicious Game",
     players: [
       {
         id: playerSocketId,
@@ -36,4 +36,25 @@ function getAllLobbies() {
   return lobbies;
 }
 
-export { createLobby, deleteLobby, getAllLobbies };
+function joinLobby(
+  lobbyId: string,
+  playerSocketId: string,
+  playerName: string
+) {
+  const lobby = lobbies.find((lobby) => lobby.id === lobbyId);
+  if (lobby) {
+    if (lobby.players.find((player) => player.id === playerSocketId)) {
+      return false;
+    } else {
+      lobby.players.push({
+        id: playerSocketId,
+        name: playerName,
+        isHost: false,
+      });
+    }
+  }
+
+  return lobby;
+}
+
+export { createLobby, deleteLobby, getAllLobbies, joinLobby };
