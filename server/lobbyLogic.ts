@@ -4,7 +4,7 @@ const lobbies = [];
 
 function createLobby(playerSocketId: string, playerName: string) {
   const lobby: Lobby = {
-    id: Math.random().toString(36).substring(2, 6), // short ID ,
+    id: Math.random().toString(36).substring(2, 6), // short ID
     name: "Zombilicious Game",
     players: [
       {

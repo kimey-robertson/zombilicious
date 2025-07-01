@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 import { socket } from "../../socket";
 import { Button } from "../UI/Button";
 
@@ -17,11 +18,18 @@ const HomeButtons = ({
       return;
     }
 
-    setCreateGameScreen(true);
+    socket.emit(
+      "create-game-lobby",
+      { playerName },
+      (response: { success: boolean; errorMessage?: string }) => {
+        if (!response.success) {
+          toast.error(response.errorMessage || "Failed to create lobby");
+          return;
+        }
+      }
+    );
 
-    socket.emit("create-game-lobby", {
-      playerName: playerName,
-    });
+    setCreateGameScreen(true);
   };
 
   return (
