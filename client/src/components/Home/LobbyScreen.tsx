@@ -15,10 +15,10 @@ import { toast } from "react-hot-toast";
 //   maxPlayers: number;
 // }
 
-const CreateGameScreen = ({
-  setCreateGameScreen,
+const LobbyScreen = ({
+  setLobbyScreen,
 }: {
-  setCreateGameScreen: (value: boolean) => void;
+  setLobbyScreen: (value: boolean) => void;
 }) => {
   const { lobbyPlayers, lobbyName, lobbyId } = useLobbyStore();
 
@@ -41,7 +41,7 @@ const CreateGameScreen = ({
       lobbyId,
       (data: { success: boolean; errorMessage?: string }) => {
         if (data.success) {
-          setCreateGameScreen(false);
+          setLobbyScreen(false);
           toast.success("Lobby deleted");
         } else {
           toast.error(data.errorMessage || "Failed to delete lobby");
@@ -189,4 +189,4 @@ const CreateGameScreen = ({
   );
 };
 
-export default CreateGameScreen;
+export default LobbyScreen;

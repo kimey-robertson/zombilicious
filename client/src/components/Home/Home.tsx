@@ -1,12 +1,12 @@
 import { useState } from "react";
 import HomeButtons from "./HomeButtons";
-import CreateGameScreen from "./CreateGameScreen";
-import JoinGameScreen from "./JoinGameScreen";
+import LobbyScreen from "./LobbyScreen";
+import JoinLobbiesScreen from "./JoinLobbiesScreen";
 import { useLobbySockets } from "../../hooks/useLobbySockets";
 
 const Home = () => {
-  const [createGameScreen, setCreateGameScreen] = useState(false);
-  const [joinGameScreen, setJoinGameScreen] = useState(false);
+  const [lobbyScreen, setLobbyScreen] = useState(false);
+  const [joinLobbiesScreen, setJoinLobbiesScreen] = useState(false);
   const [playerName, setPlayerName] = useState("");
 
   useLobbySockets();
@@ -14,17 +14,17 @@ const Home = () => {
   return (
     <div className="flex flex-col items-center h-screen p-3 gap-4">
       <h3 className="text-4xl font-bold zombilicious">Zombilicious</h3>
-      {!createGameScreen && !joinGameScreen ? (
+      {!lobbyScreen && !joinLobbiesScreen ? (
         <HomeButtons
-          setCreateGameScreen={setCreateGameScreen}
-          setJoinGameScreen={setJoinGameScreen}
+          setLobbyScreen={setLobbyScreen}
+          setJoinLobbiesScreen={setJoinLobbiesScreen}
           playerName={playerName}
           setPlayerName={setPlayerName}
         />
-      ) : createGameScreen ? (
-        <CreateGameScreen setCreateGameScreen={setCreateGameScreen} />
-      ) : joinGameScreen ? (
-        <JoinGameScreen />
+      ) : lobbyScreen ? (
+        <LobbyScreen setLobbyScreen={setLobbyScreen} />
+      ) : joinLobbiesScreen ? (
+        <JoinLobbiesScreen />
       ) : null}
     </div>
   );

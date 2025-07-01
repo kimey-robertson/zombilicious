@@ -3,13 +3,13 @@ import { socket } from "../../socket";
 import { Button } from "../UI/Button";
 
 const HomeButtons = ({
-  setCreateGameScreen,
-  setJoinGameScreen,
+  setLobbyScreen,
+  setJoinLobbiesScreen,
   playerName,
   setPlayerName,
 }: {
-  setCreateGameScreen: (value: boolean) => void;
-  setJoinGameScreen: (value: boolean) => void;
+  setLobbyScreen: (value: boolean) => void;
+  setJoinLobbiesScreen: (value: boolean) => void;
   playerName: string;
   setPlayerName: (value: string) => void;
 }) => {
@@ -26,7 +26,7 @@ const HomeButtons = ({
           toast.error(response.errorMessage || "Failed to create lobby");
           return;
         } else {
-          setCreateGameScreen(true);
+          setLobbyScreen(true);
         }
       }
     );
@@ -48,7 +48,7 @@ const HomeButtons = ({
           </Button>
           <Button
             className="text-4xl w-full"
-            onClick={() => setJoinGameScreen(true)}
+            onClick={() => setJoinLobbiesScreen(true)}
           >
             Join Game
           </Button>

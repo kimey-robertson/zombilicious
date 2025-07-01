@@ -31,7 +31,7 @@ const mockLobbies = [
   },
 ];
 
-const JoinGameScreen = () => {
+const JoinLobbiesScreen = () => {
   const handleJoinLobby = (lobbyId: string) => {
     // TODO: Implement join lobby logic
     console.log(`Joining lobby: ${lobbyId}`);
@@ -110,4 +110,4 @@ const JoinGameScreen = () => {
   );
 };
 
-export default JoinGameScreen;
+export default JoinLobbiesScreen;
