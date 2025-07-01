@@ -1,5 +1,6 @@
 import { Server, Socket } from "socket.io";
-import { createLobby, deleteLobby } from "./lobbyLogic";
+import { createLobby, deleteLobby, getAllLobbies } from "./lobbyLogic";
+import { Lobby } from "../shared/types";
 
 export const handleGameEvents = (io: Server, socket: Socket) => {
   console.log("a user connected", socket.id);
@@ -8,7 +9,7 @@ export const handleGameEvents = (io: Server, socket: Socket) => {
     "create-game-lobby",
     (
       { playerName }: { playerName: string },
-      callback: (data: { success: boolean; errorMessage?: string }) => void
+      callback: (data: { success: boolean; errorMessage?: string; lobby?: Lobby }) => void
     ) => {
       const lobby = createLobby(socket.id, playerName);
       console.log("Lobby created with id:", lobby.id, "by", playerName);
@@ -20,9 +21,7 @@ export const handleGameEvents = (io: Server, socket: Socket) => {
         });
       }
 
-      callback({ success: true });
-
-      socket.emit("lobby-created", lobby);
+      callback({ success: true, lobby });
     }
   );
 

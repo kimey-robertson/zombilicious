@@ -20,7 +20,9 @@ const LobbyScreen = ({
 }: {
   setLobbyScreen: (value: boolean) => void;
 }) => {
-  const { lobbyPlayers, lobbyName, lobbyId } = useLobbyStore();
+  const myLobbyId = useLobbyStore((state) => state.myLobbyId);
+  const lobbies = useLobbyStore((state) => state.lobbies);
+  const myLobby = lobbies.find((lobby) => lobby.id === myLobbyId);
 
   // const [players, setPlayers] = useState<Player[]>([
   //       { id: "1", name: playerName, isReady: true, isHost: true },
@@ -38,7 +40,7 @@ const LobbyScreen = ({
   const handleReturnToHome = () => {
     socket.emit(
       "delete-game-lobby",
-      lobbyId,
+      myLobbyId,
       (data: { success: boolean; errorMessage?: string }) => {
         if (data.success) {
           setLobbyScreen(false);
@@ -68,13 +70,13 @@ const LobbyScreen = ({
           <div className="bg-black bg-opacity-40 backdrop-blur-sm rounded-lg p-4 border border-gray-700 border-opacity-50 flex flex-col min-h-0">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-semibold text-yellow-400">
-                Players ({lobbyPlayers.length}/{6})
+                Players ({myLobby?.players.length}/{6})
               </h2>
             </div>
 
             {/* Player List */}
             <div className="space-y-2 mb-4 flex-1 overflow-y-auto">
-              {lobbyPlayers.map((player) => (
+              {myLobby?.players.map((player) => (
                 <div
                   key={player.id}
                   className="flex items-center justify-between bg-gray-800 bg-opacity-60 rounded-lg p-3 border border-gray-600 border-opacity-40"
@@ -124,7 +126,7 @@ const LobbyScreen = ({
                 Game Settings
               </h2>
               <div>
-                <h4 className="text-sm text-gray-300">Lobby ID: {lobbyId}</h4>
+                <h4 className="text-sm text-gray-300">Lobby ID: {myLobbyId}</h4>
               </div>
             </div>
 
@@ -136,7 +138,7 @@ const LobbyScreen = ({
                 </label>
                 <input
                   type="text"
-                  value={lobbyName}
+                  value={myLobby?.name}
                   // onChange={(e) =>
                   //   setSettings({ ...settings, gameName: e.target.value })
                   // }

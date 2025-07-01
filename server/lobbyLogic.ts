@@ -6,7 +6,7 @@ function createLobby(playerSocketId: string, playerName: string) {
   const lobbyId = Math.random().toString(36).substring(2, 6);
   const lobby: Lobby = {
     id: lobbyId,
-    name: `Zombilicious Game | ${lobbyId}`,
+    name: 'Zombilicious Game',
     players: [
       {
         id: playerSocketId,
@@ -32,4 +32,8 @@ function deleteLobby(lobbyId: string) {
   }
 }
 
-export { createLobby, deleteLobby };
+function getAllLobbies() {
+  return lobbies;
+}
+
+export { createLobby, deleteLobby, getAllLobbies };
