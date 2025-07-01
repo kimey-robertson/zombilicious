@@ -1,8 +1,11 @@
-import { useEffect } from "react";
-import { socket } from "../socket";
+import { useEffect, useRef } from "react";
+import { getSocket } from "../socket";
 
 export const useLobbySockets = () => {
+  const socketRef = useRef(getSocket());
   useEffect(() => {
+    const socket = socketRef.current;
+
     const handleConnect = () => {
       console.log("connected to server");
     };

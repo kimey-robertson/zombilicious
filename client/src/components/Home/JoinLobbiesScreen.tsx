@@ -8,7 +8,7 @@ import {
 } from "../UI/Card";
 import { Button } from "../UI/Button";
 import { useLobbyStore } from "../../store/useLobbyStore";
-import { socket } from "../../socket";
+import { getSocket } from "../../socket";
 import { Lobby } from "../../../../shared/types";
 import { toast } from "react-hot-toast";
 import { useState } from "react";
@@ -38,6 +38,7 @@ import LobbyScreen from "./LobbyScreen";
 // ];
 
 const JoinLobbiesScreen = ({ playerName }: { playerName: string }) => {
+  const socket = getSocket();
   const setLobbies = useLobbyStore((state) => state.setLobbies);
   const lobbies = useLobbyStore((state) => state.lobbies);
   const myLobbyId = useLobbyStore((state) => state.myLobbyId);

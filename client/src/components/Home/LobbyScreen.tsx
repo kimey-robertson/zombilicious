@@ -1,6 +1,6 @@
 import { Button } from "../UI/Button";
 import { useLobbyStore } from "../../store/useLobbyStore";
-import { socket } from "../../socket";
+import { getSocket } from "../../socket";
 import { toast } from "react-hot-toast";
 
 // interface Player {
@@ -20,6 +20,7 @@ const LobbyScreen = ({
 }: {
   setLobbyScreen?: (value: boolean) => void;
 }) => {
+  const socket = getSocket();
   const myLobbyId = useLobbyStore((state) => state.myLobbyId);
   const lobbies = useLobbyStore((state) => state.lobbies);
   const myLobby = lobbies.find((lobby) => lobby.id === myLobbyId);

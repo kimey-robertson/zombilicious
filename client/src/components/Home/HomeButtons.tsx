@@ -1,5 +1,5 @@
 import toast from "react-hot-toast";
-import { socket } from "../../socket";
+import { getSocket } from "../../socket";
 import { Button } from "../UI/Button";
 import { useRef } from "react";
 import { Lobby } from "../../../../shared/types";
@@ -16,6 +16,7 @@ const HomeButtons = ({
   playerName: string;
   setPlayerName: (value: string) => void;
 }) => {
+  const socket = getSocket();
   const inputRef = useRef<HTMLInputElement | null>(null);
   const setLobbies = useLobbyStore((state) => state.setLobbies);
   const lobbies = useLobbyStore((state) => state.lobbies);
