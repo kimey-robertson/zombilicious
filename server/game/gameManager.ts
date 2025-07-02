@@ -1,3 +1,4 @@
+import { Server } from "socket.io";
 import { Game, Lobby } from "../../shared/types";
 
 const games: Game[] = [];
@@ -30,4 +31,11 @@ function deleteGame(gameId: string): Game | undefined {
   return undefined;
 }
 
-export { createGame, deleteGame };
+function handleDisconnectFromGame(socketId: string, io: Server) {
+  const game = games.find((game) =>
+    game.players.some((player) => player.id === socketId)
+  );
+
+}
+
+export { createGame, deleteGame, handleDisconnectFromGame };
