@@ -1,5 +1,6 @@
 import { Server, Socket } from "socket.io";
 import {
+  changeGameNameLobby,
   createLobby,
   deleteLobby,
   getAllLobbies,
@@ -76,7 +77,8 @@ export const handleGameEvents = (io: Server, socket: Socket) => {
       if (lobby) {
         callback({ success: true });
         io.emit("lobby-updated", {
-          lobbyId,
+          lobbyId: lobby.id,
+          gameName: lobby.gameName,
           players: lobby.players,
         });
       } else {
@@ -94,7 +96,11 @@ export const handleGameEvents = (io: Server, socket: Socket) => {
       const lobby = leaveLobby(lobbyId, socket.id);
       if (lobby) {
         callback({ success: true });
-        io.emit("lobby-updated", { lobbyId, players: lobby.players });
+        io.emit("lobby-updated", {
+          lobbyId: lobby.id,
+          gameName: lobby.gameName,
+          players: lobby.players,
+        });
       } else {
         callback({ success: false, errorMessage: "Lobby not found" });
       }
@@ -112,6 +118,27 @@ export const handleGameEvents = (io: Server, socket: Socket) => {
         callback({ success: true });
         io.emit("lobby-updated", {
           lobbyId: lobby.id,
+          gameName: lobby.gameName,
+          players: lobby.players,
+        });
+      } else {
+        callback({ success: false, errorMessage: "Lobby not found" });
+      }
+    }
+  );
+
+  socket.on(
+    "change-game-name-lobby",
+    (
+      { lobbyId, gameName, playerId }: { lobbyId: string; gameName: string; playerId: string },
+      callback: (data: { success: boolean; errorMessage?: string }) => void
+    ) => {
+      const lobby = changeGameNameLobby(lobbyId, gameName, playerId);
+      if (lobby) {
+        callback({ success: true });
+        io.emit("lobby-updated", {
+          lobbyId: lobby.id,
+          gameName: lobby.gameName,
           players: lobby.players,
         });
       } else {

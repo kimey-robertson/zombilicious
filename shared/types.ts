@@ -40,6 +40,6 @@ export type LobbyPlayer = Player & {
 
 export type Lobby = {
   id: string;
-  name: string;
+  gameName: string;
   players: LobbyPlayer[];
 };

@@ -34,6 +34,10 @@ const LobbyScreen = ({
 
   const currentPlayer = myLobby?.players.find((p) => p.id === playerId);
 
+  const canStartGame =
+    currentPlayer?.isHost &&
+    myLobby?.players?.every((player) => player.isReady);
+
   // const [settings, setSettings] = useState<GameSettings>({
   //   gameName: "Zombilicious Game",
   //   maxPlayers: 6,
@@ -80,6 +84,26 @@ const LobbyScreen = ({
       (data: { success: boolean; errorMessage?: string }) => {
         if (!data.success) {
           toast.error(data.errorMessage || "Failed to ready player");
+        }
+      }
+    );
+  };
+
+  const handleChangeGameName = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!currentPlayer?.isHost) {
+      return;
+    }
+
+    socket.emit(
+      "change-game-name-lobby",
+      {
+        lobbyId: myLobbyId,
+        gameName: e.target.value,
+        playerId: currentPlayer?.id,
+      },
+      (data: { success: boolean; errorMessage?: string }) => {
+        if (!data.success) {
+          toast.error(data.errorMessage || "Failed to change game name");
         }
       }
     );
@@ -173,10 +197,9 @@ const LobbyScreen = ({
                 </label>
                 <input
                   type="text"
-                  value={myLobby?.name}
-                  // onChange={(e) =>
-                  //   setSettings({ ...settings, gameName: e.target.value })
-                  // }
+                  value={myLobby?.gameName}
+                  disabled={!currentPlayer?.isHost}
+                  onChange={handleChangeGameName}
                   className="w-full bg-gray-700 bg-opacity-60 border border-gray-600 rounded-md px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
                 />
               </div>
@@ -217,7 +240,14 @@ const LobbyScreen = ({
           >
             {currentPlayer?.isHost ? "Cancel" : "Leave Lobby"}
           </Button>
-          <button className="h-10 px-8 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-md transition-all text-base">
+          <button
+            className={`h-10 px-8 bg-gradient-to-r from-red-600 to-red-700 text-white font-semibold rounded-md transition-all text-base ${
+              canStartGame
+                ? "opacity-100 hover:from-red-500 hover:to-red-600"
+                : "opacity-50 cursor-not-allowed"
+            }`}
+            disabled={!canStartGame}
+          >
             Start Game
           </button>
         </div>
