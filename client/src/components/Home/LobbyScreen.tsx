@@ -134,7 +134,7 @@ const LobbyScreen = ({
           <div className="bg-black bg-opacity-40 backdrop-blur-sm rounded-lg p-4 border border-gray-700 border-opacity-50 flex flex-col min-h-0">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-semibold text-yellow-400">
-                Players ({myLobby?.players.length}/{6})
+                Players ({myLobby?.players.length}/{4})
               </h2>
             </div>
 
@@ -210,7 +210,7 @@ const LobbyScreen = ({
                   Max Players
                 </label>
                 <select
-                  value={6}
+                  value={4}
                   // onChange={(e) =>
                   //   setSettings({
                   //     ...settings,
@@ -219,7 +219,7 @@ const LobbyScreen = ({
                   // }
                   className="w-full bg-gray-700 bg-opacity-60 border border-gray-600 rounded-md px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-red-500"
                 >
-                  {[2, 3, 4, 5, 6, 8].map((num) => (
+                  {[4].map((num) => (
                     <option key={num} value={num}>
                       {num} Players
                     </option>

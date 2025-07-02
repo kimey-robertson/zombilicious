@@ -55,6 +55,19 @@ const JoinLobbiesScreen = ({
   const handleJoinLobby = (lobbyId: string) => {
     console.log(`Joining lobby: ${lobbyId}`);
     setJoinLobbyLoading(true);
+    const lobby = lobbies.find((lobby) => lobby.id === lobbyId);
+    if (lobby) {
+      if (lobby.players.length >= 4) {
+        toast.error("Lobby is full");
+        setJoinLobbyLoading(false);
+        return;
+      }
+    } else {
+      toast.error("Lobby not found");
+      setJoinLobbyLoading(false);
+      return;
+    }
+
     socket.emit(
       "join-lobby",
       { lobbyId, playerName },
@@ -125,7 +138,7 @@ const JoinLobbiesScreen = ({
                 <div className="flex items-start justify-between">
                   <div>
                     <CardTitle className="text-lg text-[var(--primary-color)]">
-                      {lobby.name}
+                      {lobby.gameName}
                     </CardTitle>
                     <CardDescription className="mt-1 text-white text-[var(--secondary-color)] font-bold">
                       Lobby ID:{" "}

@@ -45,6 +45,9 @@ function joinLobby(
 ) {
   const lobby = lobbies.find((lobby) => lobby.id === lobbyId);
   if (lobby) {
+    if (lobby.players.length >= 4) {
+      return false;
+    }
     if (lobby.players.find((player) => player.id === playerSocketId)) {
       return false;
     } else {
