@@ -50,6 +50,7 @@ export const handleGameEvents = (io: Server, socket: Socket) => {
       const success = deleteLobby(lobbyId);
       if (success) {
         callback({ success });
+        io.emit("lobby-deleted", { lobbyId });
       } else {
         callback({ success: false, errorMessage: "Lobby not found" });
       }

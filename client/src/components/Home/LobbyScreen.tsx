@@ -2,6 +2,7 @@ import { Button } from "../UI/Button";
 import { useLobbyStore } from "../../store/useLobbyStore";
 import { getSocket } from "../../socket";
 import { toast } from "react-hot-toast";
+import { useEffect } from "react";
 
 // interface Player {
 //   id: string;
@@ -22,6 +23,7 @@ const LobbyScreen = ({
 }) => {
   const socket = getSocket();
   const myLobbyId = useLobbyStore((state) => state.myLobbyId);
+  const setMyLobbyId = useLobbyStore((state) => state.setMyLobbyId);
   const lobbies = useLobbyStore((state) => state.lobbies);
   const myLobby = lobbies.find((lobby) => lobby.id === myLobbyId);
 
@@ -52,6 +54,14 @@ const LobbyScreen = ({
       }
     );
   };
+
+  useEffect(() => {
+    console.log("myLobby", myLobby);
+    if (!myLobby) {
+      setMyLobbyId("");
+      toast.error("Lobby not found");
+    }
+  }, [myLobby, setMyLobbyId]);
 
   return (
     <div className="h-[80vh] w-[70vw] m-auto bg-gradient-to-br from-gray-900 to-gray-800 text-white overflow-hidden rounded-[30px]">
