@@ -4,7 +4,7 @@ This is subject to change.
 
 ## 🎯 Goal
 
-Create a web-based multiplayer version of Zombicide with a tile-based draggable/pannable board, fixed UI elements and real-time turn-based gameplay.
+Create a web-based multiplayer zombie survival game with a tile-based draggable/pannable board, fixed UI elements and real-time turn-based gameplay.
 
 ---
 
@@ -41,7 +41,7 @@ Create a web-based multiplayer version of Zombicide with a tile-based draggable/
 ### 1. Tile-Based Board
 
 - Rendered with CSS Grid
-- Each tile: 3x3 cells + rooms (Zombicide standard). Zones are formed by the cells and rooms, and may span multiple tiles.
+- Each tile: 3x3 cells + rooms. Zones are formed by the cells and rooms, and may span multiple tiles.
 - Supports panning and zooming. Hold space to pan, and scroll to zoom.
 
 ### 2. Survivors and Zombies
