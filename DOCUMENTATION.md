@@ -37,7 +37,7 @@
 
 ---
 
-## 🏗️ Architecture
+## 🏗️ <a id="architecture"></a> Architecture
 
 ### Project Structure
 
@@ -69,7 +69,7 @@ zombilicious/
 
 ---
 
-## 👥 User Flow During Lobbies
+## <a id="user-flow-during-lobbies"></a> 👥 User Flow During Lobbies
 
 ### 1. Initial Entry
 
@@ -128,7 +128,7 @@ zombilicious/
 
 ---
 
-## 🔌 Socket Communication System
+## <a id="socket-communication-system"></a> 🔌 Socket Communication System
 
 ### Connection Setup
 
@@ -181,7 +181,7 @@ zombilicious/
 
 ---
 
-## 🗄️ State Management
+## <a id="state-management"></a> 🗄️ State Management
 
 ### Two-Store Architecture
 
@@ -233,7 +233,7 @@ zombilicious/
 
 ---
 
-## 🎨 UI Components
+## <a id="ui-components"></a>  🎨 UI Components
 
 ### Component Hierarchy
 
@@ -297,7 +297,7 @@ GameWrapper (commented out in App.tsx)
 
 ---
 
-## 🎲 Game Board System
+## <a id="game-board-system"></a> 🎲 Game Board System
 
 ### Tile-Based Architecture
 
@@ -351,7 +351,7 @@ Zone {
 
 ---
 
-## 🛠️ Development Features
+## <a id="development-features"></a> 🛠️ Development Features
 
 ### DevMode System
 
@@ -375,7 +375,7 @@ Zone {
 
 ---
 
-## 🔧 Technical Details
+## <a id="technical-details"></a>🔧 Technical Details
 
 ### Build System
 
@@ -413,7 +413,7 @@ Zone {
 
 ---
 
-## 🚀 Future Plans
+## <a id="future-plans"></a>🚀 Future Plans
 
 ### Immediate Roadmap (from ROADMAP.md)
 
