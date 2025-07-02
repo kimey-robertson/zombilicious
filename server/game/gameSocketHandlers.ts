@@ -28,7 +28,16 @@ export const handleGameEvents = (io: Server, socket: Socket) => {
             errorMessage: "Failed to delete lobby. Game not created.",
           });
         } else {
-          io.emit("game-created", game);
+          // Join all players from the lobby to the game
+          lobby.players.forEach((player) => {
+            const playerSocket = io.sockets.sockets.get(player.id);
+            if (playerSocket) {
+              playerSocket.join(game.id);
+              console.log(`Player ${player.name} joined game ${game.id}`);
+            }
+          });
+          // Emit game-created only to players in this game
+          io.to(game.id).emit("game-created", game);
           console.log("game created", game);
           return callback({ success: true });
         }

@@ -1,4 +1,4 @@
-import { Game, Lobby, Zone } from "../../../shared/types";
+import { Lobby, Zone } from "../../../shared/types";
 
 export type Offset = { x: number; y: number };
 
@@ -34,6 +34,6 @@ export type LobbyStore = {
 };
 
 export type GameStore = {
-  games: Game[];
-  setGames: (games: Game[] | ((prev: Game[]) => Game[])) => void;
+  gameId: string;
+  setGameId: (gameId: string) => void;
 };

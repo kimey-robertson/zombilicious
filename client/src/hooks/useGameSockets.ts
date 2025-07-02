@@ -7,12 +7,11 @@ export const useGameSockets = () => {
   const socketRef = useRef(getSocket());
   const socket = socketRef.current;
 
-  const setGames = useGameStore((state) => state.setGames);
+  const setGameId = useGameStore((state) => state.setGameId);
 
   const handleGameCreated = (game: Game) => {
     console.log("game created", game);
-    setGames((prevGames) => [...prevGames, game]);
-
+    setGameId(game.id);
   };
 
   useEffect(() => {
