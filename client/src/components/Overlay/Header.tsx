@@ -1,6 +1,7 @@
 import { usePlayerStore } from "../../store/usePlayerStore";
 import ResetBoard from "./ResetBoard";
 import RotateBoard from "./RotateBoard";
+import "./Header.css";
 
 const Header = () => {
   const panMode = usePlayerStore((state) => state.panMode);
