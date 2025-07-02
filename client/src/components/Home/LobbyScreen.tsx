@@ -73,8 +73,19 @@ const LobbyScreen = ({
     }
   };
 
+  const handleToggleIsReadyLobbyPlayer = (playerId: string) => {
+    socket.emit(
+      "toggle-is-ready-lobby-player",
+      playerId,
+      (data: { success: boolean; errorMessage?: string }) => {
+        if (!data.success) {
+          toast.error(data.errorMessage || "Failed to ready player");
+        }
+      }
+    );
+  };
+
   useEffect(() => {
-    console.log("myLobby", myLobby);
     if (!myLobby) {
       setMyLobbyId("");
       toast.error("Lobby not found");
@@ -112,8 +123,9 @@ const LobbyScreen = ({
                 >
                   <div className="flex items-center space-x-3">
                     <div
-                      className={`w-3 h-3 rounded-full `}
-                      // ${player.isReady ? "bg-green-500" : "bg-red-500"}
+                      className={`w-3 h-3 rounded-full ${
+                        player.isReady ? "bg-green-500" : "bg-red-500"
+                      }`}
                     />
                     <span className="font-medium">{player.name}</span>
                     {player.isHost && (
@@ -123,25 +135,19 @@ const LobbyScreen = ({
                     )}
                   </div>
                   <div className="flex items-center space-x-2">
-                    {!player.isHost && (
+                    {player.id === currentPlayer?.id && !player.isHost ? (
                       <>
                         <Button
                           size="sm"
-                          // variant={player.isReady ? "destructive" : "default"}
                           className="text-xs"
+                          onClick={() =>
+                            handleToggleIsReadyLobbyPlayer(player.id)
+                          }
                         >
-                          {/* {player.isReady ? "Unready" : "Ready"} */}
+                          {player.isReady ? "Unready" : "Ready"}
                         </Button>
-                        {/* <Button
-                          size="sm"
-                          variant="destructive"
-                          onClick={() => removePlayer(player.id)}
-                          className="text-xs bg-red-700 hover:bg-red-600"
-                        >
-                          ✕
-                        </Button> */}
                       </>
-                    )}
+                    ) : null}
                   </div>
                 </div>
               ))}

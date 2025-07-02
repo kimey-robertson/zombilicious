@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { getSocket } from "../socket";
 import { useLobbyStore } from "../store/useLobbyStore";
+import { LobbyPlayer } from "../../../shared/types";
 
 export const useLobbySockets = () => {
   const socketRef = useRef(getSocket());
@@ -14,7 +15,7 @@ export const useLobbySockets = () => {
 
   const handleLobbyUpdated = (data: {
     lobbyId: string;
-    players: { name: string; id: string; isHost: boolean }[];
+    players: LobbyPlayer[];
   }) => {
     console.log("lobby updated", data);
     setLobbies((prevLobbies) => {

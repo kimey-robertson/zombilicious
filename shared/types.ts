@@ -35,6 +35,7 @@ export type Player = {
 
 export type LobbyPlayer = Player & {
   isHost: boolean;
+  isReady: boolean;
 };
 
 export type Lobby = {

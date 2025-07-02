@@ -6,6 +6,7 @@ import {
   handleDisconnectFromLobby,
   joinLobby,
   leaveLobby,
+  toggleIsReadyLobbyPlayer,
 } from "./lobbyLogic";
 import { Lobby } from "../shared/types";
 
@@ -94,6 +95,25 @@ export const handleGameEvents = (io: Server, socket: Socket) => {
       if (lobby) {
         callback({ success: true });
         io.emit("lobby-updated", { lobbyId, players: lobby.players });
+      } else {
+        callback({ success: false, errorMessage: "Lobby not found" });
+      }
+    }
+  );
+
+  socket.on(
+    "toggle-is-ready-lobby-player",
+    (
+      playerId: string,
+      callback: (data: { success: boolean; errorMessage?: string }) => void
+    ) => {
+      const lobby = toggleIsReadyLobbyPlayer(playerId);
+      if (lobby) {
+        callback({ success: true });
+        io.emit("lobby-updated", {
+          lobbyId: lobby.id,
+          players: lobby.players,
+        });
       } else {
         callback({ success: false, errorMessage: "Lobby not found" });
       }

@@ -13,6 +13,7 @@ function createLobby(playerSocketId: string, playerName: string) {
         id: playerSocketId,
         name: playerName,
         isHost: true,
+        isReady: true,
       },
     ],
   };
@@ -51,6 +52,7 @@ function joinLobby(
         id: playerSocketId,
         name: playerName,
         isHost: false,
+        isReady: false,
       });
     }
   }
@@ -94,10 +96,30 @@ function handleDisconnectFromLobby(playerSocketId: string, io: Server) {
   }
 }
 
-function leaveLobby(lobbyId: string, playerSocketId: string): Lobby | undefined {
+function leaveLobby(
+  lobbyId: string,
+  playerSocketId: string
+): Lobby | undefined {
   const lobby = lobbies.find((lobby) => lobby.id === lobbyId);
   if (lobby) {
-    lobby.players = lobby.players.filter((player) => player.id !== playerSocketId);
+    lobby.players = lobby.players.filter(
+      (player) => player.id !== playerSocketId
+    );
+    return lobby;
+  } else {
+    return undefined;
+  }
+}
+
+function toggleIsReadyLobbyPlayer(playerId: string): Lobby | undefined {
+  const lobby = lobbies.find((lobby) =>
+    lobby.players.some((player) => player.id === playerId)
+  );
+  if (lobby) {
+    const player = lobby.players.find((player) => player.id === playerId);
+    if (player) {
+      player.isReady = !player.isReady;
+    }
     return lobby;
   } else {
     return undefined;
@@ -112,4 +134,5 @@ export {
   getLobbyByPlayerSocketId,
   handleDisconnectFromLobby,
   leaveLobby,
+  toggleIsReadyLobbyPlayer,
 };
