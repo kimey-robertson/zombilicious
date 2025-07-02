@@ -37,7 +37,13 @@ import LobbyScreen from "./LobbyScreen";
 //   },
 // ];
 
-const JoinLobbiesScreen = ({ playerName }: { playerName: string }) => {
+const JoinLobbiesScreen = ({
+  playerName,
+  setJoinLobbiesScreen,
+}: {
+  playerName: string;
+  setJoinLobbiesScreen: (value: boolean) => void;
+}) => {
   const socket = getSocket();
   const setLobbies = useLobbyStore((state) => state.setLobbies);
   const lobbies = useLobbyStore((state) => state.lobbies);
@@ -45,14 +51,11 @@ const JoinLobbiesScreen = ({ playerName }: { playerName: string }) => {
   const setMyLobbyId = useLobbyStore((state) => state.setMyLobbyId);
   const [joinLobbyLoading, setJoinLobbyLoading] = useState(false);
 
-  // const [joinedLobby, setJoinedLobby] = useState<Lobby | null>(null);
-
   socket.emit("fetch-lobbies", (data: { lobbies: Lobby[] }) => {
     setLobbies(data.lobbies);
   });
 
   const handleJoinLobby = (lobbyId: string) => {
-    // TODO: Implement join lobby logic
     console.log(`Joining lobby: ${lobbyId}`);
     setJoinLobbyLoading(true);
     socket.emit(
@@ -70,6 +73,10 @@ const JoinLobbiesScreen = ({ playerName }: { playerName: string }) => {
         setJoinLobbyLoading(false);
       }
     );
+  };
+
+  const handleReturnToHome = () => {
+    setJoinLobbiesScreen(false);
   };
 
   if (joinLobbyLoading) {
@@ -149,6 +156,9 @@ const JoinLobbiesScreen = ({ playerName }: { playerName: string }) => {
           ))}
         </div>
       )}
+      <div className="mt-4">
+        <Button onClick={handleReturnToHome}>Return to Home</Button>
+      </div>
     </div>
   );
 };

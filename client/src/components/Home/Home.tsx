@@ -24,7 +24,10 @@ const Home = () => {
       ) : lobbyScreen ? (
         <LobbyScreen setLobbyScreen={setLobbyScreen} />
       ) : joinLobbiesScreen ? (
-        <JoinLobbiesScreen playerName={playerName} />
+        <JoinLobbiesScreen
+          playerName={playerName}
+          setJoinLobbiesScreen={setJoinLobbiesScreen}
+        />
       ) : null}
     </div>
   );
