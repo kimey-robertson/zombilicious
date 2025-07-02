@@ -9,7 +9,7 @@ export type PlayerStore = {
   setOffset: (offset: Offset | ((prev: Offset) => Offset)) => void;
   rotation: number;
   setRotation: (rotation: number | ((prev: number) => number)) => void;
-  reset: () => void;
+  resetBoardPosition: () => void;
   isDragging: boolean;
   setIsDragging: (isDragging: boolean) => void;
   selectedZone: Zone | undefined;
@@ -24,6 +24,11 @@ export type PlayerStore = {
   setPlayerName: (playerName: string) => void;
   playerId: string;
   setPlayerId: (playerId: string) => void;
+  totalActions: number;
+  setTotalActions: (totalActions: number) => void;
+  actionsRemaining: number;
+  setActionsRemaining: (actionsRemaining: number) => void;
+  resetGame: () => void;
 };
 
 export type LobbyStore = {

@@ -20,7 +20,8 @@ export const usePlayerStore = create<PlayerStore>((set) => ({
       rotation:
         typeof rotation === "function" ? rotation(state.rotation) : rotation,
     })),
-  reset: () => set({ zoom: 1, offset: { x: 0, y: 0 }, rotation: 0 }),
+  resetBoardPosition: () =>
+    set({ zoom: 1, offset: { x: 0, y: 0 }, rotation: 0 }),
   isDragging: false,
   setIsDragging: (isDragging) => set({ isDragging }),
   selectedZone: undefined,
@@ -35,4 +36,12 @@ export const usePlayerStore = create<PlayerStore>((set) => ({
   setPlayerName: (playerName) => set({ playerName }),
   playerId: "",
   setPlayerId: (playerId) => set({ playerId }),
+  resetGame: () =>
+    set({
+      actionsRemaining: 3,
+    }),
+  totalActions: 3,
+  setTotalActions: (totalActions) => set({ totalActions }),
+  actionsRemaining: 3,
+  setActionsRemaining: (actionsRemaining) => set({ actionsRemaining }),
 }));
