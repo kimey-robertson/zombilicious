@@ -15,7 +15,7 @@
 
 ---
 
-## 🎯 Project Overview {#project-overview}
+## 🎯 <a id="project-overview"></a> Project Overview
 
 **Zombilicious** is a web-based multiplayer zombie survival game featuring:
 
