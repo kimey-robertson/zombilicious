@@ -72,6 +72,7 @@ const HomeButtons = ({
           value={playerName}
           onChange={(e) => setPlayerName(e.target.value)}
           ref={inputRef}
+          maxLength={24}
         />
         <div className="flex gap-2 justify-center items-center w-full">
           <Button className="p-10 w-full" onClick={handleCreateLobby}>

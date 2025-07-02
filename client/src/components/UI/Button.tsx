@@ -24,6 +24,7 @@ type ButtonProps = {
   size?: keyof typeof sizes;
   as?: keyof JSX.IntrinsicElements;
   className?: string;
+  disabled?: boolean;
 } & React.HTMLAttributes<Element>;
 
 export function Button({
@@ -31,11 +32,12 @@ export function Button({
   size = "default",
   as: Component = "button",
   className = "",
+  disabled = false,
   ...props
 }: ButtonProps) {
   const classes = [base, variants[variant] || "", sizes[size] || "", className]
     .filter(Boolean)
     .join(" ");
 
-  return <Component className={classes} {...props} />;
+  return <Component className={classes} disabled={disabled} {...props} />;
 }

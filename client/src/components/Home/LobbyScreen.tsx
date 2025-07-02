@@ -189,7 +189,7 @@ const LobbyScreen = ({
               </div>
             </div>
 
-            <div className="space-y-4 flex-1 overflow-y-auto">
+            <div className="space-y-4 flex-1 overflow-y-auto px-1">
               {/* Game Name */}
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -200,6 +200,7 @@ const LobbyScreen = ({
                   value={myLobby?.gameName}
                   disabled={!currentPlayer?.isHost}
                   onChange={handleChangeGameName}
+                  maxLength={28}
                   className="w-full bg-gray-700 bg-opacity-60 border border-gray-600 rounded-md px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
                 />
               </div>
@@ -240,7 +241,7 @@ const LobbyScreen = ({
           >
             {currentPlayer?.isHost ? "Cancel" : "Leave Lobby"}
           </Button>
-          <button
+          <Button
             className={`h-10 px-8 bg-gradient-to-r from-red-600 to-red-700 text-white font-semibold rounded-md transition-all text-base ${
               canStartGame
                 ? "opacity-100 hover:from-red-500 hover:to-red-600"
@@ -249,7 +250,7 @@ const LobbyScreen = ({
             disabled={!canStartGame}
           >
             Start Game
-          </button>
+          </Button>
         </div>
       </div>
     </div>
