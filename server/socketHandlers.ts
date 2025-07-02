@@ -3,12 +3,19 @@ import {
   createLobby,
   deleteLobby,
   getAllLobbies,
+  handleDisconnectFromLobby,
   joinLobby,
 } from "./lobbyLogic";
 import { Lobby } from "../shared/types";
 
 export const handleGameEvents = (io: Server, socket: Socket) => {
   console.log("a user connected", socket.id);
+
+  socket.on("disconnect", () => {
+    console.log("a user disconnected", socket.id);
+
+    handleDisconnectFromLobby(socket.id, io);
+  });
 
   socket.on(
     "create-game-lobby",
@@ -65,13 +72,13 @@ export const handleGameEvents = (io: Server, socket: Socket) => {
       const lobby = joinLobby(lobbyId, socket.id, playerName);
       if (lobby) {
         callback({ success: true });
+        io.emit("lobby-updated", {
+          lobbyId,
+          players: lobby.players,
+        });
       } else {
         callback({ success: false, errorMessage: "Lobby not found" });
       }
-      io.emit("lobby-updated", {
-        lobbyId,
-        player: { name: playerName, id: socket.id, isHost: false },
-      });
     }
   );
 };

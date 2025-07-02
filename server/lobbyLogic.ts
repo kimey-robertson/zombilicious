@@ -1,3 +1,4 @@
+import { Server } from "socket.io";
 import { Lobby } from "../shared/types";
 
 const lobbies: Lobby[] = [];
@@ -57,4 +58,47 @@ function joinLobby(
   return lobby;
 }
 
-export { createLobby, deleteLobby, getAllLobbies, joinLobby };
+function getLobbyByPlayerSocketId(playerSocketId: string): Lobby | undefined {
+  return lobbies.find((lobby) =>
+    lobby.players.some((player) => player.id === playerSocketId)
+  );
+}
+
+// If the player is in a lobby, remove them from the lobby, and if the lobby is empty, delete the lobby
+function handleDisconnectFromLobby(playerSocketId: string, io: Server) {
+  const lobby = getLobbyByPlayerSocketId(playerSocketId);
+  if (lobby) {
+    const disconnectedPlayer = lobby.players.find(
+      (player) => player.id === playerSocketId
+    );
+    if (!disconnectedPlayer) {
+      return;
+    }
+    lobby.players = lobby.players.filter(
+      (player) => player.id !== disconnectedPlayer?.id
+    );
+    if (lobby.players.length === 0) {
+      deleteLobby(lobby.id);
+    } else {
+      if (disconnectedPlayer.isHost) {
+        if (lobby.players.length > 0) {
+          const newHost = lobby.players[0];
+          newHost.isHost = true;
+        }
+      }
+      io.emit("lobby-updated", {
+        lobbyId: lobby.id,
+        players: lobby.players,
+      });
+    }
+  }
+}
+
+export {
+  createLobby,
+  deleteLobby,
+  getAllLobbies,
+  joinLobby,
+  getLobbyByPlayerSocketId,
+  handleDisconnectFromLobby,
+};

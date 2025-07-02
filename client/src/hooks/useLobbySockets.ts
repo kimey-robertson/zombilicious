@@ -15,13 +15,13 @@ export const useLobbySockets = () => {
 
     const handleLobbyUpdated = (data: {
       lobbyId: string;
-      player: { name: string; id: string; isHost: boolean };
+      players: { name: string; id: string; isHost: boolean }[];
     }) => {
       console.log("lobby updated", data);
       setLobbies((prevLobbies) => {
         return prevLobbies.map((lobby) =>
           lobby.id === data.lobbyId
-            ? { ...lobby, players: [...lobby.players, data.player] }
+            ? { ...lobby, players: data.players }
             : lobby
         );
       });
