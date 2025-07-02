@@ -375,7 +375,7 @@ Zone {
 
 ---
 
-## <a id="technical-details"></a>🔧 Technical Details
+## <a id="technical-details"></a> 🔧 Technical Details
 
 ### Build System
 
