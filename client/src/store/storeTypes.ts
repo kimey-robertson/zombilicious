@@ -26,5 +26,5 @@ export type LobbyStore = {
   myLobbyId: string;
   setMyLobbyId: (lobbyId: string) => void;
   lobbies: Lobby[];
-  setLobbies: (lobbies: Lobby[]) => void;
+  setLobbies: (lobbies: Lobby[] | ((prev: Lobby[]) => Lobby[])) => void;
 };

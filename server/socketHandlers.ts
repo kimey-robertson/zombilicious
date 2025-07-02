@@ -68,6 +68,10 @@ export const handleGameEvents = (io: Server, socket: Socket) => {
       } else {
         callback({ success: false, errorMessage: "Lobby not found" });
       }
+      io.emit("lobby-updated", {
+        lobbyId,
+        player: { name: playerName, id: socket.id, isHost: false },
+      });
     }
   );
 };

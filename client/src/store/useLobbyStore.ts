@@ -6,5 +6,8 @@ export const useLobbyStore = create<LobbyStore>((set) => ({
   myLobbyId: "",
   setMyLobbyId: (lobbyId) => set({ myLobbyId: lobbyId }),
   lobbies: [],
-  setLobbies: (lobbies) => set({ lobbies }),
+  setLobbies: (lobbies) =>
+    set((state) => ({
+      lobbies: typeof lobbies === "function" ? lobbies(state.lobbies) : lobbies,
+    })),
 }));
