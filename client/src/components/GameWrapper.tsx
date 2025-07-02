@@ -1,6 +1,7 @@
 import GameBoard from "./GameBoard/GameBoard";
 import Overlay from "./Overlay/Overlay";
 import KeyboardListener from "./KeyboardListener";
+import PlayerDisconnectedPopup from "./Overlay/PlayerDisconnectedPopup";
 
 const GameWrapper = () => {
   return (
@@ -8,6 +9,7 @@ const GameWrapper = () => {
       <GameBoard />
       <Overlay />
       <KeyboardListener />
+      <PlayerDisconnectedPopup />
     </>
   );
 };

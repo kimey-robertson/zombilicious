@@ -15,6 +15,8 @@ function createGame(lobby: Lobby): Game | undefined {
       id: player.id,
       name: player.name,
     })),
+    status: "active",
+    disconnectedPlayers: {},
   };
 
   games.push(game);
@@ -31,11 +33,35 @@ function deleteGame(gameId: string): Game | undefined {
   return undefined;
 }
 
-function handleDisconnectFromGame(socketId: string, io: Server) {
-  const game = games.find((game) =>
+function getGameBySocketId(socketId: string): Game | undefined {
+  return games.find((game) =>
     game.players.some((player) => player.id === socketId)
   );
+}
 
+function getPlayerNameBySocketId(socketId: string): string {
+  const game = getGameBySocketId(socketId);
+  if (!game) return "Unknown";
+
+  return (
+    game.players.find((player) => player.id === socketId)?.name ?? "Unknown"
+  );
+}
+
+function handleDisconnectFromGame(socketId: string, io: Server) {
+  const game = getGameBySocketId(socketId);
+  if (!game) return;
+  const disconnectedPlayer = getPlayerNameBySocketId(socketId);
+
+  game.disconnectedPlayers[socketId] = {
+    name: disconnectedPlayer,
+    disconnectedAt: new Date(),
+    kickVotes: [],
+  };
+
+  game.status = "paused";
+
+  io.to(game.id).emit("game-updated", game);
 }
 
 export { createGame, deleteGame, handleDisconnectFromGame };

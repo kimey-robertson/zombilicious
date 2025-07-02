@@ -44,8 +44,16 @@ export type Lobby = {
   players: LobbyPlayer[];
 };
 
+export type DisconnectedPlayer = {
+  name: string;
+  disconnectedAt: Date;
+  kickVotes: string[];
+};
+
 export type Game = {
   id: string;
   name: string;
   players: Player[];
+  status: "active" | "paused";
+  disconnectedPlayers: { [socketId: string]: DisconnectedPlayer };
 };
