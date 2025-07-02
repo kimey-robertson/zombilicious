@@ -5,18 +5,6 @@ import { toast } from "react-hot-toast";
 import { useEffect } from "react";
 import { usePlayerStore } from "../../store/usePlayerStore";
 
-// interface Player {
-//   id: string;
-//   name: string;
-//   isReady: boolean;
-//   isHost: boolean;
-// }
-
-// interface GameSettings {
-//   gameName: string;
-//   maxPlayers: number;
-// }
-
 const LobbyScreen = ({
   setLobbyScreen,
 }: {
@@ -29,7 +17,6 @@ const LobbyScreen = ({
 
   const myLobby = lobbies.find((lobby) => lobby.id === myLobbyId);
 
-  // const playerName = usePlayerStore((state) => state.playerName);
   const playerId = usePlayerStore((state) => state.playerId);
 
   const currentPlayer = myLobby?.players.find((p) => p.id === playerId);
@@ -37,15 +24,6 @@ const LobbyScreen = ({
   const canStartGame =
     currentPlayer?.isHost &&
     myLobby?.players?.every((player) => player.isReady);
-
-  // const [settings, setSettings] = useState<GameSettings>({
-  //   gameName: "Zombilicious Game",
-  //   maxPlayers: 6,
-  // });
-
-  // const removePlayer = (playerId: string) => {
-  //   setPlayers(players.filter((p) => p.id !== playerId));
-  // };
 
   const handleReturnToHome = () => {
     if (currentPlayer?.isHost) {
@@ -104,6 +82,18 @@ const LobbyScreen = ({
       (data: { success: boolean; errorMessage?: string }) => {
         if (!data.success) {
           toast.error(data.errorMessage || "Failed to change game name");
+        }
+      }
+    );
+  };
+
+  const handleCreateGame = () => {
+    socket.emit(
+      "create-game",
+      myLobby,
+      (data: { success: boolean; errorMessage?: string }) => {
+        if (!data.success) {
+          toast.error(data.errorMessage || "Failed to start game");
         }
       }
     );
@@ -248,6 +238,7 @@ const LobbyScreen = ({
                 : "opacity-50 cursor-not-allowed"
             }`}
             disabled={!canStartGame}
+            onClick={handleCreateGame}
           >
             Start Game
           </Button>

@@ -43,3 +43,9 @@ export type Lobby = {
   gameName: string;
   players: LobbyPlayer[];
 };
+
+export type Game = {
+  id: string;
+  name: string;
+  players: Player[];
+};

@@ -8,18 +8,10 @@ import {
   joinLobby,
   leaveLobby,
   toggleIsReadyLobbyPlayer,
-} from "./lobbyLogic";
-import { Lobby } from "../shared/types";
+} from "./lobbyManager";
+import { Lobby } from "../../shared/types";
 
-export const handleGameEvents = (io: Server, socket: Socket) => {
-  console.log("a user connected", socket.id);
-
-  socket.on("disconnect", () => {
-    console.log("a user disconnected", socket.id);
-
-    handleDisconnectFromLobby(socket.id, io);
-  });
-
+export const handleLobbyEvents = (io: Server, socket: Socket) => {
   socket.on(
     "create-game-lobby",
     (
@@ -130,7 +122,11 @@ export const handleGameEvents = (io: Server, socket: Socket) => {
   socket.on(
     "change-game-name-lobby",
     (
-      { lobbyId, gameName, playerId }: { lobbyId: string; gameName: string; playerId: string },
+      {
+        lobbyId,
+        gameName,
+        playerId,
+      }: { lobbyId: string; gameName: string; playerId: string },
       callback: (data: { success: boolean; errorMessage?: string }) => void
     ) => {
       const lobby = changeGameNameLobby(lobbyId, gameName, playerId);

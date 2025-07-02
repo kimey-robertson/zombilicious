@@ -1,5 +1,5 @@
 import { Server } from "socket.io";
-import { Lobby } from "../shared/types";
+import { Lobby } from "../../shared/types";
 
 const lobbies: Lobby[] = [];
 

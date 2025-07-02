@@ -1,9 +1,18 @@
 import { createServer } from "./config";
-import { handleGameEvents } from "./socketHandlers";
+import { handleDisconnectFromLobby } from "./lobby/lobbyManager";
+import { handleLobbyEvents } from "./lobby/lobbySocketHandlers";
+import { handleGameEvents } from "./game/gameSocketHandlers";
 
 const { server, io, PORT } = createServer();
 
 io.on("connection", (socket) => {
+  socket.on("disconnect", () => {
+    console.log("a user disconnected", socket.id);
+
+    handleDisconnectFromLobby(socket.id, io);
+  });
+
+  handleLobbyEvents(io, socket);
   handleGameEvents(io, socket);
 });
 
