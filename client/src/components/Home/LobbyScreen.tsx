@@ -3,6 +3,7 @@ import { useLobbyStore } from "../../store/useLobbyStore";
 import { getSocket } from "../../socket";
 import { toast } from "react-hot-toast";
 import { useEffect } from "react";
+import { usePlayerStore } from "../../store/usePlayerStore";
 
 // interface Player {
 //   id: string;
@@ -25,11 +26,13 @@ const LobbyScreen = ({
   const myLobbyId = useLobbyStore((state) => state.myLobbyId);
   const setMyLobbyId = useLobbyStore((state) => state.setMyLobbyId);
   const lobbies = useLobbyStore((state) => state.lobbies);
+
   const myLobby = lobbies.find((lobby) => lobby.id === myLobbyId);
 
-  // const [players, setPlayers] = useState<Player[]>([
-  //       { id: "1", name: playerName, isReady: true, isHost: true },
-  // ]);
+  // const playerName = usePlayerStore((state) => state.playerName);
+  const playerId = usePlayerStore((state) => state.playerId);
+
+  const currentPlayer = myLobby?.players.find((p) => p.id === playerId);
 
   // const [settings, setSettings] = useState<GameSettings>({
   //   gameName: "Zombilicious Game",
@@ -41,18 +44,33 @@ const LobbyScreen = ({
   // };
 
   const handleReturnToHome = () => {
-    socket.emit(
-      "delete-game-lobby",
-      myLobbyId,
-      (data: { success: boolean; errorMessage?: string }) => {
-        if (data.success) {
-          setLobbyScreen?.(false);
-          toast.success("Lobby deleted");
-        } else {
-          toast.error(data.errorMessage || "Failed to delete lobby");
+    if (currentPlayer?.isHost) {
+      socket.emit(
+        "delete-game-lobby",
+        myLobbyId,
+        (data: { success: boolean; errorMessage?: string }) => {
+          if (data.success) {
+            setLobbyScreen?.(false);
+            toast.success("Lobby deleted");
+          } else {
+            toast.error(data.errorMessage || "Failed to delete lobby");
+          }
         }
-      }
-    );
+      );
+    } else {
+      socket.emit(
+        "leave-lobby",
+        myLobbyId,
+        (data: { success: boolean; errorMessage?: string }) => {
+          if (data.success) {
+            setLobbyScreen?.(false);
+            setMyLobbyId("");
+          } else {
+            toast.error(data.errorMessage || "Failed to leave lobby");
+          }
+        }
+      );
+    }
   };
 
   useEffect(() => {
@@ -191,7 +209,7 @@ const LobbyScreen = ({
             className="bg-gray-700 bg-opacity-60 border-gray-600 text-gray-300 hover:bg-gray-600"
             onClick={handleReturnToHome}
           >
-            Cancel
+            {currentPlayer?.isHost ? "Cancel" : "Leave Lobby"}
           </Button>
           <button className="h-10 px-8 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-md transition-all text-base">
             Start Game

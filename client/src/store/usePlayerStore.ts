@@ -31,4 +31,8 @@ export const usePlayerStore = create<PlayerStore>((set) => ({
   setDevMode: (devMode) => set({ devMode }),
   hideOverlay: false,
   setHideOverlay: (hideOverlay) => set({ hideOverlay }),
+  playerName: "",
+  setPlayerName: (playerName) => set({ playerName }),
+  playerId: "",
+  setPlayerId: (playerId) => set({ playerId }),
 }));

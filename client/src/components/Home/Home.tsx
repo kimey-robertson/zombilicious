@@ -7,7 +7,6 @@ import { useLobbySockets } from "../../hooks/useLobbySockets";
 const Home = () => {
   const [lobbyScreen, setLobbyScreen] = useState(false);
   const [joinLobbiesScreen, setJoinLobbiesScreen] = useState(false);
-  const [playerName, setPlayerName] = useState("");
 
   useLobbySockets();
 
@@ -18,14 +17,11 @@ const Home = () => {
         <HomeButtons
           setLobbyScreen={setLobbyScreen}
           setJoinLobbiesScreen={setJoinLobbiesScreen}
-          playerName={playerName}
-          setPlayerName={setPlayerName}
         />
       ) : lobbyScreen ? (
         <LobbyScreen setLobbyScreen={setLobbyScreen} />
       ) : joinLobbiesScreen ? (
         <JoinLobbiesScreen
-          playerName={playerName}
           setJoinLobbiesScreen={setJoinLobbiesScreen}
         />
       ) : null}

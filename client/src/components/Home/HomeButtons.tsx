@@ -4,17 +4,14 @@ import { Button } from "../UI/Button";
 import { useRef } from "react";
 import { Lobby } from "../../../../shared/types";
 import { useLobbyStore } from "../../store/useLobbyStore";
+import { usePlayerStore } from "../../store/usePlayerStore";
 
 const HomeButtons = ({
   setLobbyScreen,
   setJoinLobbiesScreen,
-  playerName,
-  setPlayerName,
 }: {
   setLobbyScreen: (value: boolean) => void;
   setJoinLobbiesScreen: (value: boolean) => void;
-  playerName: string;
-  setPlayerName: (value: string) => void;
 }) => {
   const socket = getSocket();
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -22,11 +19,16 @@ const HomeButtons = ({
   const lobbies = useLobbyStore((state) => state.lobbies);
   const setMyLobbyId = useLobbyStore((state) => state.setMyLobbyId);
 
+  const playerName = usePlayerStore((state) => state.playerName);
+  const setPlayerName = usePlayerStore((state) => state.setPlayerName);
+  const setPlayerId = usePlayerStore((state) => state.setPlayerId);
+
   const handleCreateLobby = () => {
     if (!playerName) {
       inputRef.current?.focus();
       return;
     }
+    setPlayerId(socket.id || "");
 
     socket.emit(
       "create-game-lobby",
@@ -55,6 +57,7 @@ const HomeButtons = ({
       inputRef.current?.focus();
       return;
     }
+    setPlayerId(socket.id || "");
 
     setJoinLobbiesScreen(true);
   };

@@ -94,6 +94,16 @@ function handleDisconnectFromLobby(playerSocketId: string, io: Server) {
   }
 }
 
+function leaveLobby(lobbyId: string, playerSocketId: string): Lobby | undefined {
+  const lobby = lobbies.find((lobby) => lobby.id === lobbyId);
+  if (lobby) {
+    lobby.players = lobby.players.filter((player) => player.id !== playerSocketId);
+    return lobby;
+  } else {
+    return undefined;
+  }
+}
+
 export {
   createLobby,
   deleteLobby,
@@ -101,4 +111,5 @@ export {
   joinLobby,
   getLobbyByPlayerSocketId,
   handleDisconnectFromLobby,
+  leaveLobby,
 };

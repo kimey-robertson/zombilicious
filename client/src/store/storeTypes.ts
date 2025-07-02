@@ -20,6 +20,10 @@ export type PlayerStore = {
   setDevMode: (devMode: boolean) => void;
   hideOverlay: boolean;
   setHideOverlay: (hideOverlay: boolean) => void;
+  playerName: string;
+  setPlayerName: (playerName: string) => void;
+  playerId: string;
+  setPlayerId: (playerId: string) => void;
 };
 
 export type LobbyStore = {

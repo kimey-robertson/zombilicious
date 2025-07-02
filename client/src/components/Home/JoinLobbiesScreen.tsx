@@ -13,6 +13,7 @@ import { Lobby } from "../../../../shared/types";
 import { toast } from "react-hot-toast";
 import { useEffect, useState } from "react";
 import LobbyScreen from "./LobbyScreen";
+import { usePlayerStore } from "../../store/usePlayerStore";
 
 // Mock data for demonstration - replace with actual lobby data later
 // const mockLobbies = [
@@ -38,10 +39,8 @@ import LobbyScreen from "./LobbyScreen";
 // ];
 
 const JoinLobbiesScreen = ({
-  playerName,
   setJoinLobbiesScreen,
 }: {
-  playerName: string;
   setJoinLobbiesScreen: (value: boolean) => void;
 }) => {
   const socket = getSocket();
@@ -50,6 +49,8 @@ const JoinLobbiesScreen = ({
   const myLobbyId = useLobbyStore((state) => state.myLobbyId);
   const setMyLobbyId = useLobbyStore((state) => state.setMyLobbyId);
   const [joinLobbyLoading, setJoinLobbyLoading] = useState(false);
+
+  const playerName = usePlayerStore((state) => state.playerName);
 
   const handleJoinLobby = (lobbyId: string) => {
     console.log(`Joining lobby: ${lobbyId}`);
