@@ -55,7 +55,7 @@ export const useLobbySockets = () => {
           toast.error("You have been disconnected from the game");
           setReconnectableGames([
             ...reconnectableGames,
-            { gameId: game.id, playerId: playerIdFromLocalStorage },
+            { game, playerId: playerIdFromLocalStorage },
           ]);
         }
       });

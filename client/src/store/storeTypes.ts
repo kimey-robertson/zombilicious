@@ -1,4 +1,4 @@
-import { DisconnectedPlayer, Lobby, Player, Zone } from "../../../shared/types";
+import { Game, DisconnectedPlayer, Lobby, Player, Zone } from "../../../shared/types";
 
 export type Offset = { x: number; y: number };
 
@@ -36,10 +36,8 @@ export type LobbyStore = {
   setMyLobbyId: (lobbyId: string) => void;
   lobbies: Lobby[];
   setLobbies: (lobbies: Lobby[] | ((prev: Lobby[]) => Lobby[])) => void;
-  reconnectableGames: { gameId: string; playerId: string }[];
-  setReconnectableGames: (
-    games: { gameId: string; playerId: string }[]
-  ) => void;
+  reconnectableGames: { game: Game; playerId: string }[];
+  setReconnectableGames: (games: { game: Game; playerId: string }[]) => void;
 };
 
 export type GameStore = {
