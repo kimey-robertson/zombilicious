@@ -80,6 +80,8 @@ export const handleGameEvents = (io: Server, socket: Socket) => {
               errorMessage: "Failed to remove player",
             });
             return;
+          } else {
+            game.status = "active";
           }
         }
 

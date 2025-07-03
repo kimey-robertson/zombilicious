@@ -49,6 +49,7 @@ export type DisconnectedPlayer = {
   disconnectedAt: Date;
   kickVotes: string[];
   id: string;
+  stopDisconnectTimer?: () => void;
 };
 
 export type Game = {

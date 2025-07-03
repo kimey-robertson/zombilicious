@@ -20,20 +20,23 @@ function addZero(number: number) {
 
 function countDownTimer(onTick: (time: string) => void) {
   let startTime = new Date(0, 0, 0, 0, 10, 0);
-  let intervalId: Timeout | undefined;
-  let time: string = "";
 
-  intervalId = setInterval(() => {
-    if (startTime.getSeconds() === 0 && startTime.getMinutes() === 0) {
-      clearInterval(intervalId);
-      intervalId = undefined;
-    }
-    time = `${addZero(startTime.getMinutes())}:${addZero(
+  const intervalId = setInterval(() => {
+    const time = `${addZero(startTime.getMinutes())}:${addZero(
       startTime.getSeconds()
     )}`;
     onTick(time);
+
+    // Check AFTER calling onTick so "00:00" gets emitted
+    if (startTime.getSeconds() === 0 && startTime.getMinutes() === 0) {
+      clearInterval(intervalId);
+      return;
+    }
+
     startTime.setSeconds(startTime.getSeconds() - 1);
   }, 1000);
+
+  return () => clearInterval(intervalId);
 }
 
 export { getTileCells, countDownTimer };

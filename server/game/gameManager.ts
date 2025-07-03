@@ -69,12 +69,26 @@ function handleDisconnectFromGame(socketId: string, io: Server) {
 
   io.to(game.id).emit("game-updated", game);
 
-  countDownTimer((time) => {
-    io.to(game.id).emit("updated-disconnect-timer", {
-      time,
-      playerId: socketId,
-    });
+  const stopTimer = countDownTimer((time) => {
+    if (time === "00:00") {
+      const newGame = removePlayerFromGame(game.id, socketId);
+      if (newGame) {
+        newGame.status = "active";
+        io.to(newGame.id).emit("game-updated", newGame);
+      }
+    } else {
+      io.to(game.id).emit("updated-disconnect-timer", {
+        time,
+        playerId: socketId,
+      });
+    }
   });
+
+  game.disconnectedPlayers[socketId].stopDisconnectTimer = stopTimer;
+  console.log(
+    "game.disconnectedPlayers[socketId]",
+    game.disconnectedPlayers[socketId]
+  );
 }
 
 function removePlayerFromGame(gameId: string, targetPlayerId: string) {
