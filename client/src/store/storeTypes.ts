@@ -49,4 +49,10 @@ export type GameStore = {
   setDisconnectedPlayers: (disconnectedPlayers: {
     [key: string]: DisconnectedPlayer;
   }) => void;
+  disconnectTimers: { [key: string]: string };
+  setDisconnectTimers: (
+    disconnectTimers:
+      | { [key: string]: string }
+      | ((prev: { [key: string]: string }) => { [key: string]: string })
+  ) => void;
 };

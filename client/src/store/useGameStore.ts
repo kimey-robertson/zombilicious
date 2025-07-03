@@ -14,4 +14,12 @@ export const useGameStore = create<GameStore>((set) => ({
   setDisconnectedPlayers: (disconnectedPlayers: {
     [key: string]: DisconnectedPlayer;
   }) => set({ disconnectedPlayers }),
+  disconnectTimers: {},
+  setDisconnectTimers: (disconnectTimers) =>
+    set((state) => ({
+      disconnectTimers:
+        typeof disconnectTimers === "function"
+          ? disconnectTimers(state.disconnectTimers)
+          : disconnectTimers,
+    })),
 }));

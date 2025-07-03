@@ -202,12 +202,7 @@ const LobbyScreen = ({
                 </label>
                 <select
                   value={4}
-                  // onChange={(e) =>
-                  //   setSettings({
-                  //     ...settings,
-                  //     maxPlayers: parseInt(e.target.value),
-                  //   })
-                  // }
+                  // onChange={(e) => {return e}}
                   className="w-full bg-gray-700 bg-opacity-60 border border-gray-600 rounded-md px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-red-500"
                 >
                   {[4].map((num) => (

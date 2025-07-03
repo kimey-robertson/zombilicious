@@ -2,6 +2,7 @@ import { toast } from "react-hot-toast";
 import { getSocket } from "../../socket";
 import { useGameStore } from "../../store/useGameStore";
 import { usePlayerStore } from "../../store/usePlayerStore";
+import { useEffect } from "react";
 
 const PlayerDisconnectedPopup = () => {
   const socket = getSocket();
@@ -12,11 +13,12 @@ const PlayerDisconnectedPopup = () => {
   );
   const players = useGameStore((state) => state.players);
   const playerId = usePlayerStore((state) => state.playerId);
+  const disconnectTimers = useGameStore((state) => state.disconnectTimers);
 
   const disconnectedPlayer = Object.values(disconnectedPlayers)[0];
 
   const remainingPlayers = players.filter(
-    (player) => player.id !== Object.keys(disconnectedPlayers)[0]
+    (player) => player.id !== disconnectedPlayer?.id
   );
 
   const remainingPlayersWithVotes = remainingPlayers.map((player) => {
@@ -36,7 +38,7 @@ const PlayerDisconnectedPopup = () => {
       "vote-kick-player-from-game",
       {
         gameId: gameId,
-        targetPlayerId: Object.keys(disconnectedPlayers)[0],
+        targetPlayerId: disconnectedPlayer?.id,
         votingPlayerId: playerId,
       },
       (data: { success: boolean; errorMessage?: string }) => {
@@ -46,6 +48,10 @@ const PlayerDisconnectedPopup = () => {
       }
     );
   };
+
+  useEffect(() => {
+    console.log("disconnectTimers", disconnectTimers);
+  }, [disconnectTimers]);
 
   if (Object.keys(disconnectedPlayers).length === 0) return null;
 
@@ -104,7 +110,7 @@ const PlayerDisconnectedPopup = () => {
             {disconnectedPlayer?.name ?? "Unknown Player"}
           </strong>{" "}
           has left the game. You can vote them out now, or they will be removed
-          in 00:00.
+          in {disconnectTimers[disconnectedPlayer?.id]}.
         </p>
 
         {/* Voting Section */}

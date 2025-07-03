@@ -19,6 +19,9 @@ export const useGameSockets = () => {
   const setDisconnectedPlayers = useGameStore(
     (state) => state.setDisconnectedPlayers
   );
+  const setDisconnectTimers = useGameStore(
+    (state) => state.setDisconnectTimers
+  );
 
   const handleGameCreated = (game: Game) => {
     console.log("game created", game);
@@ -36,12 +39,25 @@ export const useGameSockets = () => {
     setDisconnectedPlayers(game.disconnectedPlayers);
   };
 
+  const handleUpdateDisconnectTimer = ({
+    time,
+    playerId,
+  }: {
+    time: string;
+    playerId: string;
+  }) => {
+    console.log("update timer", time, playerId);
+    setDisconnectTimers((prev) => ({ ...prev, [playerId]: time }));
+  };
+
   useEffect(() => {
     socket.on("game-created", handleGameCreated);
     socket.on("game-updated", handleGameUpdated);
+    socket.on("updated-disconnect-timer", handleUpdateDisconnectTimer);
     return () => {
       socket.off("game-created", handleGameCreated);
       socket.off("game-updated", handleGameUpdated);
+      socket.off("updated-disconnect-timer", handleUpdateDisconnectTimer);
     };
   });
 };

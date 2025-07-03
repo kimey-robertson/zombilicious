@@ -1,5 +1,6 @@
 import { Server } from "socket.io";
 import { Game, Lobby } from "../../shared/types";
+import { countDownTimer } from "../utils";
 
 const games: Game[] = [];
 
@@ -61,11 +62,19 @@ function handleDisconnectFromGame(socketId: string, io: Server) {
     name: disconnectedPlayer,
     disconnectedAt: new Date(),
     kickVotes: [],
+    id: socketId,
   };
 
   game.status = "paused";
 
   io.to(game.id).emit("game-updated", game);
+
+  countDownTimer((time) => {
+    io.to(game.id).emit("updated-disconnect-timer", {
+      time,
+      playerId: socketId,
+    });
+  });
 }
 
 function removePlayerFromGame(gameId: string, targetPlayerId: string) {

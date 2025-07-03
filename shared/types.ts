@@ -48,6 +48,7 @@ export type DisconnectedPlayer = {
   name: string;
   disconnectedAt: Date;
   kickVotes: string[];
+  id: string;
 };
 
 export type Game = {
