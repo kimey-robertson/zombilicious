@@ -3,20 +3,22 @@ import { handleDisconnectFromLobby } from "./lobby/lobbyManager";
 import { handleLobbyEvents } from "./lobby/lobbySocketHandlers";
 import { handleGameEvents } from "./game/gameSocketHandlers";
 import { handleDisconnectFromGame } from "./game/gameManager";
+import { handleConnect } from "./utils";
 
 const { server, io, PORT } = createServer();
 
 io.on("connection", (socket) => {
+  handleConnect(io);
+
+  handleLobbyEvents(io, socket);
+  handleGameEvents(io, socket);
+
   socket.on("disconnect", () => {
     console.log("a user disconnected", socket.id);
 
     handleDisconnectFromLobby(socket.id, io);
-
     handleDisconnectFromGame(socket.id, io);
   });
-
-  handleLobbyEvents(io, socket);
-  handleGameEvents(io, socket);
 });
 
 server.listen(PORT, () => {

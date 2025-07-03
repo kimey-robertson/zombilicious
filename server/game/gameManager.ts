@@ -104,10 +104,17 @@ function removePlayerFromGame(gameId: string, targetPlayerId: string) {
   }
 }
 
+function getGamesWithDisconnectedPlayers() {
+  return games.filter(
+    (game) => Object.keys(game.disconnectedPlayers).length > 0
+  );
+}
+
 export {
   createGame,
   deleteGame,
   handleDisconnectFromGame,
   getGameBySocketId,
   removePlayerFromGame,
+  getGamesWithDisconnectedPlayers,
 };

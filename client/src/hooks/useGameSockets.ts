@@ -23,6 +23,8 @@ export const useGameSockets = () => {
     (state) => state.setDisconnectTimers
   );
 
+  const playerId = usePlayerStore((state) => state.playerId);
+
   const handleGameCreated = (game: Game) => {
     console.log("game created", game);
     setGameId(game.id);
@@ -30,6 +32,7 @@ export const useGameSockets = () => {
     setStatus(game.status);
     resetGame();
     resetBoardPosition();
+    localStorage.setItem("playerId", playerId);
   };
 
   const handleGameUpdated = (game: Game) => {

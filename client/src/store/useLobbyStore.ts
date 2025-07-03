@@ -10,4 +10,7 @@ export const useLobbyStore = create<LobbyStore>((set) => ({
     set((state) => ({
       lobbies: typeof lobbies === "function" ? lobbies(state.lobbies) : lobbies,
     })),
+  reconnectableGames: [],
+  setReconnectableGames: (games) =>
+    set({ reconnectableGames: games }),
 }));

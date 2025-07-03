@@ -1,5 +1,6 @@
+import { Server } from "socket.io";
 import type { Cell } from "../shared/types";
-import Timeout = NodeJS.Timeout;
+import { getGamesWithDisconnectedPlayers } from "./game/gameManager";
 
 function getTileCells(tileId: string) {
   const cells: Cell[] = [];
@@ -39,4 +40,10 @@ function countDownTimer(onTick: (time: string) => void) {
   return () => clearInterval(intervalId);
 }
 
-export { getTileCells, countDownTimer };
+const handleConnect = (io: Server) => {
+  const gamesWithDisconnectedPlayers = getGamesWithDisconnectedPlayers();
+
+  io.emit("games-with-disconnected-players", gamesWithDisconnectedPlayers);
+};
+
+export { getTileCells, countDownTimer, handleConnect };
