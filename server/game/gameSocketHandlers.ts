@@ -1,6 +1,11 @@
 import { Server, Socket } from "socket.io";
 import { Lobby } from "../../shared/types";
-import { createGame, deleteGame } from "./gameManager";
+import {
+  createGame,
+  deleteGame,
+  getGameBySocketId,
+  removePlayerFromGame,
+} from "./gameManager";
 import { deleteLobby } from "../lobby/lobbyManager";
 
 export const handleGameEvents = (io: Server, socket: Socket) => {
@@ -43,6 +48,44 @@ export const handleGameEvents = (io: Server, socket: Socket) => {
         }
       } else {
         callback({ success: false, errorMessage: "Failed to create game" });
+      }
+    }
+  );
+
+  socket.on(
+    "vote-kick-player-from-game",
+    (
+      data: {
+        gameId: string;
+        targetPlayerId: string;
+        votingPlayerId: string;
+      },
+      callback: (data: { success: boolean; errorMessage?: string }) => void
+    ) => {
+      console.log("vote-kick-player-from-game", data);
+      let game = getGameBySocketId(socket.id);
+      if (game) {
+        game.disconnectedPlayers[data.targetPlayerId].kickVotes.push(
+          data.votingPlayerId
+        );
+        if (
+          game.disconnectedPlayers[data.targetPlayerId]?.kickVotes?.length ===
+          game.players?.length - 1
+        ) {
+          console.log("removing player");
+          game = removePlayerFromGame(game.id, data.targetPlayerId);
+          if (!game) {
+            callback({
+              success: false,
+              errorMessage: "Failed to remove player",
+            });
+            return;
+          }
+        }
+
+        io.to(game.id).emit("game-updated", game);
+      } else {
+        callback({ success: false, errorMessage: "Game not found" });
       }
     }
   );

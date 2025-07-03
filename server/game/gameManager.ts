@@ -39,6 +39,10 @@ function getGameBySocketId(socketId: string): Game | undefined {
   );
 }
 
+function getGameById(gameId: string): Game | undefined {
+  return games.find((game) => game.id === gameId);
+}
+
 function getPlayerNameBySocketId(socketId: string): string {
   const game = getGameBySocketId(socketId);
   if (!game) return "Unknown";
@@ -64,4 +68,23 @@ function handleDisconnectFromGame(socketId: string, io: Server) {
   io.to(game.id).emit("game-updated", game);
 }
 
-export { createGame, deleteGame, handleDisconnectFromGame };
+function removePlayerFromGame(gameId: string, targetPlayerId: string) {
+  const game = getGameById(gameId);
+  if (game) {
+    delete game.disconnectedPlayers[targetPlayerId];
+    game.players = game.players.filter(
+      (player) => player.id !== targetPlayerId
+    );
+    return game;
+  } else {
+    return undefined;
+  }
+}
+
+export {
+  createGame,
+  deleteGame,
+  handleDisconnectFromGame,
+  getGameBySocketId,
+  removePlayerFromGame,
+};

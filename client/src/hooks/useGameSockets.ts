@@ -23,6 +23,8 @@ export const useGameSockets = () => {
   const handleGameCreated = (game: Game) => {
     console.log("game created", game);
     setGameId(game.id);
+    setPlayers(game.players);
+    setStatus(game.status);
     resetGame();
     resetBoardPosition();
   };

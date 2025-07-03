@@ -1,8 +1,12 @@
-// import { useState } from "react";
+import { toast } from "react-hot-toast";
+import { getSocket } from "../../socket";
 import { useGameStore } from "../../store/useGameStore";
 import { usePlayerStore } from "../../store/usePlayerStore";
 
 const PlayerDisconnectedPopup = () => {
+  const socket = getSocket();
+
+  const gameId = useGameStore((state) => state.gameId);
   const disconnectedPlayers = useGameStore(
     (state) => state.disconnectedPlayers
   );
@@ -15,8 +19,6 @@ const PlayerDisconnectedPopup = () => {
     (player) => player.id !== Object.keys(disconnectedPlayers)[0]
   );
 
-  console.log({ disconnectedPlayer });
-
   const remainingPlayersWithVotes = remainingPlayers.map((player) => {
     return {
       id: player.id,
@@ -26,11 +28,26 @@ const PlayerDisconnectedPopup = () => {
     };
   });
 
-  console.log({ remainingPlayersWithVotes });
+  const votedCount = remainingPlayersWithVotes.filter((p) => p.hasVoted).length;
+
+  const handleVoteToRemove = () => {
+    console.log("vote to remove");
+    socket.emit(
+      "vote-kick-player-from-game",
+      {
+        gameId: gameId,
+        targetPlayerId: Object.keys(disconnectedPlayers)[0],
+        votingPlayerId: playerId,
+      },
+      (data: { success: boolean; errorMessage?: string }) => {
+        if (!data.success) {
+          toast.error(data.errorMessage ?? "Failed to vote to remove player");
+        }
+      }
+    );
+  };
 
   if (Object.keys(disconnectedPlayers).length === 0) return null;
-
-  const votedCount = remainingPlayersWithVotes.filter((p) => p.hasVoted).length;
 
   return (
     <div
@@ -190,6 +207,11 @@ const PlayerDisconnectedPopup = () => {
                 transition: "all 0.2s",
                 boxShadow: "0 2px 4px rgba(0, 0, 0, 0.3)",
               }}
+              onClick={() => handleVoteToRemove()}
+              disabled={
+                remainingPlayersWithVotes.find((p) => p.isCurrentPlayer)
+                  ?.hasVoted
+              }
             >
               Vote to Remove
             </button>
