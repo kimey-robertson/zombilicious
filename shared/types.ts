@@ -58,4 +58,20 @@ export type Game = {
   players: Player[];
   status: "active" | "paused";
   disconnectedPlayers: { [socketId: string]: DisconnectedPlayer };
+  gameLogs: LogEvent[];
+};
+
+export type LogEvent = {
+  id: string;
+  timestamp: Date;
+  type:
+    | "combat"
+    | "movement"
+    | "item"
+    | "zombie"
+    | "survivor"
+    | "noise"
+    | "system";
+  message: string;
+  icon?: string;
 };

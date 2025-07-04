@@ -4,6 +4,7 @@ import {
   Lobby,
   Player,
   Zone,
+  LogEvent,
 } from "../../../shared/types";
 
 export type Offset = { x: number; y: number };
@@ -58,6 +59,10 @@ export type GameStore = {
     disconnectTimers:
       | { [key: string]: string }
       | ((prev: { [key: string]: string }) => { [key: string]: string })
+  ) => void;
+  gameLogs: LogEvent[];
+  setGameLogs: (
+    gameLogs: LogEvent[] | ((prev: LogEvent[]) => LogEvent[])
   ) => void;
 };
 

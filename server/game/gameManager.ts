@@ -1,5 +1,5 @@
 import { Server } from "socket.io";
-import { Game, Lobby } from "../../shared/types";
+import { Game, Lobby, LogEvent } from "../../shared/types";
 import { countDownTimer } from "../utils";
 
 const games: Game[] = [];
@@ -18,6 +18,7 @@ function createGame(lobby: Lobby): Game | undefined {
     })),
     status: "active",
     disconnectedPlayers: {},
+    gameLogs: [],
   };
 
   games.push(game);
@@ -58,6 +59,14 @@ function handleDisconnectFromGame(socketId: string, io: Server) {
   if (!game) return;
   const disconnectedPlayer = getPlayerNameBySocketId(socketId);
 
+  sendLogEvent(io, game.id, {
+    id: (game.gameLogs.length + 1).toString(),
+    timestamp: new Date(),
+    type: "system",
+    message: `Player ${disconnectedPlayer} disconnected from game`,
+    icon: "🚫",
+  });
+
   game.disconnectedPlayers[socketId] = {
     name: disconnectedPlayer,
     disconnectedAt: new Date(),
@@ -76,6 +85,13 @@ function handleDisconnectFromGame(socketId: string, io: Server) {
         newGame.status = "active";
         io.to(newGame.id).emit("game-updated", newGame);
         const gamesWithDisconnectedPlayers = getGamesWithDisconnectedPlayers();
+        sendLogEvent(io, newGame.id, {
+          id: (newGame.gameLogs.length + 1).toString(),
+          timestamp: new Date(),
+          type: "system",
+          message: `Player ${disconnectedPlayer} has been removed from game because they did not reconnect in time`,
+          icon: "🚫",
+        });
         io.emit(
           "games-with-disconnected-players",
           gamesWithDisconnectedPlayers
@@ -167,12 +183,30 @@ function rejoinGame(
     game.players[playerIndex].id = newPlayerId;
   }
 
+  sendLogEvent(io, game.id, {
+    id: (game.gameLogs.length + 1).toString(),
+    timestamp: new Date(),
+    type: "system",
+    message: `Player ${getPlayerNameBySocketId(
+      newPlayerId
+    )} reconnected to game`,
+    icon: "❤️",
+  });
+
   // If no more disconnected players, set game status to active
   if (Object.keys(game.disconnectedPlayers).length === 0) {
     game.status = "active";
   }
 
   return game;
+}
+
+function sendLogEvent(io: Server, gameId: string, logEvent: LogEvent) {
+  const game = getGameById(gameId);
+  if (game) {
+    io.to(gameId).emit("log-event", logEvent);
+    game.gameLogs.push(logEvent);
+  }
 }
 
 export {
@@ -185,4 +219,6 @@ export {
   getGamesWithDisconnectedPlayers,
   stopPlayerDisconnectTimer,
   rejoinGame,
+  sendLogEvent,
+  getPlayerNameBySocketId,
 };

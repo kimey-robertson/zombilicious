@@ -22,4 +22,10 @@ export const useGameStore = create<GameStore>((set) => ({
           ? disconnectTimers(state.disconnectTimers)
           : disconnectTimers,
     })),
+  gameLogs: [],
+  setGameLogs: (gameLogs) =>
+    set((state) => ({
+      gameLogs:
+        typeof gameLogs === "function" ? gameLogs(state.gameLogs) : gameLogs,
+    })),
 }));

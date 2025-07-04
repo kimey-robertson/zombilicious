@@ -7,6 +7,8 @@ import {
   getGamesWithDisconnectedPlayers,
   removePlayerFromGame,
   rejoinGame,
+  sendLogEvent,
+  getPlayerNameBySocketId,
 } from "./gameManager";
 import { deleteLobby } from "../lobby/lobbyManager";
 
@@ -90,6 +92,13 @@ export const handleGameEvents = (io: Server, socket: Socket) => {
               "games-with-disconnected-players",
               gamesWithDisconnectedPlayers
             );
+            sendLogEvent(io, game.id, {
+              id: (game.gameLogs.length + 1).toString(),
+              timestamp: new Date(),
+              type: "system",
+              message: `Player ${getPlayerNameBySocketId(data.targetPlayerId)} has been voted to be kicked from game`,
+              icon: "🚫",
+            });
           }
         }
 

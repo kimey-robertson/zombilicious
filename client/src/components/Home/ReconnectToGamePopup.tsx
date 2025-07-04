@@ -14,7 +14,7 @@ const ReconnectToGamePopup = () => {
     Object.keys(game.disconnectedPlayers).includes(playerId)
   );
 
-  if (reconnectableGames.length === 0 || !gameToConnectTo) {
+  if (reconnectableGames.length === 0 || !gameToConnectTo || !disconnectTimers[playerId]) {
     return null;
   }
 

@@ -12,7 +12,9 @@ import {
 import { Lobby } from "../../shared/types";
 import {
   getGamesWithDisconnectedPlayers,
+  getPlayerNameBySocketId,
   removePlayerFromGame,
+  sendLogEvent,
 } from "../game/gameManager";
 
 export const handleLobbyEvents = (io: Server, socket: Socket) => {
@@ -153,6 +155,7 @@ export const handleLobbyEvents = (io: Server, socket: Socket) => {
       { gameId, playerId }: { gameId: string; playerId: string },
       callback: (data: { success: boolean; errorMessage?: string }) => void
     ) => {
+      const playerName = getPlayerNameBySocketId(playerId);
       const game = removePlayerFromGame(gameId, playerId, io);
       if (game) {
         game.status = "active";
@@ -162,6 +165,13 @@ export const handleLobbyEvents = (io: Server, socket: Socket) => {
           gamesWithDisconnectedPlayers
         );
         io.to(game.id).emit("game-updated", game);
+        sendLogEvent(io, game.id, {
+          id: (game.gameLogs.length + 1).toString(),
+          timestamp: new Date(),
+          type: "system",
+          message: `Player ${playerName} has chosen to abandon you..`,
+          icon: "🚫",
+        });
         callback({ success: true });
       } else {
         callback({ success: false, errorMessage: "Game not found" });

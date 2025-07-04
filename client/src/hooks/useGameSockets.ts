@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { getSocket } from "../socket";
-import { Game } from "../../../shared/types";
+import { Game, LogEvent } from "../../../shared/types";
 import { useGameStore } from "../store/useGameStore";
 import { usePlayerStore } from "../store/usePlayerStore";
 
@@ -22,6 +22,7 @@ export const useGameSockets = () => {
   const setDisconnectTimers = useGameStore(
     (state) => state.setDisconnectTimers
   );
+  const setGameLogs = useGameStore((state) => state.setGameLogs);
 
   const playerId = usePlayerStore((state) => state.playerId);
 
@@ -30,6 +31,7 @@ export const useGameSockets = () => {
     setGameId(game.id);
     setPlayers(game.players);
     setStatus(game.status);
+    setGameLogs(game.gameLogs);
     resetGame();
     resetBoardPosition();
     localStorage.setItem("playerId", playerId || socket.id || "");
@@ -52,14 +54,20 @@ export const useGameSockets = () => {
     setDisconnectTimers((prev) => ({ ...prev, [playerId]: time }));
   };
 
+  const handleLogEvent = (logEvent: LogEvent) => {
+    setGameLogs((prev) => [...prev, logEvent]);
+  };
+
   useEffect(() => {
     socket.on("game-created", handleGameCreated);
     socket.on("game-updated", handleGameUpdated);
     socket.on("updated-disconnect-timer", handleUpdateDisconnectTimer);
+    socket.on("log-event", handleLogEvent);
     return () => {
       socket.off("game-created", handleGameCreated);
       socket.off("game-updated", handleGameUpdated);
       socket.off("updated-disconnect-timer", handleUpdateDisconnectTimer);
+      socket.off("log-event", handleLogEvent);
     };
   });
 };
