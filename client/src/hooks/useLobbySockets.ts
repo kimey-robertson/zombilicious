@@ -47,7 +47,6 @@ export const useLobbySockets = () => {
   };
 
   const handleGamesWithDisconnectedPlayers = (games: Game[]) => {
-    console.log("games with disconnected players", games);
     setReconnectableGames(games);
   };
 

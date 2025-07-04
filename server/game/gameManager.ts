@@ -109,7 +109,6 @@ function removePlayerFromGame(
       (player) => player.id !== targetPlayerId
     );
     io.emit("player-removed-from-game", targetPlayerId);
-
     return game;
   } else {
     return undefined;

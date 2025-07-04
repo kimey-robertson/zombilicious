@@ -10,6 +10,10 @@ import {
   toggleIsReadyLobbyPlayer,
 } from "./lobbyManager";
 import { Lobby } from "../../shared/types";
+import {
+  getGamesWithDisconnectedPlayers,
+  removePlayerFromGame,
+} from "../game/gameManager";
 
 export const handleLobbyEvents = (io: Server, socket: Socket) => {
   socket.on(
@@ -139,6 +143,28 @@ export const handleLobbyEvents = (io: Server, socket: Socket) => {
         });
       } else {
         callback({ success: false, errorMessage: "Lobby not found" });
+      }
+    }
+  );
+
+  socket.on(
+    "leave-disconnected-game",
+    (
+      { gameId, playerId }: { gameId: string; playerId: string },
+      callback: (data: { success: boolean; errorMessage?: string }) => void
+    ) => {
+      const game = removePlayerFromGame(gameId, playerId, io);
+      if (game) {
+        game.status = "active";
+        const gamesWithDisconnectedPlayers = getGamesWithDisconnectedPlayers();
+        io.emit(
+          "games-with-disconnected-players",
+          gamesWithDisconnectedPlayers
+        );
+        io.to(game.id).emit("game-updated", game);
+        callback({ success: true });
+      } else {
+        callback({ success: false, errorMessage: "Game not found" });
       }
     }
   );

@@ -1,3 +1,5 @@
+import toast from "react-hot-toast";
+import { getSocket } from "../../socket";
 import { useGameStore } from "../../store/useGameStore";
 import { useLobbyStore } from "../../store/useLobbyStore";
 
@@ -14,6 +16,8 @@ const ReconnectToGamePopup = () => {
     return null;
   }
 
+  const socket = getSocket();
+
   const activePlayers =
     gameToConnectTo.players?.length -
     Object.keys(gameToConnectTo?.disconnectedPlayers)?.length;
@@ -24,6 +28,24 @@ const ReconnectToGamePopup = () => {
   // Check if time is running low (less than 2 minutes)
   const isUrgent =
     timeRemaining.includes("01:") || timeRemaining.includes("00:");
+
+  const handleLeaveDisconnectedGame = () => {
+    const playerId = localStorage.getItem("playerId");
+    if (playerId) {
+      socket.emit(
+        "leave-disconnected-game",
+        {
+          gameId: gameToConnectTo.id,
+          playerId,
+        },
+        (response: { success: boolean; errorMessage?: string }) => {
+          if (!response.success) {
+            toast.error(response.errorMessage ?? "Failed to leave game");
+          }
+        }
+      );
+    }
+  };
 
   return (
     <div
@@ -255,8 +277,9 @@ const ReconnectToGamePopup = () => {
               cursor: "pointer",
               transition: "all 0.2s",
             }}
+            onClick={handleLeaveDisconnectedGame}
           >
-            Cancel
+            No thanks..
           </button>
         </div>
 
