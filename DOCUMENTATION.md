@@ -4,14 +4,15 @@
 
 1. [Project Overview](#project-overview)
 2. [Architecture](#architecture)
-3. [User Flow During Lobbies](#user-flow-during-lobbies)
+3. [Application Flow](#application-flow)
 4. [Socket Communication System](#socket-communication-system)
 5. [State Management](#state-management)
 6. [UI Components](#ui-components)
 7. [Game Board System](#game-board-system)
-8. [Development Features](#development-features)
-9. [Technical Details](#technical-details)
-10. [Future Plans](#future-plans)
+8. [Game Features](#game-features)
+9. [Development Features](#development-features)
+10. [Technical Details](#technical-details)
+11. [Future Plans](#future-plans)
 
 ---
 
@@ -20,8 +21,9 @@
 **Zombilicious** is a web-based multiplayer zombie survival game featuring:
 
 - Tile-based draggable/pannable board with CSS Grid
-- Real-time turn-based gameplay
-- Socket.IO for multiplayer synchronisation
+- Real-time turn-based gameplay with Socket.IO synchronization
+- Comprehensive lobby system with player management
+- Advanced disconnection handling and reconnection features
 - Fixed UI elements with responsive design
 - Modern React frontend with TypeScript
 
@@ -29,11 +31,30 @@
 
 - **Frontend**: React 19 + TypeScript + Vite + Tailwind CSS + Zustand
 - **Backend**: Node.js + Express + Socket.IO + TypeScript
-- **State Management**: Zustand
-- **Real-time Communication**: Socket.IO
+- **State Management**: Zustand (4 stores)
+- **Real-time Communication**: Socket.IO with separate lobby/game channels
 - **UI Libraries**: React Hot Toast, React Icons
 - **Build Tool**: Vite with hot reload
 - **Deployment**: Railway (planned)
+
+### Current Status
+
+✅ **Completed Features:**
+
+- Full lobby system with real-time updates
+- Game creation and management
+- Player disconnection/reconnection handling
+- Vote kick system for disconnected players
+- Tile-based game board with zones
+- Pan/zoom/rotate board controls
+- Action button system (UI mockup)
+- Development mode with debugging tools
+
+🚧 **In Progress:**
+
+- Game mechanics implementation
+- Token system for survivors and zombies
+- Inventory and combat systems
 
 ---
 
@@ -45,255 +66,308 @@
 zombilicious/
 ├── client/                 # React frontend
 │   ├── src/
-│   │   ├── components/     # React components organised by feature
-│   │   ├── store/         # Zustand state management
+│   │   ├── components/     # React components organized by feature
+│   │   │   ├── Home/       # Lobby system components
+│   │   │   ├── GameBoard/  # Game board and tiles
+│   │   │   ├── Overlay/    # UI overlay components
+│   │   │   ├── DevMode/    # Development tools
+│   │   │   └── UI/         # Reusable UI components
+│   │   ├── store/         # Zustand state management (4 stores)
 │   │   ├── hooks/         # Custom React hooks
 │   │   └── assets/        # Static assets (images, tiles)
 ├── server/                # Node.js backend
 │   ├── index.ts          # Server entry point
-│   ├── socketHandlers.ts # Socket.IO event handlers
-│   ├── lobbyLogic.ts     # Lobby management logic
+│   ├── config.ts         # Server configuration
+│   ├── lobby/            # Lobby management
+│   │   ├── lobbyManager.ts
+│   │   └── lobbySocketHandlers.ts
+│   ├── game/             # Game management
+│   │   ├── gameManager.ts
+│   │   └── gameSocketHandlers.ts
 │   ├── maps.ts           # Game map configurations
-│   └── config.ts         # Server configuration
+│   └── utils.ts          # Server utilities
 ├── shared/               # Shared TypeScript types
 └── tsconfig.json        # Root TypeScript config
 ```
 
 ### Key Design Patterns
 
-- **Component-based architecture** with feature-organised folders
-- **Centralized state management** using Zustand stores
-- **Real-time synchronisation** via Socket.IO events
-- **Type safety** with shared TypeScript interfaces
-- **Separation of concerns** between game logic and UI
+- **Modular architecture** with separate lobby and game systems
+- **Four-store state management** using Zustand
+- **Real-time synchronization** via Socket.IO with room-based events
+- **Type safety** with comprehensive shared TypeScript interfaces
+- **Separation of concerns** between UI, game logic, and networking
 
 ---
 
-## <a id="user-flow-during-lobbies"></a> 👥 User Flow During Lobbies
+## <a id="application-flow"></a> 📱 Application Flow
 
-### 1. Initial Entry
+### 1. Entry Point
 
-- User lands on home screen with `Home` component
+- User lands on `Home` component
 - Must enter player name (1-24 characters)
-- Two options: "Create Game" or "Join Game"
+- Options: "Create Game" or "Join Game"
+- Automatic reconnection prompt if player has disconnected game
 
-### 2. Creating a Lobby
+### 2. Lobby System
 
-**Flow**: `HomeButtons` → `LobbyScreen`
+**Creating a Lobby:**
 
-1. User enters player name and clicks "Create Game"
-2. Client emits `create-game-lobby` socket event with player name
-3. Server creates lobby with random 4-character ID
-4. Creator becomes host with `isHost: true` and `isReady: true`
-5. Returns to `LobbyScreen` with lobby details
+- `HomeButtons` → `LobbyScreen`
+- Creates random 4-character lobby ID
+- Host gets `isHost: true` and `isReady: true`
+- Real-time lobby updates via Socket.IO
 
-### 3. Joining a Lobby
+**Joining a Lobby:**
 
-**Flow**: `HomeButtons` → `JoinLobbiesScreen` → `LobbyScreen`
+- `HomeButtons` → `JoinLobbiesScreen` → `LobbyScreen`
+- Browse available lobbies with player counts
+- Join validation (max 4 players)
+- Real-time lobby synchronization
 
-1. User enters player name and clicks "Join Game"
-2. Client fetches all available lobbies via `fetch-lobbies` socket event
-3. User selects lobby from list (shows player count, lobby ID, status)
-4. Client emits `join-lobby` with lobby ID and player name
-5. Server validates (max 4 players, unique socket ID)
-6. Player joins with `isHost: false` and `isReady: false`
-7. Redirects to `LobbyScreen`
+**Lobby Management:**
 
-### 4. Lobby Management
+- **Host powers**: Change game name, delete lobby, start game
+- **Player powers**: Toggle ready status, leave lobby
+- **Real-time updates**: All changes broadcast instantly
 
-**In `LobbyScreen`:**
+### 3. Game Transition
 
-- **Left Panel**: Player list with ready/unready status indicators
-- **Right Panel**: Game settings (name, max players)
-- **Host Capabilities**:
-  - Change game name (real-time updates)
-  - Delete lobby (kicks all players)
-  - Start game (only when all players ready)
-- **Player Capabilities**:
-  - Toggle ready status
-  - Leave lobby
-- **Real-time Updates**: All changes broadcast via `lobby-updated` events
+- Host starts game when all players ready
+- Lobby converts to game with same ID
+- Players automatically join game room
+- `GameWrapper` component loads with full game interface
 
-### 5. Lobby States
+### 4. Game Flow
 
-- **Waiting**: Players joining, some not ready
-- **Ready**: All players marked ready, host can start
-- **Starting**: Game initialization (planned)
+- **Active Game**: Full game board with interaction
+- **Disconnection Handling**: Automatic pause with timer
+- **Vote Kick System**: Remaining players can vote to remove
+- **Reconnection**: Automatic popup for returning players
 
-### 6. Exit Flows
+### 5. Exit Flows
 
-- **Host leaves**: Lobby deleted, all players kicked
-- **Player leaves**: Removed from lobby, others notified
-- **Disconnection**: Automatic cleanup, host transfer if needed
+- **Leave Game**: Return to lobby system
+- **Disconnection**: Automatic cleanup and reconnection options
+- **Host Transfer**: Automatic in lobbies if host leaves
 
 ---
 
 ## <a id="socket-communication-system"></a> 🔌 Socket Communication System
 
-### Connection Setup
+### Connection Architecture
 
-- **Client**: Singleton socket connection via `getSocket()` in `socket.ts`
-- **Server**: Socket.IO server with CORS enabled for all origins
-- **Reconnection**: Configured with exponential backoff (1s-5s, max 5 attempts)
+- **Client**: Singleton socket via `getSocket()` in `socket.ts`
+- **Server**: Modular socket handlers for lobby and game events
+- **Rooms**: Automatic room management for lobbies and games
+- **Reconnection**: Exponential backoff (1s-5s, max 5 attempts)
 
-### Event Architecture
+### Event Categories
 
-#### Lobby Events (Bidirectional)
+#### Lobby Events
 
-| Event                          | Direction       | Purpose                  | Data                                    |
-| ------------------------------ | --------------- | ------------------------ | --------------------------------------- |
-| `create-game-lobby`            | Client → Server | Create new lobby         | `{playerName: string}`                  |
-| `delete-game-lobby`            | Client → Server | Delete lobby (host only) | `lobbyId: string`                       |
-| `join-lobby`                   | Client → Server | Join existing lobby      | `{lobbyId: string, playerName: string}` |
-| `leave-lobby`                  | Client → Server | Leave lobby              | `lobbyId: string`                       |
-| `fetch-lobbies`                | Client → Server | Get all lobbies          | None                                    |
-| `toggle-is-ready-lobby-player` | Client → Server | Toggle ready status      | `playerId: string`                      |
-| `change-game-name-lobby`       | Client → Server | Update game name         | `{lobbyId, gameName, playerId}`         |
+| Event                          | Direction        | Purpose             | Data                            |
+| ------------------------------ | ---------------- | ------------------- | ------------------------------- |
+| `create-game-lobby`            | Client → Server  | Create new lobby    | `{playerName: string}`          |
+| `delete-game-lobby`            | Client → Server  | Delete lobby (host) | `lobbyId: string`               |
+| `join-lobby`                   | Client → Server  | Join existing lobby | `{lobbyId, playerName}`         |
+| `leave-lobby`                  | Client → Server  | Leave lobby         | `lobbyId: string`               |
+| `fetch-lobbies`                | Client → Server  | Get all lobbies     | None                            |
+| `toggle-is-ready-lobby-player` | Client → Server  | Toggle ready status | `playerId: string`              |
+| `change-game-name-lobby`       | Client → Server  | Update game name    | `{lobbyId, gameName, playerId}` |
+| `lobby-updated`                | Server → Clients | Lobby state changed | `{lobbyId, gameName, players}`  |
+| `lobby-deleted`                | Server → Clients | Lobby removed       | `{lobbyId}`                     |
 
-#### Broadcast Events (Server → All Clients)
+#### Game Events
 
-| Event           | Purpose             | Data                           |
-| --------------- | ------------------- | ------------------------------ |
-| `lobby-updated` | Lobby state changed | `{lobbyId, gameName, players}` |
-| `lobby-deleted` | Lobby removed       | `{lobbyId}`                    |
+| Event                             | Direction        | Purpose                    | Data                                              |
+| --------------------------------- | ---------------- | -------------------------- | ------------------------------------------------- |
+| `create-game`                     | Client → Server  | Start game from lobby      | `Lobby` object                                    |
+| `game-created`                    | Server → Players | Game started               | `Game` object                                     |
+| `game-updated`                    | Server → Players | Game state changed         | `Game` object                                     |
+| `vote-kick-player-from-game`      | Client → Server  | Vote to remove player      | `{gameId, targetPlayerId, votingPlayerId}`        |
+| `rejoin-game`                     | Client → Server  | Reconnect to game          | `{gameId, playerIdFromLocalStorage, newPlayerId}` |
+| `leave-disconnected-game`         | Client → Server  | Leave as disconnected      | `{gameId, playerId}`                              |
+| `games-with-disconnected-players` | Server → All     | Update reconnectable games | `Game[]`                                          |
+| `updated-disconnect-timer`        | Server → All     | Timer updates              | `{time, playerId}`                                |
+| `player-removed-from-game`        | Server → All     | Player removed             | `playerId`                                        |
 
-### Socket Event Handlers
+### Advanced Features
 
-**Server (`socketHandlers.ts`)**:
-
-- Validates all inputs and permissions
-- Uses callback pattern for immediate responses
-- Broadcasts state changes to all connected clients
-- Handles disconnection cleanup automatically
-
-**Client (`useLobbySockets.ts`)**:
-
-- Hook-based event listener management
-- Automatic cleanup on component unmount
-- State synchronisation with Zustand stores
-
-### Error Handling
-
-- Callback-based error responses with descriptive messages
-- Toast notifications for user feedback
-- Graceful fallbacks for network issues
-- Automatic lobby cleanup on disconnection
+- **Room Management**: Automatic Socket.IO room joining/leaving
+- **Disconnection Handling**: 10-minute countdown timers
+- **Vote System**: Democratic player removal
+- **Reconnection**: Persistent player IDs in localStorage
+- **Error Handling**: Comprehensive callback-based error responses
 
 ---
 
 ## <a id="state-management"></a> 🗄️ State Management
 
-### Two-Store Architecture
+### Four-Store Architecture
 
 #### 1. Lobby Store (`useLobbyStore`)
 
-**Purpose**: Manages lobby-related state shared across users
+**Purpose**: Manages lobby-related state
 
 ```typescript
 {
   myLobbyId: string,           // Current lobby ID
   setMyLobbyId: (id) => void,
   lobbies: Lobby[],            // All available lobbies
-  setLobbies: (lobbies) => void
+  setLobbies: (lobbies) => void,
+  reconnectableGames: Game[],  // Games with disconnected players
+  setReconnectableGames: (games) => void
 }
 ```
 
 #### 2. Player Store (`usePlayerStore`)
 
-**Purpose**: Manages player-specific UI and game state
+**Purpose**: Player-specific UI and game state
 
 ```typescript
 {
-  // Game View Controls
-  zoom: number,                // Board zoom level (0.5-2.0)
+  // Board Controls
+  zoom: number,                // Board zoom (0.5-2.0)
   offset: {x, y},             // Board pan offset
   rotation: number,           // Board rotation (0-360)
+  resetBoardPosition: () => void,
 
   // Interaction States
-  isDragging: boolean,        // Currently dragging board
-  panMode: boolean,           // Space key held for panning
+  isDragging: boolean,        // Currently dragging
+  panMode: boolean,           // Space key held
   selectedZone: Zone,         // Selected board zone
-
-  // UI Controls
-  devMode: boolean,           // Development panel visibility
-  hideOverlay: boolean,       // Hide UI overlay
 
   // Player Identity
   playerName: string,         // Display name
-  playerId: string           // Socket ID
+  playerId: string,           // Socket ID
+
+  // Game Actions
+  totalActions: number,       // Total actions per turn
+  actionsRemaining: number,   // Actions left this turn
+  resetGame: () => void
 }
 ```
 
-### State Synchronisation
+#### 3. Game Store (`useGameStore`)
 
-- **Lobby state**: Synchronised via Socket.IO broadcasts
-- **Player state**: Local to each client
-- **Game state**: Planned for actual gameplay
-- **Persistence**: Currently in-memory only
+**Purpose**: Shared game state synchronized across players
+
+```typescript
+{
+  gameId: string,             // Current game ID
+  setGameId: (id) => void,
+  players: Player[],          // All players in game
+  setPlayers: (players) => void,
+  status: "active" | "paused", // Game status
+  setStatus: (status) => void,
+  disconnectedPlayers: {...}, // Disconnected player tracking
+  setDisconnectedPlayers: (players) => void,
+  disconnectTimers: {...},    // Countdown timers
+  setDisconnectTimers: (timers) => void
+}
+```
+
+#### 4. Dev Store (`useDevStore`)
+
+**Purpose**: Development and debugging features
+
+```typescript
+{
+  devMode: boolean,           // Development panel visibility
+  setDevMode: (mode) => void,
+  hideOverlay: boolean,       // Hide UI overlay
+  setHideOverlay: (hide) => void
+}
+```
+
+### State Synchronization
+
+- **Lobby State**: Real-time sync via Socket.IO broadcasts
+- **Game State**: Server-authoritative with client updates
+- **Player State**: Client-local with some server sync
+- **Dev State**: Client-local only
+- **Persistence**: Player ID in localStorage for reconnection
 
 ---
 
-## <a id="ui-components"></a>  🎨 UI Components
+## <a id="ui-components"></a> 🎨 UI Components
 
 ### Component Hierarchy
 
 ```
 App
 ├── Toaster (react-hot-toast)
-└── Home
-    ├── HomeButtons (initial screen)
-    ├── JoinLobbiesScreen (lobby browser)
-    └── LobbyScreen (lobby management)
-
-GameWrapper (commented out in App.tsx)
-├── GameBoard (tile-based board)
-├── Overlay (UI overlay)
-├── KeyboardListener (space key handler)
-└── DevMode (development tools)
+├── DevMode (development tools)
+└── Conditional Rendering:
+    ├── Home (lobby system)
+    │   ├── HomeButtons
+    │   ├── JoinLobbiesScreen
+    │   ├── LobbyScreen
+    │   └── ReconnectToGamePopup
+    └── GameWrapper (game interface)
+        ├── GameBoard
+        ├── Overlay
+        ├── KeyboardListener
+        └── PlayerDisconnectedPopup
 ```
 
-### Key Components
+### Key Component Systems
 
-#### `Home` Component Family
+#### Home System (Lobby Management)
 
-- **`Home.tsx`**: Main container with screen routing logic
-- **`HomeButtons.tsx`**: Player name input + create/join buttons
+- **`Home.tsx`**: Main routing and state management
+- **`HomeButtons.tsx`**: Player name input and game creation
 - **`JoinLobbiesScreen.tsx`**: Lobby browser with real-time updates
 - **`LobbyScreen.tsx`**: Full lobby management interface
+- **`ReconnectToGamePopup.tsx`**: Automatic reconnection handling
 
-#### `GameBoard` System (for future game)
+#### GameWrapper System
 
-- **`GameBoard.tsx`**: Main board container with pan/zoom controls
+- **`GameWrapper.tsx`**: Game container component
+- **`GameBoard/`**: Tile-based board system
+- **`Overlay/`**: UI overlay components
+- **`KeyboardListener.tsx`**: Keyboard event handling
+- **`PlayerDisconnectedPopup.tsx`**: Vote kick interface
+
+#### Game Board System
+
+- **`GameBoard.tsx`**: Main board container with pan/zoom
 - **`Tiles.tsx`**: Tile rendering system
-- **`Cell.tsx`**: Individual cell components
-- **Interaction**: Mouse-based pan/zoom, keyboard controls
+- **`Tile.tsx`**: Individual tile components with images
+- **`Cell.tsx`**: Interactive cell components
 
-#### `Overlay` System
+#### Overlay System
 
 - **`Overlay.tsx`**: Main overlay container
-- **`Header.tsx`**: Top navigation/info bar
-- **`RightSidebar.tsx`**: Right panel controls
-- **`Footer.tsx`**: Bottom action bar
+- **`Header.tsx`**: Top bar with reset/rotate controls
+- **`Footer.tsx`**: Bottom panel with action buttons
+- **`RightSidebar.tsx`**: Side panel for game info
+- **`ActionButtons.tsx`**: Game action interface
+- **`PlayerCards.tsx`**: Player status display
+- **`ActionsRemaining.tsx`**: Action counter
+- **`XPTracker.tsx`**: Experience tracking
+- **`ZoneInfoPanel.tsx`**: Zone information display
 
-#### UI Primitives (`UI/`)
+#### Development System
 
-- **`Button.tsx`**: Standardized button component with variants
-- **`Card.tsx`**: Flexible card component with header/content/actions
+- **`DevMode.tsx`**: Development tools container
+- **`DevModeSwitch.tsx`**: Dev mode toggle
+- **`DevPanel.tsx`**: Debug information panel
+
+#### UI Primitives
+
+- **`Button.tsx`**: Flexible button component with variants
+- **`Card.tsx`**: Card component with header/content/actions
 - **`Switch.tsx`**: Toggle switch component
 
-### Styling Architecture
+### Styling System
 
-- **Tailwind CSS**: Utility-first styling
-- **CSS Modules**: Component-specific styles (e.g., `GameBoard.css`)
-- **CSS Variables**: Custom color scheme
+- **Tailwind CSS**: Utility-first styling with custom configuration
+- **CSS Modules**: Component-specific styles (GameBoard.css, etc.)
+- **CSS Variables**: Dark theme with red/yellow accents
 - **Responsive Design**: Mobile-friendly layouts
-
-### Visual Design
-
-- **Theme**: Dark/apocalyptic with red accents
-- **Typography**: Bold, readable fonts with zombie aesthetics
-- **Animations**: Smooth transitions, hover effects
-- **Accessibility**: Focus states, readable contrast
+- **Accessibility**: Focus states and proper contrast
 
 ---
 
@@ -301,77 +375,147 @@ GameWrapper (commented out in App.tsx)
 
 ### Tile-Based Architecture
 
-The game uses a tile-based system:
-
 #### Data Models
 
 ```typescript
 Tile {
-  id: string,
-  position: {x, y},
-  rotation: 0|90|180|270,
-  cells: Cell[]
+  id: string,                 // Tile identifier (e.g., "1B", "2B")
+  position: {x, y},           // Grid position
+  rotation: 0|90|180|270,     // Tile rotation
+  cells: Cell[]               // 3x3 grid of cells
 }
 
 Cell {
-  id: string,
-  tileId: string,
-  row: number (0-2),
-  col: number (0-2)
+  id: string,                 // Cell identifier
+  tileId: string,             // Parent tile
+  row: number,                // Row (0-2)
+  col: number                 // Column (0-2)
 }
 
 Zone {
-  id: string,
-  cellIds: string[],
-  tileIds: string[],
-  room: boolean
+  id: string,                 // Zone identifier
+  cellIds: string[],          // Cells in zone
+  tileIds: string[],          // Tiles spanning zone
+  room: boolean               // Indoor/outdoor flag
 }
 ```
 
 #### Current Implementation
 
-- **Tutorial Map**: 2 tiles (1B and 2B) with predefined zones
-- **3x3 Grid**: Each tile contains 9 cells in a 3x3 layout
-- **Zone System**: Cells grouped into logical zones (rooms/outdoor areas)
-- **Cross-Tile Zones**: Zones can span multiple tiles
+- **Tutorial Map**: 2-tile setup with tiles "1B" and "2B"
+- **Tile Images**: Loaded dynamically from assets
+- **3x3 Cell Grid**: Each tile has 9 interactive cells
+- **Zone System**: 14 predefined zones spanning multiple tiles
+- **Cross-Tile Zones**: Zones can span multiple tiles seamlessly
 
-#### Interaction System
+#### Board Interaction System
 
-- **Pan Mode**: Hold spacebar + drag to pan around board
-- **Zoom**: Mouse wheel to zoom in/out (0.5x - 2.0x)
-- **Rotation**: Board rotation feature
-- **Zone Selection**: Click zones for zone information
+- **Pan Mode**: Hold spacebar + drag to pan
+- **Zoom**: Mouse wheel (0.5x to 2.0x)
+- **Rotation**: Board rotation controls
+- **Zone Selection**: Click cells to select zones
+- **Visual Feedback**: Cursor changes, hover effects
 
-#### Technical Details
+#### Technical Implementation
 
-- **CSS Grid**: Board rendered using CSS Grid layout
-- **Transform-based**: Pan/zoom via CSS transforms for performance
-- **Event Handling**: Mouse events for interaction
-- **State Management**: Board state in PlayerStore (unique to each player)
+- **CSS Grid**: 1.5x1.5 grid layout for tiles
+- **Transform-Based**: Hardware-accelerated pan/zoom/rotate
+- **Image Loading**: Dynamic tile image imports
+- **Event Handling**: Mouse/keyboard event management
+- **State Management**: Board state in PlayerStore
+
+---
+
+## <a id="game-features"></a> 🎮 Game Features
+
+### Player Management
+
+#### Lobby Features
+
+- **Real-time Player List**: Live updates of joined players
+- **Ready System**: Players must ready up before game start
+- **Host Powers**: Change game name, delete lobby, start game
+- **Player Limits**: Maximum 4 players per lobby
+
+#### Game Features
+
+- **Action System**: Players have 3 actions per turn (UI implemented)
+- **Action Types**: Search, Move, Door, Inventory, Melee, Ranged, Take, Noise
+- **Player Cards**: Display player status and information
+- **Experience Tracking**: XP system UI components
+
+### Disconnection Handling
+
+#### Automatic Detection
+
+- **Connection Monitoring**: Server detects player disconnections
+- **Game Pausing**: Game automatically pauses when player disconnects
+- **Timer System**: 10-minute countdown for disconnected players
+
+#### Vote Kick System
+
+- **Democratic Removal**: Remaining players vote to remove disconnected player
+- **Majority Required**: All remaining players must vote to remove
+- **Visual Interface**: Clear voting UI with player status
+
+#### Reconnection System
+
+- **Persistent IDs**: Player IDs stored in localStorage
+- **Automatic Detection**: Server tracks games with disconnected players
+- **Reconnection Popup**: Automatic popup for returning players
+- **Seamless Rejoining**: Players rejoin their original game
+
+### Board Interaction
+
+#### Zone System
+
+- **Interactive Cells**: Click cells to select zones
+- **Zone Information**: Display zone details in sidebar
+- **Room Detection**: Indoor/outdoor zone classification
+- **Multi-Tile Zones**: Zones span multiple tiles seamlessly
+
+#### Board Controls
+
+- **Pan/Zoom/Rotate**: Full board manipulation
+- **Reset Controls**: One-click board reset
+- **Keyboard Controls**: Spacebar for pan mode
+- **Visual Feedback**: Cursor changes and hover effects
 
 ---
 
 ## <a id="development-features"></a> 🛠️ Development Features
 
-### DevMode System
+### Development Mode System
 
-- **Toggle**: Only available in development builds
-- **Components**:
-  - `DevModeSwitch`: Toggle development panel
-  - `DevPanel`: Development tools and debugging info
-- **Features**: Debug information, state inspection
+#### DevMode Components
 
-### Hot Reload
+- **DevModeSwitch**: Toggle development panel on/off
+- **DevPanel**: Debug information and controls
+- **Overlay Controls**: Hide/show UI overlay
+- **State Inspection**: Access to all store states
+
+#### Development Tools
+
+- **Zone Debugging**: Display zone IDs and tile relationships
+- **State Monitoring**: Real-time state inspection
+- **Board Information**: Tile and cell debugging info
+- **Socket Debugging**: Connection and event monitoring
+
+### Development Environment
+
+#### Hot Reload System
 
 - **Vite**: Lightning-fast development server
-- **TypeScript**: Live type checking
-- **Socket**: Development socket server on port 8000
+- **TypeScript**: Live type checking and compilation
+- **Socket Server**: Development server on port 8000
+- **Asset Loading**: Dynamic tile image loading
 
-### Code Quality
+#### Code Quality
 
-- **ESLint**: Code linting with React hooks rules
+- **ESLint**: Comprehensive linting with React hooks rules
 - **TypeScript**: Full type safety across client/server
-- **Shared Types**: Common interfaces in `/shared` folder
+- **Shared Types**: Type definitions in `/shared/types.ts`
+- **Component Organization**: Feature-based component structure
 
 ---
 
@@ -379,84 +523,123 @@ Zone {
 
 ### Build System
 
-- **Client**: Vite build system with TypeScript
-- **Server**: ts-node for development, compiled for production
-- **Scripts**:
-  - `npm run dev` (client): Start development server
-  - `npm start` (root): Start production server
+#### Client Build
+
+- **Vite**: Modern build tool with TypeScript support
+- **Development**: `npm run dev` for hot reload
+- **Production**: Static build to `/client/dist`
+
+#### Server Build
+
+- **ts-node**: Development runtime
+- **Production**: Compiled TypeScript
+- **Socket.IO**: WebSocket server on port 8000
 
 ### Deployment Architecture
 
-- **Static Hosting**: Client builds to `/client/dist`
-- **Server Routing**: Express serves client + handles API
-- **Railway**: Planned deployment platform
-- **Environment**: PORT variable for server configuration
+#### Current Setup
 
-### Type Safety
+- **Development**: Local development with hot reload
+- **Production**: Planned Railway deployment
+- **Static Assets**: Tile images and other assets
+- **Environment**: PORT variable configuration
 
-- **Shared Types**: Common interfaces in `/shared/types.ts`
-- **Store Types**: Zustand store interfaces in `/client/src/store/storeTypes.ts`
-- **Socket Events**: Typed socket event handlers
+### Performance Optimizations
 
-### Performance Considerations
+#### Client-Side
 
-- **Singleton Socket**: Single socket connection per client
-- **State Batching**: Zustand automatic state batching
-- **Transform-based Animation**: Hardware-accelerated board movement
-- **Component Memoization**: Planned for game components
+- **Singleton Socket**: Single connection per client
+- **State Batching**: Zustand automatic batching
+- **Hardware Acceleration**: CSS transforms for board movement
+- **Dynamic Loading**: Lazy loading of tile images
 
-### Security
+#### Server-Side
 
-- **Input Validation**: Server-side validation for all inputs
+- **Room Management**: Efficient Socket.IO room handling
+- **Memory Management**: Proper cleanup of disconnected players
+- **Event Batching**: Efficient broadcast patterns
+
+### Security & Validation
+
+#### Input Validation
+
+- **Server-Side**: All inputs validated before processing
+- **Type Safety**: TypeScript interfaces for all data
+- **Error Handling**: Comprehensive error responses
+
+#### Network Security
+
+- **CORS**: Currently permissive for development
 - **Rate Limiting**: Planned for production
-- **CORS**: Currently permissive (development)
+- **Authentication**: Basic socket-based authentication
 
 ---
 
-## <a id="future-plans"></a>🚀 Future Plans
+## <a id="future-plans"></a> 🚀 Future Plans
 
-### Immediate Roadmap (from ROADMAP.md)
+### Immediate Development (Next Phase)
 
-- [ ] Basic survivor tokens
-- [ ] Basic zombie tokens
-- [ ] Game loop implementation
-- [ ] Game state management
-- [ ] Core game logic
-- [ ] Enhanced networking
-- [ ] Production deployment
+#### Core Game Mechanics
 
-### Planned Features
+- [ ] **Survivor Tokens**: Implement survivor pieces with stats
+- [ ] **Zombie Tokens**: Implement zombie pieces with AI
+- [ ] **Turn System**: Implement turn-based gameplay loop
+- [ ] **Action Implementation**: Connect action buttons to game logic
+- [ ] **Movement System**: Implement token movement on board
 
-- **Game Mechanics**: Turn-based gameplay, actions system
-- **Token System**: Survivor and zombie pieces
-- **Inventory**: Item management for survivors
-- **Combat**: Attack/defense mechanics
-- **Win Conditions**: Objective-based gameplay
+#### Game Features
+
+- [ ] **Inventory System**: Item management for survivors
+- [ ] **Combat System**: Attack and defense mechanics
+- [ ] **Search System**: Item discovery and collection
+- [ ] **Noise System**: Sound mechanics for zombie attraction
+- [ ] **Win Conditions**: Objective-based gameplay
+
+### Enhanced Networking
+
+- [ ] **Game State Sync**: Real-time game state synchronization
+- [ ] **Action Validation**: Server-side action validation
+
+### Polish & Production
+
+### Deployment & Scaling
+
+- [ ] **Railway Deployment**: Production deployment setup
+
+- [ ] **Monitoring**: Performance and error tracking
 
 ---
 
 ## 🔍 Key Files Reference
 
-### Core Server Files
+### Server Architecture
 
-- `server/index.ts` - Server entry point and Socket.IO setup
-- `server/socketHandlers.ts` - Socket event handlers and validation
-- `server/lobbyLogic.ts` - Lobby management business logic
+- `server/index.ts` - Main server entry point
 - `server/config.ts` - Express and Socket.IO configuration
+- `server/lobby/lobbyManager.ts` - Lobby business logic
+- `server/lobby/lobbySocketHandlers.ts` - Lobby socket events
+- `server/game/gameManager.ts` - Game business logic
+- `server/game/gameSocketHandlers.ts` - Game socket events
+- `server/maps.ts` - Game map definitions
+- `server/utils.ts` - Utility functions
 
-### Core Client Files
+### Client Architecture
 
-- `client/src/App.tsx` - Application root component
+- `client/src/App.tsx` - Application root with routing
 - `client/src/components/Home/` - Lobby system components
-- `client/src/store/` - Zustand state management
-- `client/src/hooks/useLobbySockets.ts` - Socket lobby event handling
+- `client/src/components/GameWrapper.tsx` - Game interface container
+- `client/src/components/GameBoard/` - Board and tile system
+- `client/src/components/Overlay/` - UI overlay components
+- `client/src/store/` - Zustand state management (4 stores)
+- `client/src/hooks/` - Custom React hooks for sockets
+- `client/src/socket.ts` - Socket.IO client configuration
 
 ### Shared Resources
 
-- `shared/types.ts` - Common TypeScript interfaces
-- `server/maps.ts` - Game map definitions
-- `server/utils.ts` - Server utility functions
+- `shared/types.ts` - TypeScript type definitions
+- `client/src/assets/` - Game tile images and assets
 
 ---
 
 Documentation created on 02/07/2025
+V1.1 04/07/2025
