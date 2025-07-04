@@ -1,9 +1,8 @@
 import { createServer } from "./config";
-import { handleDisconnectFromLobby } from "./lobby/lobbyManager";
+import { handleConnect, handleDisconnectFromLobby } from "./lobby/lobbyManager";
 import { handleLobbyEvents } from "./lobby/lobbySocketHandlers";
 import { handleGameEvents } from "./game/gameSocketHandlers";
 import { handleDisconnectFromGame } from "./game/gameManager";
-import { handleConnect } from "./utils";
 
 const { server, io, PORT } = createServer();
 

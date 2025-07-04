@@ -40,10 +40,4 @@ function countDownTimer(onTick: (time: string) => void) {
   return () => clearInterval(intervalId);
 }
 
-const handleConnect = (io: Server) => {
-  const gamesWithDisconnectedPlayers = getGamesWithDisconnectedPlayers();
-
-  io.emit("games-with-disconnected-players", gamesWithDisconnectedPlayers);
-};
-
-export { getTileCells, countDownTimer, handleConnect };
+export { getTileCells, countDownTimer };

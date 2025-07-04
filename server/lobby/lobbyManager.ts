@@ -1,5 +1,6 @@
 import { Server } from "socket.io";
 import { Lobby } from "../../shared/types";
+import { getGamesWithDisconnectedPlayers } from "../game/gameManager";
 
 const lobbies: Lobby[] = [];
 
@@ -148,6 +149,12 @@ function changeGameNameLobby(
   }
 }
 
+function handleConnect(io: Server) {
+  const gamesWithDisconnectedPlayers = getGamesWithDisconnectedPlayers();
+
+  io.emit("games-with-disconnected-players", gamesWithDisconnectedPlayers);
+}
+
 export {
   createLobby,
   deleteLobby,
@@ -158,4 +165,5 @@ export {
   leaveLobby,
   toggleIsReadyLobbyPlayer,
   changeGameNameLobby,
+  handleConnect,
 };
