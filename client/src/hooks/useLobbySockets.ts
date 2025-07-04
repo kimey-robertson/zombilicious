@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { getSocket } from "../socket";
 import { useLobbyStore } from "../store/useLobbyStore";
 import { Game, LobbyPlayer } from "../../../shared/types";
+import { useGameStore } from "../store/useGameStore";
 
 export const useLobbySockets = () => {
   const socketRef = useRef(getSocket());
@@ -10,6 +11,9 @@ export const useLobbySockets = () => {
   const setLobbies = useLobbyStore((state) => state.setLobbies);
   const setReconnectableGames = useLobbyStore(
     (state) => state.setReconnectableGames
+  );
+  const setDisconnectTimers = useGameStore(
+    (state) => state.setDisconnectTimers
   );
 
   const handleConnect = () => {
@@ -47,6 +51,17 @@ export const useLobbySockets = () => {
     setReconnectableGames(games);
   };
 
+  const handlePlayerRemovedFromGame = (playerId: string) => {
+    console.log("player removed from game", playerId);
+    setDisconnectTimers((prev) => {
+      delete prev[playerId];
+      return prev;
+    });
+    if (playerId === localStorage.getItem("playerId")) {
+      localStorage.removeItem("playerId");
+    }
+  };
+
   useEffect(() => {
     // Register socket event listeners
     socket.on("connect", handleConnect);
@@ -56,6 +71,7 @@ export const useLobbySockets = () => {
       "games-with-disconnected-players",
       handleGamesWithDisconnectedPlayers
     );
+    socket.on("player-removed-from-game", handlePlayerRemovedFromGame);
     return () => {
       // Clean up socket event listeners
       socket.off("connect", handleConnect);
@@ -65,6 +81,7 @@ export const useLobbySockets = () => {
         "games-with-disconnected-players",
         handleGamesWithDisconnectedPlayers
       );
+      socket.off("player-removed-from-game", handlePlayerRemovedFromGame);
     };
   });
 };

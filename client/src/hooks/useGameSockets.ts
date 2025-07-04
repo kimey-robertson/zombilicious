@@ -49,7 +49,6 @@ export const useGameSockets = () => {
     time: string;
     playerId: string;
   }) => {
-    console.log("update timer", time, playerId);
     setDisconnectTimers((prev) => ({ ...prev, [playerId]: time }));
   };
 

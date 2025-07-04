@@ -74,7 +74,7 @@ export const handleGameEvents = (io: Server, socket: Socket) => {
           game.players?.length - 1
         ) {
           console.log("removing player");
-          game = removePlayerFromGame(game.id, data.targetPlayerId);
+          game = removePlayerFromGame(game.id, data.targetPlayerId, io);
           if (!game) {
             callback({
               success: false,

@@ -71,7 +71,7 @@ function handleDisconnectFromGame(socketId: string, io: Server) {
 
   const stopTimer = countDownTimer((time) => {
     if (time === "00:00") {
-      const newGame = removePlayerFromGame(game.id, socketId);
+      const newGame = removePlayerFromGame(game.id, socketId, io);
       if (newGame) {
         newGame.status = "active";
         io.to(newGame.id).emit("game-updated", newGame);
@@ -96,7 +96,11 @@ function handleDisconnectFromGame(socketId: string, io: Server) {
   );
 }
 
-function removePlayerFromGame(gameId: string, targetPlayerId: string) {
+function removePlayerFromGame(
+  gameId: string,
+  targetPlayerId: string,
+  io: Server
+) {
   const game = getGameById(gameId);
   if (game) {
     stopPlayerDisconnectTimer(gameId, targetPlayerId);
@@ -104,6 +108,8 @@ function removePlayerFromGame(gameId: string, targetPlayerId: string) {
     game.players = game.players.filter(
       (player) => player.id !== targetPlayerId
     );
+    io.emit("player-removed-from-game", targetPlayerId);
+
     return game;
   } else {
     return undefined;
