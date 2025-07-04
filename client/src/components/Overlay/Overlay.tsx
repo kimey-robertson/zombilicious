@@ -3,10 +3,12 @@ import Header from "./Header";
 import RightSidebar from "./RightSidebar";
 import "./Overlay.css";
 import Footer from "./Footer";
+import LeftSidebar from "./LefttSidebar";
+import { useDevStore } from "../../store/useDevStore";
 
 const Overlay = () => {
   const isDragging = usePlayerStore((state) => state.isDragging);
-  const hideOverlay = usePlayerStore((state) => state.hideOverlay);
+  const hideOverlay = useDevStore((state) => state.hideOverlay);
 
   const conditionalClasses = [
     isDragging ? "overlay-dragging" : "",
@@ -16,6 +18,7 @@ const Overlay = () => {
   return (
     <div className={`overlay-wrapper ${conditionalClasses.join(" ")}`}>
       <Header />
+      <LeftSidebar />
       <RightSidebar />
       <Footer />
     </div>
