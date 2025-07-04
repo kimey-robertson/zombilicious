@@ -1,9 +1,9 @@
-import { usePlayerStore } from "../../store/usePlayerStore";
+import { useDevStore } from "../../store/useDevStore";
 import Switch from "../UI/Switch";
 
 const DevPanel = () => {
-  const hideOverlay = usePlayerStore((state) => state.hideOverlay);
-  const setHideOverlay = usePlayerStore((state) => state.setHideOverlay);
+  const hideOverlay = useDevStore((state) => state.hideOverlay);
+  const setHideOverlay = useDevStore((state) => state.setHideOverlay);
   return (
     <div className="side-panel overlay-item">
       <h3>Dev mode panel</h3>

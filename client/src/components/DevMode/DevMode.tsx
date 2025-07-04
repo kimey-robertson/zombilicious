@@ -1,9 +1,9 @@
 import DevModeSwitch from "../DevMode/DevModeSwitch";
 import DevPanel from "../DevMode/DevPanel";
-import { usePlayerStore } from "../../store/usePlayerStore";
+import { useDevStore } from "../../store/useDevStore";
 
 const DevMode = () => {
-  const devMode = usePlayerStore((state) => state.devMode);
+  const devMode = useDevStore((state) => state.devMode);
 
   return (
     <div className="dev-mode-wrapper">

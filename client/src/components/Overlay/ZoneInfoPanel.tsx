@@ -1,9 +1,10 @@
 import React from "react";
 import { usePlayerStore } from "../../store/usePlayerStore";
+import { useDevStore } from "../../store/useDevStore";
 
 const ZoneInfoPanel: React.FC = () => {
   const selectedZone = usePlayerStore((state) => state.selectedZone);
-  const devMode = usePlayerStore((state) => state.devMode);
+  const devMode = useDevStore((state) => state.devMode);
 
   if (!selectedZone) return null;
 

@@ -1,4 +1,10 @@
-import { Game, DisconnectedPlayer, Lobby, Player, Zone } from "../../../shared/types";
+import {
+  Game,
+  DisconnectedPlayer,
+  Lobby,
+  Player,
+  Zone,
+} from "../../../shared/types";
 
 export type Offset = { x: number; y: number };
 
@@ -16,10 +22,6 @@ export type PlayerStore = {
   setSelectedZone: (zone: Zone) => void;
   panMode: boolean;
   setPanMode: (panMode: boolean) => void;
-  devMode: boolean;
-  setDevMode: (devMode: boolean) => void;
-  hideOverlay: boolean;
-  setHideOverlay: (hideOverlay: boolean) => void;
   playerName: string;
   setPlayerName: (playerName: string) => void;
   playerId: string;
@@ -57,4 +59,11 @@ export type GameStore = {
       | { [key: string]: string }
       | ((prev: { [key: string]: string }) => { [key: string]: string })
   ) => void;
+};
+
+export type DevStore = {
+  devMode: boolean;
+  setDevMode: (devMode: boolean) => void;
+  hideOverlay: boolean;
+  setHideOverlay: (hideOverlay: boolean) => void;
 };
