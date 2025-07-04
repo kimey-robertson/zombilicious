@@ -2,10 +2,12 @@ import toast from "react-hot-toast";
 import { getSocket } from "../../socket";
 import { useGameStore } from "../../store/useGameStore";
 import { useLobbyStore } from "../../store/useLobbyStore";
+import { usePlayerStore } from "../../store/usePlayerStore";
 
 const ReconnectToGamePopup = () => {
   const reconnectableGames = useLobbyStore((state) => state.reconnectableGames);
   const disconnectTimers = useGameStore((state) => state.disconnectTimers);
+  const setPlayerId = usePlayerStore((state) => state.setPlayerId);
 
   const playerId = localStorage.getItem("playerId") ?? "";
   const gameToConnectTo = reconnectableGames.find((game) =>
@@ -41,6 +43,29 @@ const ReconnectToGamePopup = () => {
         (response: { success: boolean; errorMessage?: string }) => {
           if (!response.success) {
             toast.error(response.errorMessage ?? "Failed to leave game");
+          }
+        }
+      );
+    }
+  };
+
+  const handleReconnectToGame = () => {
+    const playerIdFromLocalStorage = localStorage.getItem("playerId");
+    const newPlayerId = socket.id;
+    if (playerIdFromLocalStorage) {
+      socket.emit(
+        "rejoin-game",
+        {
+          gameId: gameToConnectTo.id,
+          playerIdFromLocalStorage,
+          newPlayerId,
+        },
+        (response: { success: boolean; errorMessage?: string }) => {
+          if (response.success) {
+            toast.success("Reconnected to game!");
+            setPlayerId(newPlayerId || "");
+          } else {
+            toast.error(response.errorMessage ?? "Failed to reconnect to game");
           }
         }
       );
@@ -262,6 +287,7 @@ const ReconnectToGamePopup = () => {
               filter: "drop-shadow(0 0 4px rgba(139, 0, 0, 0.4))",
               animation: isUrgent ? "pulse 2s infinite" : "none",
             }}
+            onClick={handleReconnectToGame}
           >
             🎮 {isUrgent ? "RECONNECT NOW!" : "Reconnect"}
           </button>

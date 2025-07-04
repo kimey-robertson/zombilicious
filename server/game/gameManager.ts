@@ -128,12 +128,61 @@ function stopPlayerDisconnectTimer(gameId: string, playerId: string) {
   }
 }
 
+function rejoinGame(
+  gameId: string,
+  playerIdFromLocalStorage: string,
+  newPlayerId: string,
+  io: Server
+) {
+  const game = getGameById(gameId);
+  if (!game) {
+    return null;
+  }
+
+  // Check if player is actually disconnected from this game
+  if (!game.disconnectedPlayers[playerIdFromLocalStorage]) {
+    return null;
+  }
+
+  // Stop the disconnect timer for this player
+  stopPlayerDisconnectTimer(gameId, playerIdFromLocalStorage);
+
+  // Remove player from disconnected players
+  delete game.disconnectedPlayers[playerIdFromLocalStorage];
+
+  // Join the player's socket to the game room
+  const playerSocket = io.sockets.sockets.get(newPlayerId);
+  if (playerSocket) {
+    playerSocket.join(gameId);
+    console.log(
+      `Player ${newPlayerId} with previous id ${playerIdFromLocalStorage} rejoined game ${gameId}`
+    );
+  }
+
+  // Switch the player's id with the new player's id
+  const playerIndex = game.players.findIndex(
+    (player) => player.id === playerIdFromLocalStorage
+  );
+  if (playerIndex !== -1) {
+    game.players[playerIndex].id = newPlayerId;
+  }
+
+  // If no more disconnected players, set game status to active
+  if (Object.keys(game.disconnectedPlayers).length === 0) {
+    game.status = "active";
+  }
+
+  return game;
+}
+
 export {
   createGame,
   deleteGame,
   handleDisconnectFromGame,
   getGameBySocketId,
+  getGameById,
   removePlayerFromGame,
   getGamesWithDisconnectedPlayers,
   stopPlayerDisconnectTimer,
+  rejoinGame,
 };

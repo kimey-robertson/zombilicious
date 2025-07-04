@@ -32,7 +32,7 @@ export const useGameSockets = () => {
     setStatus(game.status);
     resetGame();
     resetBoardPosition();
-    localStorage.setItem("playerId", playerId);
+    localStorage.setItem("playerId", playerId || socket.id || "");
   };
 
   const handleGameUpdated = (game: Game) => {

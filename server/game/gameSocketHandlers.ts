@@ -6,6 +6,7 @@ import {
   getGameBySocketId,
   getGamesWithDisconnectedPlayers,
   removePlayerFromGame,
+  rejoinGame,
 } from "./gameManager";
 import { deleteLobby } from "../lobby/lobbyManager";
 
@@ -95,6 +96,50 @@ export const handleGameEvents = (io: Server, socket: Socket) => {
         io.to(game.id).emit("game-updated", game);
       } else {
         callback({ success: false, errorMessage: "Game not found" });
+      }
+    }
+  );
+
+  socket.on(
+    "rejoin-game",
+    (
+      {
+        gameId,
+        playerIdFromLocalStorage,
+        newPlayerId,
+      }: {
+        gameId: string;
+        playerIdFromLocalStorage: string;
+        newPlayerId: string;
+      },
+      callback: (data: { success: boolean; errorMessage?: string }) => void
+    ) => {
+      const game = rejoinGame(
+        gameId,
+        playerIdFromLocalStorage,
+        newPlayerId,
+        io
+      );
+      if (game) {
+        // Emit game-updated to all players in the game
+        io.to(game.id).emit("game-updated", game);
+
+        // Update the list of games with disconnected players
+        const gamesWithDisconnectedPlayers = getGamesWithDisconnectedPlayers();
+        io.emit(
+          "games-with-disconnected-players",
+          gamesWithDisconnectedPlayers
+        );
+
+        // Send the game state to the rejoining player
+        const playerSocket = io.sockets.sockets.get(newPlayerId);
+        if (playerSocket) {
+          playerSocket.emit("game-created", game);
+        }
+
+        callback({ success: true });
+      } else {
+        callback({ success: false, errorMessage: "Failed to rejoin game" });
       }
     }
   );
