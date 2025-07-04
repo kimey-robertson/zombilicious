@@ -75,9 +75,14 @@ function handleDisconnectFromGame(socketId: string, io: Server) {
       if (newGame) {
         newGame.status = "active";
         io.to(newGame.id).emit("game-updated", newGame);
+        const gamesWithDisconnectedPlayers = getGamesWithDisconnectedPlayers();
+        io.emit(
+          "games-with-disconnected-players",
+          gamesWithDisconnectedPlayers
+        );
       }
     } else {
-      io.to(game.id).emit("updated-disconnect-timer", {
+      io.emit("updated-disconnect-timer", {
         time,
         playerId: socketId,
       });
@@ -94,6 +99,7 @@ function handleDisconnectFromGame(socketId: string, io: Server) {
 function removePlayerFromGame(gameId: string, targetPlayerId: string) {
   const game = getGameById(gameId);
   if (game) {
+    stopPlayerDisconnectTimer(gameId, targetPlayerId);
     delete game.disconnectedPlayers[targetPlayerId];
     game.players = game.players.filter(
       (player) => player.id !== targetPlayerId
@@ -104,10 +110,17 @@ function removePlayerFromGame(gameId: string, targetPlayerId: string) {
   }
 }
 
-function getGamesWithDisconnectedPlayers() {
+function getGamesWithDisconnectedPlayers(): Game[] {
   return games.filter(
     (game) => Object.keys(game.disconnectedPlayers).length > 0
   );
+}
+
+function stopPlayerDisconnectTimer(gameId: string, playerId: string) {
+  const game = getGameById(gameId);
+  if (game) {
+    game.disconnectedPlayers[playerId]?.stopDisconnectTimer?.();
+  }
 }
 
 export {
@@ -117,4 +130,5 @@ export {
   getGameBySocketId,
   removePlayerFromGame,
   getGamesWithDisconnectedPlayers,
+  stopPlayerDisconnectTimer,
 };

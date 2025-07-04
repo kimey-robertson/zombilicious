@@ -1,14 +1,29 @@
+import { useGameStore } from "../../store/useGameStore";
 import { useLobbyStore } from "../../store/useLobbyStore";
 
 const ReconnectToGamePopup = () => {
   const reconnectableGames = useLobbyStore((state) => state.reconnectableGames);
-  const gameToConnectTo = reconnectableGames.find(
-    (game) => game.playerId === localStorage.getItem("playerId")
-  )?.game;
+  const disconnectTimers = useGameStore((state) => state.disconnectTimers);
+
+  const playerId = localStorage.getItem("playerId") ?? "";
+  const gameToConnectTo = reconnectableGames.find((game) =>
+    Object.keys(game.disconnectedPlayers).includes(playerId)
+  );
 
   if (reconnectableGames.length === 0 || !gameToConnectTo) {
     return null;
   }
+
+  const activePlayers =
+    gameToConnectTo.players?.length -
+    Object.keys(gameToConnectTo?.disconnectedPlayers)?.length;
+
+  // Get the current player's disconnect timer
+  const timeRemaining = disconnectTimers[playerId] || "00:00";
+
+  // Check if time is running low (less than 2 minutes)
+  const isUrgent =
+    timeRemaining.includes("01:") || timeRemaining.includes("00:");
 
   return (
     <div
@@ -52,6 +67,53 @@ const ReconnectToGamePopup = () => {
           }}
         >
           🔄 Reconnect to Game
+        </div>
+
+        {/* Timer Warning */}
+        <div
+          style={{
+            background: isUrgent
+              ? "rgba(220, 38, 38, 0.2)"
+              : "rgba(255, 193, 7, 0.2)",
+            border: `2px solid ${isUrgent ? "#dc2626" : "#ffc107"}`,
+            borderRadius: "0.5rem",
+            padding: "1rem",
+            marginBottom: "1.5rem",
+            animation: isUrgent ? "pulse 2s infinite" : "none",
+          }}
+        >
+          <div
+            style={{
+              fontSize: "0.9rem",
+              color: "rgba(255, 255, 255, 0.8)",
+              marginBottom: "0.5rem",
+            }}
+          >
+            {isUrgent ? "⚠️ URGENT: Time Running Out!" : "⏰ Time Remaining"}
+          </div>
+          <div
+            style={{
+              fontSize: "2.5rem",
+              fontWeight: "700",
+              color: isUrgent ? "#ef4444" : "#fbbf24",
+              fontFamily: "monospace",
+              letterSpacing: "0.1em",
+              filter: "drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5))",
+            }}
+          >
+            {timeRemaining}
+          </div>
+          <div
+            style={{
+              fontSize: "0.8rem",
+              color: "rgba(255, 255, 255, 0.6)",
+              marginTop: "0.25rem",
+            }}
+          >
+            {isUrgent
+              ? "Reconnect now or be removed!"
+              : "Before automatic removal"}
+          </div>
         </div>
 
         {/* Game Info */}
@@ -112,7 +174,7 @@ const ReconnectToGamePopup = () => {
                 Players:
               </span>
               <span style={{ color: "rgba(255, 255, 255, 0.9)" }}>
-                {gameToConnectTo.players.length}/4 Active
+                {activePlayers}/4 Active
               </span>
             </div>
             <div
@@ -170,15 +232,16 @@ const ReconnectToGamePopup = () => {
               fontWeight: "600",
               borderRadius: "0.5rem",
               border: "none",
-              background: "var(--primary-color)",
+              background: isUrgent ? "#dc2626" : "var(--primary-color)",
               color: "white",
               cursor: "pointer",
               transition: "all 0.2s",
               boxShadow: "0 2px 4px rgba(0, 0, 0, 0.3)",
               filter: "drop-shadow(0 0 4px rgba(139, 0, 0, 0.4))",
+              animation: isUrgent ? "pulse 2s infinite" : "none",
             }}
           >
-            🎮 Reconnect
+            🎮 {isUrgent ? "RECONNECT NOW!" : "Reconnect"}
           </button>
           <button
             style={{
@@ -208,6 +271,16 @@ const ReconnectToGamePopup = () => {
           The horde awaits your return... 🧟‍♂️
         </div>
       </div>
+
+      {/* Add CSS for pulse animation */}
+      <style>
+        {`
+          @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+          }
+        `}
+      </style>
     </div>
   );
 };

@@ -2,14 +2,12 @@ import { useEffect, useRef } from "react";
 import { getSocket } from "../socket";
 import { useLobbyStore } from "../store/useLobbyStore";
 import { Game, LobbyPlayer } from "../../../shared/types";
-import { toast } from "react-hot-toast";
 
 export const useLobbySockets = () => {
   const socketRef = useRef(getSocket());
   const socket = socketRef.current;
 
   const setLobbies = useLobbyStore((state) => state.setLobbies);
-  const reconnectableGames = useLobbyStore((state) => state.reconnectableGames);
   const setReconnectableGames = useLobbyStore(
     (state) => state.setReconnectableGames
   );
@@ -45,21 +43,8 @@ export const useLobbySockets = () => {
   };
 
   const handleGamesWithDisconnectedPlayers = (games: Game[]) => {
-    if (games?.length > 0) {
-      games.forEach((game) => {
-        const playerIdFromLocalStorage = localStorage.getItem("playerId");
-        if (
-          playerIdFromLocalStorage &&
-          game.disconnectedPlayers[playerIdFromLocalStorage]
-        ) {
-          toast.error("You have been disconnected from the game");
-          setReconnectableGames([
-            ...reconnectableGames,
-            { game, playerId: playerIdFromLocalStorage },
-          ]);
-        }
-      });
-    }
+    console.log("games with disconnected players", games);
+    setReconnectableGames(games);
   };
 
   useEffect(() => {

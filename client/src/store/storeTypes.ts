@@ -36,8 +36,8 @@ export type LobbyStore = {
   setMyLobbyId: (lobbyId: string) => void;
   lobbies: Lobby[];
   setLobbies: (lobbies: Lobby[] | ((prev: Lobby[]) => Lobby[])) => void;
-  reconnectableGames: { game: Game; playerId: string }[];
-  setReconnectableGames: (games: { game: Game; playerId: string }[]) => void;
+  reconnectableGames: Game[];
+  setReconnectableGames: (games: Game[]) => void;
 };
 
 export type GameStore = {

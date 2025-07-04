@@ -4,6 +4,7 @@ import {
   createGame,
   deleteGame,
   getGameBySocketId,
+  getGamesWithDisconnectedPlayers,
   removePlayerFromGame,
 } from "./gameManager";
 import { deleteLobby } from "../lobby/lobbyManager";
@@ -65,7 +66,7 @@ export const handleGameEvents = (io: Server, socket: Socket) => {
       console.log("vote-kick-player-from-game", data);
       let game = getGameBySocketId(socket.id);
       if (game) {
-        game.disconnectedPlayers[data.targetPlayerId].kickVotes.push(
+        game.disconnectedPlayers[data.targetPlayerId]?.kickVotes?.push(
           data.votingPlayerId
         );
         if (
@@ -82,6 +83,12 @@ export const handleGameEvents = (io: Server, socket: Socket) => {
             return;
           } else {
             game.status = "active";
+            const gamesWithDisconnectedPlayers =
+              getGamesWithDisconnectedPlayers();
+            io.emit(
+              "games-with-disconnected-players",
+              gamesWithDisconnectedPlayers
+            );
           }
         }
 
