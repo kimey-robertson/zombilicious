@@ -1,6 +1,5 @@
 import { Server } from "socket.io";
 import { Game, Lobby, LogEvent } from "../../shared/types";
-import { countDownTimer } from "../utils";
 
 const games: Game[] = [];
 

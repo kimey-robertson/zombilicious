@@ -28,7 +28,6 @@ export const handleLobbyEvents = (io: Server, socket: Socket) => {
       }) => void
     ) => {
       const lobby = createLobby(socket.id, playerName);
-      console.log("Lobby created with id:", lobby?.id, "by", playerName);
 
       if (!lobby) {
         return callback({
@@ -36,7 +35,6 @@ export const handleLobbyEvents = (io: Server, socket: Socket) => {
           errorMessage: "Failed to create lobby",
         });
       }
-
       callback({ success: true, lobby });
     }
   );
