@@ -35,7 +35,10 @@ export type Player = {
   totalActions: number;
   actionsRemaining: number;
   XP: number;
-  inventory: Item[];
+  playerCards: {
+    inReserve: Card[];
+    inHand: Card[];
+  };
 };
 
 export type LobbyPlayer = {
@@ -83,7 +86,7 @@ export type LogEvent = {
   icon?: string;
 };
 
-export type Item = {
+export type Card = {
   id: string;
   name: string;
 };

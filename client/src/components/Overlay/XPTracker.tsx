@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { IoSkullOutline } from "react-icons/io5";
+import { usePlayerStore } from "../../store/usePlayerStore";
 
 const XPTracker = () => {
-  const xp = 14;
+  const XP = usePlayerStore((state) => state.XP);
   const segments = Array.from({ length: 44 }, (_, i) => i);
   const getXPSegmentColor = (index: number) => {
     const total = 43;
@@ -105,7 +106,7 @@ const XPTracker = () => {
               className={`flex-1 border-r border-black/50 last:border-r-0 ${getXPSegmentColor(
                 num
               )} ${
-                num <= xp ? "opacity-100 shadow-inner" : "opacity-20"
+                num < XP ? "opacity-100 shadow-inner" : "opacity-20"
               } transition-all duration-300`}
             />
           ))}
@@ -114,7 +115,7 @@ const XPTracker = () => {
         {/* Skull indicator */}
         <div
           className="absolute -top-4 transition-all duration-500 transform -translate-x-1/2"
-          style={{ left: `${(xp / 43) * 100}%` }}
+          style={{ left: `${(XP / 43) * 100}%` }}
         >
           <IoSkullOutline
             size={18}
@@ -132,7 +133,7 @@ const XPTracker = () => {
 
       {/* <div className="text-center mt-3">
         <span className="text-red-400 font-bold tracking-widest font-mono">
-          SURVIVAL XP: {xp}/43
+          SURVIVAL XP: {XP}/43
         </span>
       </div> */}
     </div>

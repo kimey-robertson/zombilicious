@@ -19,7 +19,7 @@ function createGame(lobby: Lobby): Game | undefined {
       totalActions: 3,
       actionsRemaining: 3,
       XP: 0,
-      inventory: [],
+      playerCards: { inReserve: [], inHand: [] },
     })),
     status: "active",
     disconnectedPlayers: {},

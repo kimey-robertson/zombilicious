@@ -32,12 +32,12 @@ export const usePlayerStore = create<PlayerStore>((set) => ({
   setPlayerName: (playerName) => set({ playerName }),
   playerId: "",
   setPlayerId: (playerId) => set({ playerId }),
-  resetGame: () =>
-    set({
-      actionsRemaining: 3,
-    }),
   totalActions: 3,
   setTotalActions: (totalActions) => set({ totalActions }),
   actionsRemaining: 3,
   setActionsRemaining: (actionsRemaining) => set({ actionsRemaining }),
+  XP: 0,
+  setXP: (XP) => set({ XP }),
+  playerCards: { inReserve: [], inHand: [] },
+  setPlayerCards: (playerCards) => set({ playerCards }),
 }));

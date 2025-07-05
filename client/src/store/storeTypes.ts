@@ -5,6 +5,7 @@ import {
   Player,
   Zone,
   LogEvent,
+  Card,
 } from "../../../shared/types";
 
 export type Offset = { x: number; y: number };
@@ -31,7 +32,13 @@ export type PlayerStore = {
   setTotalActions: (totalActions: number) => void;
   actionsRemaining: number;
   setActionsRemaining: (actionsRemaining: number) => void;
-  resetGame: () => void;
+  XP: number;
+  setXP: (XP: number) => void;
+  playerCards: {
+    inReserve: Card[];
+    inHand: Card[];
+  };
+  setPlayerCards: (playerCards: { inReserve: Card[]; inHand: Card[] }) => void;
 };
 
 export type LobbyStore = {
