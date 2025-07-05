@@ -225,14 +225,17 @@ function updatePlayerTurn(gameId: string, io: Server) {
     if (playerIndex !== -1) {
       game.players[playerIndex].myTurn = false;
     }
-    game.players[playerIndex + 1].myTurn = true;
-    sendLogEvent(io, gameId, {
-      id: (game.gameLogs.length + 1).toString(),
-      timestamp: new Date(),
-      type: "system",
-      message: `It's now player ${game.players[playerIndex + 1].name}'s turn`,
-      icon: "🔥",
-    });
+    const nextPlayer = game.players[playerIndex + 1];
+    if (nextPlayer) {
+      nextPlayer.myTurn = true;
+      sendLogEvent(io, gameId, {
+        id: (game.gameLogs.length + 1).toString(),
+        timestamp: new Date(),
+        type: "system",
+        message: `It's now player ${nextPlayer.name}'s turn`,
+        icon: "🔥",
+      });
+    }
     io.to(gameId).emit("game-updated", game);
   }
 }
