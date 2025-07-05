@@ -9,6 +9,7 @@ import {
   rejoinGame,
   sendLogEvent,
   getPlayerNameBySocketId,
+  updatePlayerTurn,
 } from "./gameManager";
 import { deleteLobby } from "../lobby/lobbyManager";
 
@@ -152,6 +153,23 @@ export const handleGameEvents = (io: Server, socket: Socket) => {
         callback({ success: true });
       } else {
         callback({ success: false, errorMessage: "Failed to rejoin game" });
+      }
+    }
+  );
+
+  socket.on(
+    "end-turn",
+    (
+      { gameId }: { gameId: string },
+      callback: (data: { success: boolean; errorMessage?: string }) => void
+    ) => {
+      console.log("end turn");
+      const game = updatePlayerTurn(gameId, io);
+      if (game) {
+        callback({ success: true });
+        io.to(gameId).emit("game-updated", game);
+      } else {
+        callback({ success: false, errorMessage: "Failed to end turn" });
       }
     }
   );

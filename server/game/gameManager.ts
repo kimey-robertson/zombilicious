@@ -122,10 +122,13 @@ function removePlayerFromGame(
   targetPlayerId: string,
   io: Server
 ) {
-  const game = getGameById(gameId);
+  let game = getGameById(gameId);
   if (game) {
     if (game.players.find((player) => player.myTurn)?.id === targetPlayerId) {
-      updatePlayerTurn(gameId, io);
+      game = updatePlayerTurn(gameId, io);
+      if (!game) {
+        return undefined;
+      }
     }
     stopPlayerDisconnectTimer(gameId, targetPlayerId);
     delete game.disconnectedPlayers[targetPlayerId];
@@ -218,7 +221,7 @@ function sendLogEvent(io: Server, gameId: string, logEvent: LogEvent) {
   }
 }
 
-function updatePlayerTurn(gameId: string, io: Server) {
+function updatePlayerTurn(gameId: string, io: Server): Game | undefined {
   const game = getGameById(gameId);
   if (game) {
     const playerIndex = game.players.findIndex((player) => player.myTurn);
@@ -236,7 +239,8 @@ function updatePlayerTurn(gameId: string, io: Server) {
         icon: "🔥",
       });
     }
-    io.to(gameId).emit("game-updated", game);
+    // io.to(gameId).emit("game-updated", game);
+    return game;
   }
 }
 
@@ -252,4 +256,5 @@ export {
   rejoinGame,
   sendLogEvent,
   getPlayerNameBySocketId,
+  updatePlayerTurn,
 };

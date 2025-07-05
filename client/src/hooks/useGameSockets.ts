@@ -46,6 +46,7 @@ export const useGameSockets = () => {
     setPlayers(game.players);
     setStatus(game.status);
     setDisconnectedPlayers(game.disconnectedPlayers);
+    setIsMyTurn(game.players.find((p) => p.id === playerId)?.myTurn || false);
   };
 
   const handleUpdateDisconnectTimer = ({

@@ -2,15 +2,29 @@
 
 import { usePlayerStore } from "../../store/usePlayerStore";
 import { Button } from "../UI/Button";
+import { getSocket } from "../../socket";
+import { useGameStore } from "../../store/useGameStore";
+import { toast } from "react-hot-toast";
 
 const ActionsRemaining = () => {
+  const socket = getSocket();
   const actionsRemaining = usePlayerStore((state) => state.actionsRemaining);
   const totalActions = usePlayerStore((state) => state.totalActions);
-
   const isMyTurn = usePlayerStore((state) => state.isMyTurn);
+
+  const gameId = useGameStore((state) => state.gameId);
 
   const handleEndTurn = () => {
     console.log("end turn");
+    socket.emit(
+      "end-turn",
+      { gameId },
+      (result: { success: boolean; errorMessage?: string }) => {
+        if (!result.success) {
+          toast.error(result.errorMessage || "Failed to end turn");
+        }
+      }
+    );
   };
 
   return (
