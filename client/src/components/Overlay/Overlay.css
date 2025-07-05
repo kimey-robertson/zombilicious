@@ -39,8 +39,6 @@
 
 .side-panel {
   position: relative;
-  right: 1rem;
-  top: 1rem;
   width: 200px;
   background-color: #1c1c1c;
   color: #eee;
