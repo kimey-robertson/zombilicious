@@ -70,36 +70,6 @@ function getLobbyByPlayerSocketId(playerSocketId: string): Lobby | undefined {
   );
 }
 
-// If the player is in a lobby, remove them from the lobby, and if the lobby is empty, delete the lobby
-function handleDisconnectFromLobby(playerSocketId: string, io: Server) {
-  const lobby = getLobbyByPlayerSocketId(playerSocketId);
-  if (lobby) {
-    const disconnectedPlayer = lobby.players.find(
-      (player) => player.id === playerSocketId
-    );
-    if (!disconnectedPlayer) {
-      return;
-    }
-    lobby.players = lobby.players.filter(
-      (player) => player.id !== disconnectedPlayer?.id
-    );
-    if (lobby.players.length === 0) {
-      deleteLobby(lobby.id);
-    } else {
-      if (disconnectedPlayer.isHost) {
-        if (lobby.players.length > 0) {
-          const newHost = lobby.players[0];
-          newHost.isHost = true;
-        }
-      }
-      io.emit("lobby-updated", {
-        lobbyId: lobby.id,
-        players: lobby.players,
-      });
-    }
-  }
-}
-
 function leaveLobby(
   lobbyId: string,
   playerSocketId: string
@@ -149,21 +119,13 @@ function changeGameNameLobby(
   }
 }
 
-function handleConnect(io: Server) {
-  const gamesWithDisconnectedPlayers = getGamesWithDisconnectedPlayers();
-
-  io.emit("games-with-disconnected-players", gamesWithDisconnectedPlayers);
-}
-
 export {
   createLobby,
   deleteLobby,
   getAllLobbies,
   joinLobby,
   getLobbyByPlayerSocketId,
-  handleDisconnectFromLobby,
   leaveLobby,
   toggleIsReadyLobbyPlayer,
   changeGameNameLobby,
-  handleConnect,
 };

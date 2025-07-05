@@ -59,64 +59,6 @@ function getPlayerNameBySocketId(socketId: string): string {
   );
 }
 
-function handleDisconnectFromGame(socketId: string, io: Server) {
-  const game = getGameBySocketId(socketId);
-  if (!game) return;
-  const disconnectedPlayer = getPlayerNameBySocketId(socketId);
-
-  sendLogEvent(io, game.id, {
-    id: (game.gameLogs.length + 1).toString(),
-    timestamp: new Date(),
-    type: "system",
-    message: `Player ${disconnectedPlayer} disconnected from game`,
-    icon: "🚫",
-  });
-
-  game.disconnectedPlayers[socketId] = {
-    name: disconnectedPlayer,
-    disconnectedAt: new Date(),
-    kickVotes: [],
-    id: socketId,
-  };
-
-  game.status = "paused";
-
-  io.to(game.id).emit("game-updated", game);
-
-  const stopTimer = countDownTimer((time) => {
-    if (time === "00:00") {
-      const newGame = removePlayerFromGame(game.id, socketId, io);
-      if (newGame) {
-        newGame.status = "active";
-        io.to(newGame.id).emit("game-updated", newGame);
-        const gamesWithDisconnectedPlayers = getGamesWithDisconnectedPlayers();
-        sendLogEvent(io, newGame.id, {
-          id: (newGame.gameLogs.length + 1).toString(),
-          timestamp: new Date(),
-          type: "system",
-          message: `Player ${disconnectedPlayer} has been removed from game because they did not reconnect in time`,
-          icon: "🚫",
-        });
-        io.emit(
-          "games-with-disconnected-players",
-          gamesWithDisconnectedPlayers
-        );
-      }
-    } else {
-      io.emit("updated-disconnect-timer", {
-        time,
-        playerId: socketId,
-      });
-    }
-  });
-
-  game.disconnectedPlayers[socketId].stopDisconnectTimer = stopTimer;
-  console.log(
-    "game.disconnectedPlayers[socketId]",
-    game.disconnectedPlayers[socketId]
-  );
-}
-
 function removePlayerFromGame(
   gameId: string,
   targetPlayerId: string,
@@ -247,7 +189,6 @@ function updatePlayerTurn(gameId: string, io: Server): Game | undefined {
 export {
   createGame,
   deleteGame,
-  handleDisconnectFromGame,
   getGameBySocketId,
   getGameById,
   removePlayerFromGame,

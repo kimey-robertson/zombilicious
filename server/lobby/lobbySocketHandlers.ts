@@ -4,7 +4,6 @@ import {
   createLobby,
   deleteLobby,
   getAllLobbies,
-  handleDisconnectFromLobby,
   joinLobby,
   leaveLobby,
   toggleIsReadyLobbyPlayer,
