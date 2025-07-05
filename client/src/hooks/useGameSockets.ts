@@ -25,6 +25,7 @@ export const useGameSockets = () => {
   const setGameLogs = useGameStore((state) => state.setGameLogs);
 
   const playerId = usePlayerStore((state) => state.playerId);
+  const setIsMyTurn = usePlayerStore((state) => state.setIsMyTurn);
 
   const resetPlayerGame = useResetPlayerGame();
 
@@ -34,6 +35,7 @@ export const useGameSockets = () => {
     setPlayers(game.players);
     setStatus(game.status);
     setGameLogs(game.gameLogs);
+    setIsMyTurn(game.players.find((p) => p.id === playerId)?.myTurn || false);
     resetPlayerGame(game.players.find((p) => p.id === playerId));
     resetBoardPosition();
     localStorage.setItem("playerId", playerId || socket.id || "");

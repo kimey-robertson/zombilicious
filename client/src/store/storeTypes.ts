@@ -39,6 +39,8 @@ export type PlayerStore = {
     inHand: Card[];
   };
   setPlayerCards: (playerCards: { inReserve: Card[]; inHand: Card[] }) => void;
+  isMyTurn: boolean;
+  setIsMyTurn: (isMyTurn: boolean) => void;
 };
 
 export type LobbyStore = {

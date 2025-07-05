@@ -40,4 +40,6 @@ export const usePlayerStore = create<PlayerStore>((set) => ({
   setXP: (XP) => set({ XP }),
   playerCards: { inReserve: [], inHand: [] },
   setPlayerCards: (playerCards) => set({ playerCards }),
+  isMyTurn: false,
+  setIsMyTurn: (isMyTurn) => set({ isMyTurn }),
 }));
