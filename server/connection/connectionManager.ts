@@ -2,12 +2,14 @@ import { Server } from "socket.io";
 import {
   getGameBySocketId,
   getPlayerNameBySocketId,
-  getGamesWithDisconnectedPlayers,
-  sendLogEvent,
   removePlayerFromGame,
 } from "../game/gameManager";
 import { countDownTimer } from "../utils";
 import { deleteLobby, getLobbyByPlayerSocketId } from "../lobby/lobbyManager";
+import {
+  getGamesWithDisconnectedPlayers,
+  sendGameLogEvent,
+} from "../game/gameUtils";
 
 function handleConnect(io: Server) {
   const gamesWithDisconnectedPlayers = getGamesWithDisconnectedPlayers();
@@ -20,7 +22,7 @@ function handleDisconnectFromGame(socketId: string, io: Server) {
   if (!game) return;
   const disconnectedPlayer = getPlayerNameBySocketId(socketId);
 
-  sendLogEvent(io, game.id, {
+  sendGameLogEvent(io, game.id, {
     id: (game.gameLogs.length + 1).toString(),
     timestamp: new Date(),
     type: "system",
@@ -46,7 +48,7 @@ function handleDisconnectFromGame(socketId: string, io: Server) {
         newGame.status = "active";
         io.to(newGame.id).emit("game-updated", newGame);
         const gamesWithDisconnectedPlayers = getGamesWithDisconnectedPlayers();
-        sendLogEvent(io, newGame.id, {
+        sendGameLogEvent(io, newGame.id, {
           id: (newGame.gameLogs.length + 1).toString(),
           timestamp: new Date(),
           type: "system",

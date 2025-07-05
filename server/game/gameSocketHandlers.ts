@@ -4,13 +4,12 @@ import {
   createGame,
   deleteGame,
   getGameBySocketId,
-  getGamesWithDisconnectedPlayers,
   removePlayerFromGame,
   rejoinGame,
-  sendLogEvent,
   getPlayerNameBySocketId,
   updatePlayerTurn,
 } from "./gameManager";
+import { getGamesWithDisconnectedPlayers, sendGameLogEvent } from "./gameUtils";
 import { deleteLobby } from "../lobby/lobbyManager";
 
 export const handleGameEvents = (io: Server, socket: Socket) => {
@@ -93,7 +92,7 @@ export const handleGameEvents = (io: Server, socket: Socket) => {
               "games-with-disconnected-players",
               gamesWithDisconnectedPlayers
             );
-            sendLogEvent(io, game.id, {
+            sendGameLogEvent(io, game.id, {
               id: (game.gameLogs.length + 1).toString(),
               timestamp: new Date(),
               type: "system",

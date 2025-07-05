@@ -1,6 +1,4 @@
-import { Server } from "socket.io";
 import type { Cell } from "../shared/types";
-import { getGamesWithDisconnectedPlayers } from "./game/gameManager";
 
 function getTileCells(tileId: string) {
   const cells: Cell[] = [];

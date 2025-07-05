@@ -1,10 +1,13 @@
 import { Server } from "socket.io";
 import { Game, Lobby, LogEvent } from "../../shared/types";
+import { getPlayerNameBySocketId, sendGameLogEvent } from "./gameUtils";
 
-const games: Game[] = [];
+export const games: Game[] = [];
+
+// All function in this file should return Game | undefined
 
 function createGame(lobby: Lobby): Game | undefined {
-  if (games.find((game) => game.id === lobby.id)) {
+  if (games.find((game) => game.id === lobby.id) || !lobby) {
     return undefined;
   }
 
@@ -31,6 +34,7 @@ function createGame(lobby: Lobby): Game | undefined {
 }
 
 function deleteGame(gameId: string): Game | undefined {
+  if (!gameId) return undefined;
   const game = games.find((game) => game.id === gameId);
   if (game) {
     games.splice(games.indexOf(game), 1);
@@ -40,29 +44,23 @@ function deleteGame(gameId: string): Game | undefined {
 }
 
 function getGameBySocketId(socketId: string): Game | undefined {
+  if (!socketId) return undefined;
   return games.find((game) =>
     game.players.some((player) => player.id === socketId)
   );
 }
 
 function getGameById(gameId: string): Game | undefined {
+  if (!gameId) return undefined;
   return games.find((game) => game.id === gameId);
-}
-
-function getPlayerNameBySocketId(socketId: string): string {
-  const game = getGameBySocketId(socketId);
-  if (!game) return "Unknown";
-
-  return (
-    game.players.find((player) => player.id === socketId)?.name ?? "Unknown"
-  );
 }
 
 function removePlayerFromGame(
   gameId: string,
   targetPlayerId: string,
   io: Server
-) {
+): Game | undefined {
+  if (!gameId || !targetPlayerId || !io) return undefined;
   let game = getGameById(gameId);
   if (game) {
     if (game.players.find((player) => player.myTurn)?.id === targetPlayerId) {
@@ -84,12 +82,6 @@ function removePlayerFromGame(
   }
 }
 
-function getGamesWithDisconnectedPlayers(): Game[] {
-  return games.filter(
-    (game) => Object.keys(game.disconnectedPlayers).length > 0
-  );
-}
-
 function stopPlayerDisconnectTimer(gameId: string, playerId: string) {
   const game = getGameById(gameId);
   if (game) {
@@ -102,15 +94,18 @@ function rejoinGame(
   playerIdFromLocalStorage: string,
   newPlayerId: string,
   io: Server
-) {
+): Game | undefined {
+  if (!gameId || !playerIdFromLocalStorage || !newPlayerId || !io) {
+    return undefined;
+  }
   const game = getGameById(gameId);
   if (!game) {
-    return null;
+    return undefined;
   }
 
   // Check if player is actually disconnected from this game
   if (!game.disconnectedPlayers[playerIdFromLocalStorage]) {
-    return null;
+    return undefined;
   }
 
   // Stop the disconnect timer for this player
@@ -136,7 +131,7 @@ function rejoinGame(
     game.players[playerIndex].id = newPlayerId;
   }
 
-  sendLogEvent(io, game.id, {
+  sendGameLogEvent(io, game.id, {
     id: (game.gameLogs.length + 1).toString(),
     timestamp: new Date(),
     type: "system",
@@ -154,14 +149,6 @@ function rejoinGame(
   return game;
 }
 
-function sendLogEvent(io: Server, gameId: string, logEvent: LogEvent) {
-  const game = getGameById(gameId);
-  if (game) {
-    io.to(gameId).emit("log-event", logEvent);
-    game.gameLogs.push(logEvent);
-  }
-}
-
 function updatePlayerTurn(gameId: string, io: Server): Game | undefined {
   const game = getGameById(gameId);
   if (game) {
@@ -172,7 +159,7 @@ function updatePlayerTurn(gameId: string, io: Server): Game | undefined {
     const nextPlayer = game.players[playerIndex + 1];
     if (nextPlayer) {
       nextPlayer.myTurn = true;
-      sendLogEvent(io, gameId, {
+      sendGameLogEvent(io, gameId, {
         id: (game.gameLogs.length + 1).toString(),
         timestamp: new Date(),
         type: "system",
@@ -191,10 +178,8 @@ export {
   getGameBySocketId,
   getGameById,
   removePlayerFromGame,
-  getGamesWithDisconnectedPlayers,
   stopPlayerDisconnectTimer,
   rejoinGame,
-  sendLogEvent,
   getPlayerNameBySocketId,
   updatePlayerTurn,
 };

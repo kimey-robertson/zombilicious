@@ -8,12 +8,7 @@ import {
   toggleIsReadyLobbyPlayer,
 } from "./lobbyManager";
 import { Lobby } from "../../shared/types";
-import {
-  getGamesWithDisconnectedPlayers,
-  getPlayerNameBySocketId,
-  removePlayerFromGame,
-  sendLogEvent,
-} from "../game/gameManager";
+
 import { getAllLobbies } from "./lobbyUtils";
 
 export const handleLobbyEvents = (io: Server, socket: Socket) => {
@@ -142,36 +137,6 @@ export const handleLobbyEvents = (io: Server, socket: Socket) => {
         });
       } else {
         callback({ success: false, errorMessage: "Lobby not found" });
-      }
-    }
-  );
-
-  socket.on(
-    "leave-disconnected-game",
-    (
-      { gameId, playerId }: { gameId: string; playerId: string },
-      callback: (data: { success: boolean; errorMessage?: string }) => void
-    ) => {
-      const playerName = getPlayerNameBySocketId(playerId);
-      const game = removePlayerFromGame(gameId, playerId, io);
-      if (game) {
-        game.status = "active";
-        const gamesWithDisconnectedPlayers = getGamesWithDisconnectedPlayers();
-        io.emit(
-          "games-with-disconnected-players",
-          gamesWithDisconnectedPlayers
-        );
-        io.to(game.id).emit("game-updated", game);
-        sendLogEvent(io, game.id, {
-          id: (game.gameLogs.length + 1).toString(),
-          timestamp: new Date(),
-          type: "system",
-          message: `Player ${playerName} has chosen to abandon you..`,
-          icon: "🚫",
-        });
-        callback({ success: true });
-      } else {
-        callback({ success: false, errorMessage: "Game not found" });
       }
     }
   );
