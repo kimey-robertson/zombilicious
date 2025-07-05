@@ -3,7 +3,6 @@ import {
   changeGameNameLobby,
   createLobby,
   deleteLobby,
-  getAllLobbies,
   joinLobby,
   leaveLobby,
   toggleIsReadyLobbyPlayer,
@@ -15,6 +14,7 @@ import {
   removePlayerFromGame,
   sendLogEvent,
 } from "../game/gameManager";
+import { getAllLobbies } from "./lobbyUtils";
 
 export const handleLobbyEvents = (io: Server, socket: Socket) => {
   socket.on(
@@ -28,7 +28,7 @@ export const handleLobbyEvents = (io: Server, socket: Socket) => {
       }) => void
     ) => {
       const lobby = createLobby(socket.id, playerName);
-      console.log("Lobby created with id:", lobby.id, "by", playerName);
+      console.log("Lobby created with id:", lobby?.id, "by", playerName);
 
       if (!lobby) {
         return callback({
@@ -47,9 +47,9 @@ export const handleLobbyEvents = (io: Server, socket: Socket) => {
       lobbyId: string,
       callback: (data: { success: boolean; errorMessage?: string }) => void
     ) => {
-      const success = deleteLobby(lobbyId);
-      if (success) {
-        callback({ success });
+      const lobby = deleteLobby(lobbyId);
+      if (lobby) {
+        callback({ success: true });
         io.emit("lobby-deleted", { lobbyId });
       } else {
         callback({ success: false, errorMessage: "Lobby not found" });
