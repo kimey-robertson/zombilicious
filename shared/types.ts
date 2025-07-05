@@ -32,6 +32,10 @@ export type Player = {
   id: string;
   name: string;
   myTurn: boolean;
+  totalActions: number;
+  actionsRemaining: number;
+  XP: number;
+  inventory: Item[];
 };
 
 export type LobbyPlayer = {
@@ -77,4 +81,9 @@ export type LogEvent = {
     | "system";
   message: string;
   icon?: string;
+};
+
+export type Item = {
+  id: string;
+  name: string;
 };

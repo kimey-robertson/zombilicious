@@ -96,7 +96,9 @@ export const handleGameEvents = (io: Server, socket: Socket) => {
               id: (game.gameLogs.length + 1).toString(),
               timestamp: new Date(),
               type: "system",
-              message: `Player ${getPlayerNameBySocketId(data.targetPlayerId)} has been voted to be kicked from game`,
+              message: `Player ${getPlayerNameBySocketId(
+                data.targetPlayerId
+              )} has been voted to be kicked from game`,
               icon: "🚫",
             });
           }
@@ -143,6 +145,7 @@ export const handleGameEvents = (io: Server, socket: Socket) => {
         // Send the game state to the rejoining player
         const playerSocket = io.sockets.sockets.get(newPlayerId);
         if (playerSocket) {
+          // Not sure about this
           playerSocket.emit("game-created", game);
         }
 

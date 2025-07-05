@@ -3,12 +3,12 @@ import { getSocket } from "../socket";
 import { Game, LogEvent } from "../../../shared/types";
 import { useGameStore } from "../store/useGameStore";
 import { usePlayerStore } from "../store/usePlayerStore";
+import { useResetPlayerGame } from "./useResetPlayerGame";
 
 export const useGameSockets = () => {
   const socketRef = useRef(getSocket());
   const socket = socketRef.current;
 
-  const resetGame = usePlayerStore((state) => state.resetGame);
   const resetBoardPosition = usePlayerStore(
     (state) => state.resetBoardPosition
   );
@@ -26,13 +26,15 @@ export const useGameSockets = () => {
 
   const playerId = usePlayerStore((state) => state.playerId);
 
+  const resetPlayerGame = useResetPlayerGame();
+
   const handleGameCreated = (game: Game) => {
     console.log("game created", game);
     setGameId(game.id);
     setPlayers(game.players);
     setStatus(game.status);
     setGameLogs(game.gameLogs);
-    resetGame();
+    resetPlayerGame(game.players.find((p) => p.id === playerId));
     resetBoardPosition();
     localStorage.setItem("playerId", playerId || socket.id || "");
   };
