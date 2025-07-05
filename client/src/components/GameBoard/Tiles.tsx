@@ -10,7 +10,12 @@ const Tiles = () => {
   return (
     <>
       {chosenMap.tiles.map((tile) => (
-        <Tile key={tile.id} tile={tile} zones={chosenMap.zones} />
+        <Tile
+          key={tile.id}
+          tile={tile}
+          zones={chosenMap.zones.filter((zone) => zone.tileIds.includes(tile.id))}
+          doors={chosenMap.doors.filter((door) => door.tileId === tile.id)}
+        />
       ))}
     </>
   );

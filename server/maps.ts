@@ -108,6 +108,13 @@ const tutorialMap: Map = {
       id: "1B-7/1B-8",
       cellIds: ["1B-7", "1B-8"],
       tileId: "1B",
+      transform: "translate(120px, 104px) rotate(90deg)",
+    },
+    {
+      id: "2B-4/2B-7",
+      cellIds: ["2B-4", "2B-7"],
+      tileId: "2B",
+      transform: "translate(30px, 139px) rotate(0)",
     },
   ],
 };

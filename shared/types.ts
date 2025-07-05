@@ -26,6 +26,7 @@ export type Door = {
   id: string;
   cellIds: string[];
   tileId: string;
+  transform: string;
 };
 
 export type Map = {

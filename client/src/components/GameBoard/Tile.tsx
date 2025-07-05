@@ -1,13 +1,14 @@
 import { useState, useEffect } from "react";
-import type { Tile, Zone } from "../../../../shared/types";
+import type { Door, Tile, Zone } from "../../../../shared/types";
 import Cell from "./Cell";
 
 type TileProps = {
   tile: Tile;
   zones: Zone[];
+  doors: Door[];
 };
 
-const Tile = ({ tile, zones }: TileProps) => {
+const Tile = ({ tile, zones, doors }: TileProps) => {
   const [tileImage, setTileImage] = useState<string>("");
 
   useEffect(() => {
@@ -42,6 +43,7 @@ const Tile = ({ tile, zones }: TileProps) => {
             key={cell.id}
             cell={cell}
             zone={zones.find((zone) => zone.cellIds.includes(cell.id))}
+            door={doors.find((door) => door.cellIds.includes(cell.id))}
           />
         ))}
       </div>
