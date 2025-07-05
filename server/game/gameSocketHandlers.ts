@@ -12,6 +12,9 @@ import {
 import { getGamesWithDisconnectedPlayers, sendGameLogEvent } from "./gameUtils";
 import { deleteLobby } from "../lobby/lobbyManager";
 
+// Handles receiving events from the client, responding with callbacks,
+// and emitting events to the client. Shouldn't have logic.
+
 export const handleGameEvents = (io: Server, socket: Socket) => {
   socket.on(
     "create-game",
@@ -19,7 +22,8 @@ export const handleGameEvents = (io: Server, socket: Socket) => {
       lobby: Lobby,
       callback: (data: { success: boolean; errorMessage?: string }) => void
     ) => {
-      // Create game. If successful, delete lobby. If lobby not deleted, delete game. If game not deleted, return error. Shouldn't get that far!
+      // Create game. If successful, delete lobby. If lobby not deleted, delete game. 
+      // If game not deleted, return error. Shouldn't get that far!
       const game = createGame(lobby);
       if (game) {
         const deletedLobby = deleteLobby(lobby.id);
