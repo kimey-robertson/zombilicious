@@ -1,14 +1,18 @@
 import Tile from "./Tile";
-import { tutorialMap } from "../../../../server/maps";
+import { useGameStore } from "../../store/useGameStore";
+import { Map } from "../../../../shared/types";
 
 const Tiles = () => {
-  const chosenMap = tutorialMap;
+  const chosenMap = useGameStore((state) => state.map) as Map;
+
+  if (!chosenMap || Object.keys(chosenMap).length === 0) return null;
+
   return (
-    <div>
+    <>
       {chosenMap.tiles.map((tile) => (
         <Tile key={tile.id} tile={tile} zones={chosenMap.zones} />
       ))}
-    </div>
+    </>
   );
 };
 

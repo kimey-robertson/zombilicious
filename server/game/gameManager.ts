@@ -1,6 +1,7 @@
 import { Server } from "socket.io";
-import { Game, Lobby, LogEvent } from "../../shared/types";
+import { Game, Lobby } from "../../shared/types";
 import { getPlayerNameBySocketId, sendGameLogEvent } from "./gameUtils";
+import { tutorialMap } from "../maps";
 
 export const games: Game[] = [];
 
@@ -26,6 +27,7 @@ function createGame(lobby: Lobby): Game | undefined {
     status: "active",
     disconnectedPlayers: {},
     gameLogs: [],
+    map: tutorialMap,
   };
 
   games.push(game);

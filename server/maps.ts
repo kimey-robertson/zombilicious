@@ -103,6 +103,13 @@ const tutorialMap: Map = {
       room: false,
     },
   ],
+  doors: [
+    {
+      id: "1B-7/1B-8",
+      cellIds: ["1B-7", "1B-8"],
+      tileId: "1B",
+    },
+  ],
 };
 
 export { tutorialMap };

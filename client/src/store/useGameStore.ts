@@ -28,4 +28,6 @@ export const useGameStore = create<GameStore>((set) => ({
       gameLogs:
         typeof gameLogs === "function" ? gameLogs(state.gameLogs) : gameLogs,
     })),
+  map: {},
+  setMap: (map) => set({ map }),
 }));

@@ -6,6 +6,7 @@ import {
   Zone,
   LogEvent,
   Card,
+  Map,
 } from "../../../shared/types";
 
 export type Offset = { x: number; y: number };
@@ -73,6 +74,8 @@ export type GameStore = {
   setGameLogs: (
     gameLogs: LogEvent[] | ((prev: LogEvent[]) => LogEvent[])
   ) => void;
+  map: Map | object;
+  setMap: (map: Map) => void;
 };
 
 export type DevStore = {

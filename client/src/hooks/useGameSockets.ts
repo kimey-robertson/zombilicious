@@ -23,6 +23,7 @@ export const useGameSockets = () => {
     (state) => state.setDisconnectTimers
   );
   const setGameLogs = useGameStore((state) => state.setGameLogs);
+  const setMap = useGameStore((state) => state.setMap);
 
   const playerId = usePlayerStore((state) => state.playerId);
   const setIsMyTurn = usePlayerStore((state) => state.setIsMyTurn);
@@ -36,6 +37,7 @@ export const useGameSockets = () => {
     setStatus(game.status);
     setGameLogs(game.gameLogs);
     setIsMyTurn(game.players.find((p) => p.id === playerId)?.myTurn || false);
+    setMap(game.map);
     resetPlayerGame(game.players.find((p) => p.id === playerId));
     resetBoardPosition();
     localStorage.setItem("playerId", playerId || socket.id || "");

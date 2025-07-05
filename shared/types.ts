@@ -22,10 +22,17 @@ export type Zone = {
   room: boolean;
 };
 
+export type Door = {
+  id: string;
+  cellIds: string[];
+  tileId: string;
+};
+
 export type Map = {
   id: string;
   tiles: Tile[];
   zones: Zone[];
+  doors: Door[];
 };
 
 export type Player = {
@@ -69,6 +76,7 @@ export type Game = {
   status: "active" | "paused";
   disconnectedPlayers: { [socketId: string]: DisconnectedPlayer };
   gameLogs: LogEvent[];
+  map: Map;
 };
 
 export type LogEvent = {
