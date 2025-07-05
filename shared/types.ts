@@ -31,9 +31,12 @@ export type Map = {
 export type Player = {
   id: string;
   name: string;
+  myTurn: boolean;
 };
 
-export type LobbyPlayer = Player & {
+export type LobbyPlayer = {
+  id: string;
+  name: string;
   isHost: boolean;
   isReady: boolean;
 };

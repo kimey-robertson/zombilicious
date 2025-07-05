@@ -15,6 +15,7 @@ function createGame(lobby: Lobby): Game | undefined {
     players: lobby.players.map((player) => ({
       id: player.id,
       name: player.name,
+      myTurn: player.isHost,
     })),
     status: "active",
     disconnectedPlayers: {},
@@ -119,11 +120,15 @@ function removePlayerFromGame(
 ) {
   const game = getGameById(gameId);
   if (game) {
+    if (game.players.find((player) => player.myTurn)?.id === targetPlayerId) {
+      updatePlayerTurn(gameId, io);
+    }
     stopPlayerDisconnectTimer(gameId, targetPlayerId);
     delete game.disconnectedPlayers[targetPlayerId];
     game.players = game.players.filter(
       (player) => player.id !== targetPlayerId
     );
+    io.to(gameId).emit("game-updated", game);
     io.emit("player-removed-from-game", targetPlayerId);
     return game;
   } else {
@@ -206,6 +211,25 @@ function sendLogEvent(io: Server, gameId: string, logEvent: LogEvent) {
   if (game) {
     io.to(gameId).emit("log-event", logEvent);
     game.gameLogs.push(logEvent);
+  }
+}
+
+function updatePlayerTurn(gameId: string, io: Server) {
+  const game = getGameById(gameId);
+  if (game) {
+    const playerIndex = game.players.findIndex((player) => player.myTurn);
+    if (playerIndex !== -1) {
+      game.players[playerIndex].myTurn = false;
+    }
+    game.players[playerIndex + 1].myTurn = true;
+    sendLogEvent(io, gameId, {
+      id: (game.gameLogs.length + 1).toString(),
+      timestamp: new Date(),
+      type: "system",
+      message: `It's now player ${game.players[playerIndex + 1].name}'s turn`,
+      icon: "🔥",
+    });
+    io.to(gameId).emit("game-updated", game);
   }
 }
 
