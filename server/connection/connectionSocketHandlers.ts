@@ -8,6 +8,10 @@ import {
 } from "../game/gameUtils";
 import { removePlayerFromGame } from "../game/gameManager";
 
+// Handles receiving events from the client, responding with callbacks,
+// and emitting events to the client. Shouldn't have logic.
+// Callbacks should only ever contain success boolean and error message if success is false.
+
 export const handleConnectionEvents = (io: Server, socket: Socket) => {
   handleConnect(io);
 

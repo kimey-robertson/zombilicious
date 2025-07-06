@@ -4,7 +4,7 @@ import {
   getPlayerNameBySocketId,
   removePlayerFromGame,
 } from "../game/gameManager";
-import { countDownTimer } from "../utils";
+import { countDownTimer } from "../utils/helpers";
 import { deleteLobby, getLobbyByPlayerSocketId } from "../lobby/lobbyManager";
 import {
   getGamesWithDisconnectedPlayers,

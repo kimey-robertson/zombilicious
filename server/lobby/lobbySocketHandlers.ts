@@ -11,6 +11,10 @@ import { Lobby } from "../../shared/types";
 
 import { getAllLobbies } from "./lobbyUtils";
 
+// Handles receiving events from the client, responding with callbacks,
+// and emitting events to the client. Shouldn't have logic.
+// Callbacks should only ever contain success boolean and error message if success is false.
+
 export const handleLobbyEvents = (io: Server, socket: Socket) => {
   socket.on(
     "create-game-lobby",

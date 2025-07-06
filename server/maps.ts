@@ -1,4 +1,4 @@
-import { getTileCells } from "./utils";
+import { getTileCells } from "./utils/helpers";
 import type { Map } from "../shared/types";
 
 const tutorialMap: Map = {
