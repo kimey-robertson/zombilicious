@@ -10,29 +10,26 @@ import {
 import { Lobby } from "../../shared/types";
 
 import { getAllLobbies } from "./lobbyUtils";
+import { createSocketHandler } from "../utils/socketWrapper";
+import { OperationFailedError } from "../utils/socketErrors";
 
 // Handles receiving events from the client, responding with callbacks,
 // and emitting events to the client. Shouldn't have logic.
 // Callbacks should only ever contain success boolean and error message if success is false.
 
 export const handleLobbyEvents = (io: Server, socket: Socket) => {
-  socket.on(
+
+  const createGameLobbyHandler = createSocketHandler<{ playerName: string }>(
     "create-game-lobby",
-    (
-      { playerName }: { playerName: string },
-      callback: (data: { success: boolean; errorMessage?: string }) => void
-    ) => {
+    async (io, socket, { playerName }) => {
       const lobby = createLobby(socket.id, playerName);
 
       if (!lobby) {
-        return callback({
-          success: false,
-          errorMessage: "Failed to create lobby",
-        });
-      } else {
-        callback({ success: true });
-        io.emit("lobby-created", { lobby });
+        throw new OperationFailedError("Create lobby");
       }
+
+      io.emit("lobby-created", { lobby });
+      return { success: true };
     }
   );
 
@@ -142,4 +139,6 @@ export const handleLobbyEvents = (io: Server, socket: Socket) => {
       }
     }
   );
+
+  createGameLobbyHandler(io, socket);
 };
