@@ -89,7 +89,7 @@ const JoinLobbiesScreen = ({
 
   // TODO: move this onto connect socket and a refresh buton on lobby screen
   useEffect(() => {
-    socket.emit("fetch-lobbies", (response: { success: boolean }) => {
+    socket.emit("fetch-lobbies", {}, (response: { success: boolean }) => {
       if (!response.success) {
         toast.error("Failed to fetch lobbies");
       }
