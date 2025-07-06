@@ -1,3 +1,5 @@
+import { Server, Socket } from "socket.io";
+
 export type Tile = {
   id: string;
   position: {
@@ -117,4 +119,11 @@ export enum SocketErrorCodes {
 
   // General
   OPERATION_FAILED = "OPERATION_FAILED",
+  INTERNAL_ERROR = "INTERNAL_ERROR",
 }
+
+export type SocketHandlerFunction<T = any> = (
+  io: Server,
+  socket: Socket,
+  data: T
+) => Promise<SocketResponse> | SocketResponse;
