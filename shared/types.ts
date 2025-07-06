@@ -99,3 +99,22 @@ export type Card = {
   id: string;
   name: string;
 };
+
+export type SocketResponse = {
+  success: boolean;
+  error?: {
+    code: string;
+    message: string;
+    details?: any; //TODO: make this more specific
+  };
+};
+
+export type SocketCallback = (response: SocketResponse) => void;
+
+export enum SocketErrorCodes {
+  // Lobby
+  LOBBY_NOT_FOUND = "LOBBY_NOT_FOUND",
+
+  // General
+  OPERATION_FAILED = "OPERATION_FAILED",
+}
