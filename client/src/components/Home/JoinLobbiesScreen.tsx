@@ -89,6 +89,7 @@ const JoinLobbiesScreen = ({
     setJoinLobbiesScreen(false);
   };
 
+  // TODO: move this onto connect socket
   useEffect(() => {
     socket.emit("fetch-lobbies", (data: { lobbies: Lobby[] }) => {
       setLobbies(data.lobbies);

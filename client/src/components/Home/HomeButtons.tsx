@@ -2,8 +2,6 @@ import toast from "react-hot-toast";
 import { getSocket } from "../../socket";
 import { Button } from "../UI/Button";
 import { useRef } from "react";
-import { Lobby } from "../../../../shared/types";
-import { useLobbyStore } from "../../store/useLobbyStore";
 import { usePlayerStore } from "../../store/usePlayerStore";
 
 const HomeButtons = ({
@@ -15,9 +13,6 @@ const HomeButtons = ({
 }) => {
   const socket = getSocket();
   const inputRef = useRef<HTMLInputElement | null>(null);
-  const setLobbies = useLobbyStore((state) => state.setLobbies);
-  const lobbies = useLobbyStore((state) => state.lobbies);
-  const setMyLobbyId = useLobbyStore((state) => state.setMyLobbyId);
 
   const playerName = usePlayerStore((state) => state.playerName);
   const setPlayerName = usePlayerStore((state) => state.setPlayerName);
@@ -33,19 +28,11 @@ const HomeButtons = ({
     socket.emit(
       "create-game-lobby",
       { playerName },
-      (response: {
-        success: boolean;
-        errorMessage?: string;
-        lobby?: Lobby;
-      }) => {
+      (response: { success: boolean; errorMessage?: string }) => {
         if (!response.success) {
           toast.error(response.errorMessage || "Failed to create lobby");
           return;
         } else {
-          if (response.lobby) {
-            setLobbies([...lobbies, response.lobby]);
-            setMyLobbyId(response.lobby.id);
-          }
           setLobbyScreen(true);
         }
       }

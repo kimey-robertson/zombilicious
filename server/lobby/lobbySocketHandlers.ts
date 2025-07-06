@@ -16,11 +16,7 @@ export const handleLobbyEvents = (io: Server, socket: Socket) => {
     "create-game-lobby",
     (
       { playerName }: { playerName: string },
-      callback: (data: {
-        success: boolean;
-        errorMessage?: string;
-        lobby?: Lobby;
-      }) => void
+      callback: (data: { success: boolean; errorMessage?: string }) => void
     ) => {
       const lobby = createLobby(socket.id, playerName);
 
@@ -29,8 +25,10 @@ export const handleLobbyEvents = (io: Server, socket: Socket) => {
           success: false,
           errorMessage: "Failed to create lobby",
         });
+      } else {
+        callback({ success: true });
+        io.emit("lobby-created", { lobby });
       }
-      callback({ success: true, lobby });
     }
   );
 
