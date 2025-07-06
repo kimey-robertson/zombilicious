@@ -116,6 +116,7 @@ export type SocketCallback = (response: SocketResponse) => void;
 export enum SocketErrorCodes {
   // Lobby
   LOBBY_NOT_FOUND = "LOBBY_NOT_FOUND",
+  LOBBY_PLAYER_NOT_FOUND = "LOBBY_PLAYER_NOT_FOUND",
 
   // General
   OPERATION_FAILED = "OPERATION_FAILED",

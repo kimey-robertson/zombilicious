@@ -1,7 +1,8 @@
+import { Lobby } from "../../shared/types";
 import { lobbies } from "./lobbyManager";
 
-function getAllLobbies() {
-  return lobbies;
+function getAllLobbies(): Lobby[] {
+  return lobbies || [];
 }
 
 export { getAllLobbies };

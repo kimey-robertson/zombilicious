@@ -7,7 +7,6 @@ import {
   leaveLobby,
   toggleIsReadyLobbyPlayer,
 } from "./lobbyManager";
-import { Lobby } from "../../shared/types";
 
 import { getAllLobbies } from "./lobbyUtils";
 import { createSocketHandler } from "../utils/socketWrapper";
@@ -18,7 +17,6 @@ import { OperationFailedError } from "../utils/socketErrors";
 // Callbacks should only ever contain success boolean and error message if success is false.
 
 export const handleLobbyEvents = (io: Server, socket: Socket) => {
-
   const createGameLobbyHandler = createSocketHandler<{ playerName: string }>(
     "create-game-lobby",
     async (io, socket, { playerName }) => {
@@ -33,112 +31,116 @@ export const handleLobbyEvents = (io: Server, socket: Socket) => {
     }
   );
 
-  socket.on(
+  const deleteGameLobbyHandler = createSocketHandler<{ lobbyId: string }>(
     "delete-game-lobby",
-    (
-      lobbyId: string,
-      callback: (data: { success: boolean; errorMessage?: string }) => void
-    ) => {
+    async (io, socket, { lobbyId }) => {
       const lobby = deleteLobby(lobbyId);
-      if (lobby) {
-        callback({ success: true });
-        io.emit("lobby-deleted", { lobbyId });
-      } else {
-        callback({ success: false, errorMessage: "Lobby not found" });
+
+      if (!lobby) {
+        throw new OperationFailedError("Delete lobby");
       }
+
+      io.emit("lobby-deleted", { lobbyId });
+      return { success: true };
     }
   );
 
-  socket.on(
+  const fetchLobbiesHandler = createSocketHandler<void>(
     "fetch-lobbies",
-    (callback: (data: { lobbies: Lobby[] }) => void) => {
-      callback({ lobbies: getAllLobbies() });
+    async (io, socket) => {
+      const allLobbies = getAllLobbies();
+      io.emit("lobbies-fetched", { allLobbies });
+      return { success: true };
     }
   );
 
-  socket.on(
-    "join-lobby",
-    (
-      { lobbyId, playerName }: { lobbyId: string; playerName: string },
-      callback: (data: { success: boolean; errorMessage?: string }) => void
-    ) => {
-      const lobby = joinLobby(lobbyId, socket.id, playerName);
-      if (lobby) {
-        callback({ success: true });
-        io.emit("lobby-updated", {
-          lobbyId: lobby.id,
-          gameName: lobby.gameName,
-          players: lobby.players,
-        });
-      } else {
-        callback({ success: false, errorMessage: "Lobby not found" });
-      }
-    }
-  );
+  const joinLobbyHandler = createSocketHandler<{
+    lobbyId: string;
+    playerName: string;
+  }>("join-lobby", async (io, socket, { lobbyId, playerName }) => {
+    const lobby = joinLobby(lobbyId, socket.id, playerName);
 
-  socket.on(
+    if (!lobby) {
+      throw new OperationFailedError("Join lobby");
+    }
+
+    io.emit("lobby-updated", {
+      lobbyId: lobby.id,
+      gameName: lobby.gameName,
+      players: lobby.players,
+    });
+    return { success: true };
+  });
+
+  const leaveLobbyHandler = createSocketHandler<{ lobbyId: string }>(
     "leave-lobby",
-    (
-      lobbyId: string,
-      callback: (data: { success: boolean; errorMessage?: string }) => void
-    ) => {
+    async (io, socket, { lobbyId }) => {
       const lobby = leaveLobby(lobbyId, socket.id);
-      if (lobby) {
-        callback({ success: true });
-        io.emit("lobby-updated", {
-          lobbyId: lobby.id,
-          gameName: lobby.gameName,
-          players: lobby.players,
-        });
-      } else {
-        callback({ success: false, errorMessage: "Lobby not found" });
+
+      if (!lobby) {
+        throw new OperationFailedError("Leave lobby");
       }
+
+      io.emit("lobby-updated", {
+        lobbyId: lobby.id,
+        gameName: lobby.gameName,
+        players: lobby.players,
+      });
+
+      return { success: true };
     }
   );
 
-  socket.on(
+  const toggleIsReadyLobbyPlayerHandler = createSocketHandler<{
+    playerId: string;
+    lobbyId: string;
+  }>(
     "toggle-is-ready-lobby-player",
-    (
-      playerId: string,
-      callback: (data: { success: boolean; errorMessage?: string }) => void
-    ) => {
-      const lobby = toggleIsReadyLobbyPlayer(playerId);
-      if (lobby) {
-        callback({ success: true });
-        io.emit("lobby-updated", {
-          lobbyId: lobby.id,
-          gameName: lobby.gameName,
-          players: lobby.players,
-        });
-      } else {
-        callback({ success: false, errorMessage: "Lobby not found" });
+    async (io, socket, { playerId, lobbyId }) => {
+      const lobby = toggleIsReadyLobbyPlayer(playerId, lobbyId);
+
+      if (!lobby) {
+        throw new OperationFailedError("Toggle is ready lobby player");
       }
+
+      io.emit("lobby-updated", {
+        lobbyId: lobby.id,
+        gameName: lobby.gameName,
+        players: lobby.players,
+      });
+
+      return { success: true };
     }
   );
 
-  socket.on(
+  const changeGameNameLobbyHandler = createSocketHandler<{
+    lobbyId: string;
+    gameName: string;
+    playerId: string;
+  }>(
     "change-game-name-lobby",
-    (
-      {
-        lobbyId,
-        gameName,
-        playerId,
-      }: { lobbyId: string; gameName: string; playerId: string },
-      callback: (data: { success: boolean; errorMessage?: string }) => void
-    ) => {
+    async (io, socket, { lobbyId, gameName, playerId }) => {
       const lobby = changeGameNameLobby(lobbyId, gameName, playerId);
-      if (lobby) {
-        callback({ success: true });
-        io.emit("lobby-updated", {
-          lobbyId: lobby.id,
-          gameName: lobby.gameName,
-          players: lobby.players,
-        });
-      } else {
-        callback({ success: false, errorMessage: "Lobby not found" });
+
+      if (!lobby) {
+        throw new OperationFailedError("Change game name lobby");
       }
+
+      io.emit("lobby-updated", {
+        lobbyId: lobby.id,
+        gameName: lobby.gameName,
+        players: lobby.players,
+      });
+
+      return { success: true };
     }
   );
 
   createGameLobbyHandler(io, socket);
+  deleteGameLobbyHandler(io, socket);
+  fetchLobbiesHandler(io, socket);
+  joinLobbyHandler(io, socket);
+  leaveLobbyHandler(io, socket);
+  toggleIsReadyLobbyPlayerHandler(io, socket);
+  changeGameNameLobbyHandler(io, socket);
 };

@@ -54,10 +54,10 @@ const LobbyScreen = ({
     }
   };
 
-  const handleToggleIsReadyLobbyPlayer = (playerId: string) => {
+  const handleToggleIsReadyLobbyPlayer = (playerId: string, lobbyId: string) => {
     socket.emit(
       "toggle-is-ready-lobby-player",
-      playerId,
+      { playerId, lobbyId },
       (data: { success: boolean; errorMessage?: string }) => {
         if (!data.success) {
           toast.error(data.errorMessage || "Failed to ready player");
@@ -147,7 +147,7 @@ const LobbyScreen = ({
                           size="sm"
                           className="text-xs"
                           onClick={() =>
-                            handleToggleIsReadyLobbyPlayer(player.id)
+                            handleToggleIsReadyLobbyPlayer(player.id, myLobbyId)
                           }
                         >
                           {player.isReady ? "Unready" : "Ready"}

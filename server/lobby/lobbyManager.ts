@@ -1,4 +1,8 @@
 import { Lobby } from "../../shared/types";
+import {
+  LobbyNotFoundError,
+  LobbyPlayerNotFoundError,
+} from "../utils/socketErrors";
 
 export const lobbies: Lobby[] = [];
 
@@ -88,19 +92,23 @@ function leaveLobby(
   }
 }
 
-function toggleIsReadyLobbyPlayer(playerId: string): Lobby | undefined {
-  if (!playerId) return undefined;
-  const lobby = lobbies.find((lobby) =>
-    lobby.players.some((player) => player.id === playerId)
-  );
-  if (lobby) {
+function toggleIsReadyLobbyPlayer(
+  playerId: string,
+  lobbyId: string
+): Lobby | undefined {
+  if (!playerId || !lobbyId) return undefined;
+
+  const lobby = lobbies.find((lobby) => lobby.id === lobbyId);
+  if (!lobby) {
+    throw new LobbyNotFoundError(lobbyId);
+  } else {
     const player = lobby.players.find((player) => player.id === playerId);
     if (player) {
       player.isReady = !player.isReady;
+    } else {
+      throw new LobbyPlayerNotFoundError(playerId, lobbyId);
     }
     return lobby;
-  } else {
-    return undefined;
   }
 }
 
@@ -112,15 +120,20 @@ function changeGameNameLobby(
   // If there is no lobby with the given lobbyId, or the player is not the host, return undefined
   if (!lobbyId || !gameName || !playerId) return undefined;
   const lobby = lobbies.find((lobby) => lobby.id === lobbyId);
-  if (lobby) {
-    const player = lobby.players.find((player) => player.id === playerId);
-    if (!player || !player.isHost) {
-      return undefined;
-    }
-    lobby.gameName = gameName;
-    return lobby;
+  if (!lobby) {
+    throw new LobbyNotFoundError(lobbyId);
   } else {
-    return undefined;
+    const player = lobby.players.find((player) => player.id === playerId);
+    if (!player) {
+      throw new LobbyPlayerNotFoundError(playerId, lobbyId);
+    } else {
+      if (!player.isHost) {
+        return undefined;
+      } else {
+        lobby.gameName = gameName;
+        return lobby;
+      }
+    }
   }
 }
 

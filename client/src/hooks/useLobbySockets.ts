@@ -82,12 +82,17 @@ export const useLobbySockets = () => {
     }
   };
 
+  const handleLobbiesFetched = ({ allLobbies }: { allLobbies: Lobby[] }) => {
+    setLobbies(allLobbies);
+  };
+
   useEffect(() => {
     // Register socket event listeners
     socket.on("connect", handleConnect);
     socket.on("lobby-created", handleLobbyCreated);
     socket.on("lobby-updated", handleLobbyUpdated);
     socket.on("lobby-deleted", handleLobbyDeleted);
+    socket.on("lobbies-fetched", handleLobbiesFetched);
     socket.on(
       "games-with-disconnected-players",
       handleGamesWithDisconnectedPlayers
@@ -99,6 +104,7 @@ export const useLobbySockets = () => {
       socket.off("lobby-created", handleLobbyCreated);
       socket.off("lobby-updated", handleLobbyUpdated);
       socket.off("lobby-deleted", handleLobbyDeleted);
+      socket.off("lobbies-fetched", handleLobbiesFetched);
       socket.off(
         "games-with-disconnected-players",
         handleGamesWithDisconnectedPlayers

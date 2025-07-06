@@ -19,3 +19,23 @@ export class OperationFailedError extends SocketError {
     );
   }
 }
+
+export class LobbyNotFoundError extends SocketError {
+  constructor(lobbyId: string, details?: any) {
+    super(
+      SocketErrorCodes.LOBBY_NOT_FOUND,
+      `Lobby not found: ${lobbyId}`,
+      details
+    );
+  }
+}
+
+export class LobbyPlayerNotFoundError extends SocketError {
+  constructor(playerId: string, lobbyId: string, details?: any) {
+    super(
+      SocketErrorCodes.LOBBY_PLAYER_NOT_FOUND,
+      `Lobby player not found: ${playerId} in lobby ${lobbyId}`,
+      details
+    );
+  }
+}

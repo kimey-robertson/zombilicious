@@ -9,7 +9,6 @@ import {
 import { Button } from "../UI/Button";
 import { useLobbyStore } from "../../store/useLobbyStore";
 import { getSocket } from "../../socket";
-import { Lobby } from "../../../../shared/types";
 import { toast } from "react-hot-toast";
 import { useEffect, useState } from "react";
 import LobbyScreen from "./LobbyScreen";
@@ -44,7 +43,6 @@ const JoinLobbiesScreen = ({
   setJoinLobbiesScreen: (value: boolean) => void;
 }) => {
   const socket = getSocket();
-  const setLobbies = useLobbyStore((state) => state.setLobbies);
   const lobbies = useLobbyStore((state) => state.lobbies);
   const myLobbyId = useLobbyStore((state) => state.myLobbyId);
   const setMyLobbyId = useLobbyStore((state) => state.setMyLobbyId);
@@ -89,10 +87,12 @@ const JoinLobbiesScreen = ({
     setJoinLobbiesScreen(false);
   };
 
-  // TODO: move this onto connect socket
+  // TODO: move this onto connect socket and a refresh buton on lobby screen
   useEffect(() => {
-    socket.emit("fetch-lobbies", (data: { lobbies: Lobby[] }) => {
-      setLobbies(data.lobbies);
+    socket.emit("fetch-lobbies", (response: { success: boolean }) => {
+      if (!response.success) {
+        toast.error("Failed to fetch lobbies");
+      }
     });
   }, []);
 
