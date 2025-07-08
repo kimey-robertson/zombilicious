@@ -2,7 +2,7 @@ import type { Cell, Door, Zone } from "../../../../shared/types";
 import { useGameStore } from "../../store/useGameStore";
 import { usePlayerStore } from "../../store/usePlayerStore";
 import DoorComponent from "./Door";
-import { isHorizontalDoubleZone } from "./gameBoardUtils";
+import { isHorizontalDoubleZone, isVerticalDoubleZone } from "./gameBoardUtils";
 import PlayerToken from "./PlayerToken";
 
 type CellProps = {
@@ -22,10 +22,13 @@ const Cell: React.FC<CellProps> = ({ cell, zone, door }) => {
   );
 
   const hDoubleZone = isHorizontalDoubleZone(zone, map);
+  const vDoubleZone = isVerticalDoubleZone(zone, map);
 
-  const showPlayerToken = hDoubleZone
-    ? playerInZone && cell.id.includes(zone?.id.split("/")[0] ?? "")
-    : playerInZone;
+
+  const showPlayerToken =
+    hDoubleZone || vDoubleZone
+      ? playerInZone && cell.id.includes(zone?.id.split("/")[0] ?? "")
+      : playerInZone;
 
   const handleClick = () => {
     if (zone && !panMode) {
@@ -41,6 +44,9 @@ const Cell: React.FC<CellProps> = ({ cell, zone, door }) => {
           player={playerInZone}
           showHorizontalDoubleZoneToken={
             hDoubleZone && cell.id.includes(zone?.id.split("/")[0] ?? "")
+          }
+          showVerticalDoubleZoneToken={
+            vDoubleZone && cell.id.includes(zone?.id.split("/")[0] ?? "")
           }
         />
       ) : null}
