@@ -2,6 +2,7 @@ import { Server, Socket } from "socket.io";
 import { Lobby } from "../../shared/types";
 import {
   createGame,
+  movePlayerToZone,
   rejoinGame,
   updatePlayerTurn,
   voteKickPlayerFromGame,
@@ -103,8 +104,27 @@ export const handleGameEvents = (io: Server, socket: Socket) => {
     }
   );
 
+  const movePlayerToZoneHandler = createSocketHandler<{
+    gameId: string;
+    playerId: string;
+    fromZoneId: string;
+    toZoneId: string;
+  }>(
+    "move-player-to-zone",
+    async (io, socket, { gameId, playerId, fromZoneId, toZoneId }) => {
+      // Move the player to the zone
+      const game = movePlayerToZone(gameId, playerId, fromZoneId, toZoneId, io);
+
+      // Emit the game updated
+      io.to(gameId).emit("game-updated", game);
+
+      return { success: true };
+    }
+  );
+
   createGameHandler(io, socket);
   voteKickPlayerFromGameHandler(io, socket);
   rejoinGameHandler(io, socket);
   endTurnHandler(io, socket);
+  movePlayerToZoneHandler(io, socket);
 };

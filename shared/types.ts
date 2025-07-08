@@ -50,7 +50,7 @@ export type Player = {
     inReserve: Card[];
     inHand: Card[];
   };
-  currentZone: string;
+  currentZoneId: string;
   movableZones: Zone[];
 };
 

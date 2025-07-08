@@ -39,7 +39,7 @@ function createGame(lobby: Lobby, io: Server): Game {
       actionsRemaining: 3,
       XP: 0,
       playerCards: { inReserve: [], inHand: [] },
-      currentZone: chosenMap.startingZone,
+      currentZoneId: chosenMap.startingZone,
       movableZones: calculateMovableZones(chosenMap, chosenMap.startingZone),
     })),
     status: "active",
@@ -262,6 +262,66 @@ function voteKickPlayerFromGame(
   return game;
 }
 
+function movePlayerToZone(
+  gameId: string,
+  playerId: string,
+  fromZoneId: string,
+  toZoneId: string,
+  io: Server
+): Game {
+  const game = getGameById(gameId);
+  const player = game.players.find((player) => player.id === playerId);
+  if (!player) {
+    throw new OperationFailedError("Move player to zone", {
+      message: `Player not found in game ${gameId} with id ${playerId}`,
+    });
+  }
+
+  // Check if the zone is a valid zone
+  const zone = game.map.zones.find((zone) => zone.id === toZoneId);
+  if (!zone) {
+    throw new OperationFailedError("Move player to zone", {
+      message: `Zone ${toZoneId} not found in game ${gameId}`,
+    });
+  }
+
+  // Check if the zone is a movable zone
+  const movableZone = player.movableZones.find((zone) => zone.id === toZoneId);
+  if (!movableZone) {
+    throw new OperationFailedError("Move player to zone", {
+      message: `Zone ${toZoneId} is not a movable zone`,
+    });
+  }
+
+  // Check if the player is in the from zone
+  const currentPlayer = game.players.find((player) => player.id === playerId);
+  if (!currentPlayer || currentPlayer.currentZoneId !== fromZoneId) {
+    throw new OperationFailedError("Move player to zone", {
+      message: `Player ${playerId} is not in zone ${fromZoneId}`,
+    });
+  }
+
+  // Update the player's current zone
+  currentPlayer.currentZoneId = toZoneId;
+
+  // Update the player's movable zones
+  player.movableZones = calculateMovableZones(game.map, toZoneId);
+
+  // Update the player's actions remaining
+  player.actionsRemaining -= 1;
+
+  // Send a log event
+  sendGameLogEvent(io, gameId, {
+    id: (game.gameLogs.length + 1).toString(),
+    timestamp: new Date(),
+    type: "movement",
+    message: `Player ${player.name} moved from zone ${fromZoneId} to zone ${toZoneId}`,
+    icon: "🚶",
+  });
+
+  return game;
+}
+
 export {
   createGame,
   deleteGame,
@@ -273,4 +333,5 @@ export {
   getPlayerNameBySocketId,
   updatePlayerTurn,
   voteKickPlayerFromGame,
+  movePlayerToZone,
 };

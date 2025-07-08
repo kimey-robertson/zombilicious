@@ -84,20 +84,20 @@ function areZonesAdjacent(zone1: Zone, zone2: Zone, map: Map): boolean {
   return isDoorBetweenZones(zone1, zone2, map);
 }
 
-export function calculateMovableZones(map: Map, currentZone: string): Zone[] {
+export function calculateMovableZones(map: Map, currentZoneId: string): Zone[] {
   const movableZones: Zone[] = [];
 
   // Find the current zone object
-  const currentZoneObj = map.zones.find((zone) => zone.id === currentZone);
+  const currentZoneObj = map.zones.find((zone) => zone.id === currentZoneId);
   if (!currentZoneObj) {
-    console.log("Current zone not found:", currentZone);
+    console.log("Current zone not found:", currentZoneId);
     return movableZones;
   }
 
   // Check all other zones for adjacency
   for (const zone of map.zones) {
     // Skip the current zone
-    if (zone.id === currentZone) continue;
+    if (zone.id === currentZoneId) continue;
 
     // Check if this zone is adjacent to the current zone
     if (areZonesAdjacent(currentZoneObj, zone, map)) {

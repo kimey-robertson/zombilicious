@@ -1,4 +1,11 @@
-import type { Cell, Door, Zone } from "../../../../shared/types";
+import type {
+  Cell,
+  Door,
+  SocketResponse,
+  Zone,
+} from "../../../../shared/types";
+import { useHandleError } from "../../hooks/useHandleError";
+import { getSocket } from "../../socket";
 import { useGameStore } from "../../store/useGameStore";
 import { usePlayerStore } from "../../store/usePlayerStore";
 import DoorComponent from "./Door";
@@ -12,17 +19,21 @@ type CellProps = {
 };
 
 const Cell: React.FC<CellProps> = ({ cell, zone, door }) => {
+  const socket = getSocket();
+  const handleError = useHandleError();
+
   const setSelectedZone = usePlayerStore((state) => state.setSelectedZone);
   const panMode = usePlayerStore((state) => state.panMode);
   const players = useGameStore((state) => state.players);
   const map = useGameStore((state) => state.map);
   const playerId = usePlayerStore((state) => state.playerId);
   const selectedAction = usePlayerStore((state) => state.selectedAction);
+  const gameId = useGameStore((state) => state.gameId);
 
   const currentPlayer = players.find((player) => player.id === playerId);
 
   const playerInZone = players.find((player) =>
-    player.currentZone.includes(zone?.id ?? "")
+    player.currentZoneId.includes(zone?.id ?? "")
   );
 
   const hDoubleZone = isHorizontalDoubleZone(zone, map);
@@ -40,6 +51,23 @@ const Cell: React.FC<CellProps> = ({ cell, zone, door }) => {
   const handleClick = () => {
     if (zone && !panMode) {
       setSelectedZone(zone);
+    }
+    if (isMovableZone && selectedAction?.id === "move") {
+      socket.emit(
+        "move-player-to-zone",
+        {
+          gameId: gameId,
+          playerId: playerId,
+          fromZoneId: currentPlayer?.currentZoneId,
+          toZoneId: zone?.id,
+        },
+        (response: SocketResponse) => {
+          if (!response.success) {
+            handleError(response?.error);
+            return;
+          }
+        }
+      );
     }
   };
 
