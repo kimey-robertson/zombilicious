@@ -91,14 +91,20 @@ function getGameById(gameId: string): Game {
 function removePlayerFromGame(
   gameId: string,
   targetPlayerId: string,
-  io: Server
+  io: Server,
+  reason: string = "left"
 ): Game {
   console.log("removePlayerFromGame");
   if (!gameId || !targetPlayerId || !io)
     throw new OperationFailedError("Remove player from game");
 
+  // Get the target player name
+  const targetPlayerName = getPlayerNameBySocketId(targetPlayerId);
+
+  // Get the game
   let game = getGameById(gameId);
 
+  // If the target player is the current player, update the turn
   if (game.players.find((player) => player.myTurn)?.id === targetPlayerId) {
     game = updatePlayerTurn(gameId, io);
   }
@@ -118,6 +124,20 @@ function removePlayerFromGame(
 
   // Set the game status to active
   game.status = "active";
+
+  const reasonMessage =
+    reason === "vote-kick"
+      ? `has been voted to be kicked from game`
+      : `has left the game`;
+
+  // Send the game log event
+  sendGameLogEvent(io, game.id, {
+    id: (game.gameLogs.length + 1).toString(),
+    timestamp: new Date(),
+    type: "system",
+    message: `Player ${targetPlayerName} ${reasonMessage}`,
+    icon: reason === "vote-kick" ? "🚫" : "👋",
+  });
 
   return game;
 }
@@ -202,6 +222,26 @@ function updatePlayerTurn(gameId: string, io: Server): Game {
   return game;
 }
 
+function voteKickPlayerFromGame(
+  gameId: string,
+  targetPlayerId: string,
+  votingPlayerId: string,
+  io: Server
+): Game {
+  let game = getGameById(gameId);
+  game.disconnectedPlayers[targetPlayerId]?.kickVotes?.push(votingPlayerId);
+
+  if (
+    game.disconnectedPlayers[targetPlayerId]?.kickVotes?.length ===
+    game.players?.length - 1
+  ) {
+    game = removePlayerFromGame(gameId, targetPlayerId, io, "vote-kick");
+    game.status = "active";
+  }
+
+  return game;
+}
+
 export {
   createGame,
   deleteGame,
@@ -212,4 +252,5 @@ export {
   rejoinGame,
   getPlayerNameBySocketId,
   updatePlayerTurn,
+  voteKickPlayerFromGame,
 };

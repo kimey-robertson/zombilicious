@@ -2,11 +2,10 @@ import { Server, Socket } from "socket.io";
 import { Lobby } from "../../shared/types";
 import {
   createGame,
-  getGameBySocketId,
-  removePlayerFromGame,
   rejoinGame,
-  getPlayerNameBySocketId,
   updatePlayerTurn,
+  getGameById,
+  voteKickPlayerFromGame,
 } from "./gameManager";
 import { getGamesWithDisconnectedPlayers, sendGameLogEvent } from "./gameUtils";
 import { deleteLobby } from "../lobby/lobbyManager";
@@ -20,67 +19,42 @@ export const handleGameEvents = (io: Server, socket: Socket) => {
   const createGameHandler = createSocketHandler<Lobby>(
     "create-game",
     async (io, socket, lobby) => {
+      // Create the game
       const game = createGame(lobby, io);
+
+      // Delete the lobby
       deleteLobby(lobby.id);
 
+      // Emit the game created
       io.to(game.id).emit("game-created", game);
 
       return { success: true };
     }
   );
 
-  socket.on(
+  const voteKickPlayerFromGameHandler = createSocketHandler<{
+    gameId: string;
+    targetPlayerId: string;
+    votingPlayerId: string;
+  }>(
     "vote-kick-player-from-game",
-    (
-      data: {
-        gameId: string;
-        targetPlayerId: string;
-        votingPlayerId: string;
-      },
-      callback: (data: { success: boolean; errorMessage?: string }) => void
-    ) => {
-      console.log("vote-kick-player-from-game", data);
-      let game = getGameBySocketId(socket.id);
-      if (game) {
-        game.disconnectedPlayers[data.targetPlayerId]?.kickVotes?.push(
-          data.votingPlayerId
-        );
-        if (
-          game.disconnectedPlayers[data.targetPlayerId]?.kickVotes?.length ===
-          game.players?.length - 1
-        ) {
-          console.log("removing player");
-          game = removePlayerFromGame(game.id, data.targetPlayerId, io);
-          if (!game) {
-            callback({
-              success: false,
-              errorMessage: "Failed to remove player",
-            });
-            return;
-          } else {
-            game.status = "active";
-            const gamesWithDisconnectedPlayers =
-              getGamesWithDisconnectedPlayers();
-            io.emit(
-              "games-with-disconnected-players",
-              gamesWithDisconnectedPlayers
-            );
-            sendGameLogEvent(io, game.id, {
-              id: (game.gameLogs.length + 1).toString(),
-              timestamp: new Date(),
-              type: "system",
-              message: `Player ${getPlayerNameBySocketId(
-                data.targetPlayerId
-              )} has been voted to be kicked from game`,
-              icon: "🚫",
-            });
-          }
-        }
+    async (io, socket, { gameId, targetPlayerId, votingPlayerId }) => {
+      // Vote to kick the player from the game
+      const game = voteKickPlayerFromGame(
+        gameId,
+        targetPlayerId,
+        votingPlayerId,
+        io
+      );
 
-        io.to(game.id).emit("game-updated", game);
-      } else {
-        callback({ success: false, errorMessage: "Game not found" });
-      }
+      // Emit the games with disconnected players
+      const gamesWithDisconnectedPlayers = getGamesWithDisconnectedPlayers();
+      io.emit("games-with-disconnected-players", gamesWithDisconnectedPlayers);
+
+      // Emit the game updated
+      io.to(game.id).emit("game-updated", game);
+
+      return { success: true };
     }
   );
 
@@ -147,4 +121,5 @@ export const handleGameEvents = (io: Server, socket: Socket) => {
   );
 
   createGameHandler(io, socket);
+  voteKickPlayerFromGameHandler(io, socket);
 };
