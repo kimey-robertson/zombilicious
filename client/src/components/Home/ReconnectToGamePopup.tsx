@@ -3,8 +3,12 @@ import { getSocket } from "../../socket";
 import { useGameStore } from "../../store/useGameStore";
 import { useLobbyStore } from "../../store/useLobbyStore";
 import { usePlayerStore } from "../../store/usePlayerStore";
+import { SocketResponse } from "../../../../shared/types";
+import { useHandleError } from "../../hooks/useHandleError";
 
 const ReconnectToGamePopup = () => {
+  const handleError = useHandleError();
+
   const reconnectableGames = useLobbyStore((state) => state.reconnectableGames);
   const disconnectTimers = useGameStore((state) => state.disconnectTimers);
   const setPlayerId = usePlayerStore((state) => state.setPlayerId);
@@ -14,7 +18,11 @@ const ReconnectToGamePopup = () => {
     Object.keys(game.disconnectedPlayers).includes(playerId)
   );
 
-  if (reconnectableGames.length === 0 || !gameToConnectTo || !disconnectTimers[playerId]) {
+  if (
+    reconnectableGames.length === 0 ||
+    !gameToConnectTo ||
+    !disconnectTimers[playerId]
+  ) {
     return null;
   }
 
@@ -40,9 +48,9 @@ const ReconnectToGamePopup = () => {
           gameId: gameToConnectTo.id,
           playerId,
         },
-        (response: { success: boolean; errorMessage?: string }) => {
+        (response: SocketResponse) => {
           if (!response.success) {
-            toast.error(response.errorMessage ?? "Failed to leave game");
+            handleError(response?.error);
           }
         }
       );
@@ -60,12 +68,12 @@ const ReconnectToGamePopup = () => {
           playerIdFromLocalStorage,
           newPlayerId,
         },
-        (response: { success: boolean; errorMessage?: string }) => {
+        (response: SocketResponse) => {
           if (response.success) {
             toast.success("Reconnected to game!");
             setPlayerId(newPlayerId || "");
           } else {
-            toast.error(response.errorMessage ?? "Failed to reconnect to game");
+            handleError(response?.error);
           }
         }
       );

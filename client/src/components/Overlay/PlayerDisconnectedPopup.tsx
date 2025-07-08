@@ -1,11 +1,13 @@
-import { toast } from "react-hot-toast";
 import { getSocket } from "../../socket";
 import { useGameStore } from "../../store/useGameStore";
 import { usePlayerStore } from "../../store/usePlayerStore";
 import { useEffect } from "react";
+import { SocketResponse } from "../../../../shared/types";
+import { useHandleError } from "../../hooks/useHandleError";
 
 const PlayerDisconnectedPopup = () => {
   const socket = getSocket();
+  const handleError = useHandleError();
 
   const gameId = useGameStore((state) => state.gameId);
   const disconnectedPlayers = useGameStore(
@@ -33,7 +35,6 @@ const PlayerDisconnectedPopup = () => {
   const votedCount = remainingPlayersWithVotes.filter((p) => p.hasVoted).length;
 
   const handleVoteToRemove = () => {
-    console.log("vote to remove");
     socket.emit(
       "vote-kick-player-from-game",
       {
@@ -41,9 +42,9 @@ const PlayerDisconnectedPopup = () => {
         targetPlayerId: disconnectedPlayer?.id,
         votingPlayerId: playerId,
       },
-      (data: { success: boolean; errorMessage?: string }) => {
-        if (!data.success) {
-          toast.error(data.errorMessage ?? "Failed to vote to remove player");
+      (response: SocketResponse) => {
+        if (!response.success) {
+          handleError(response?.error);
         }
       }
     );

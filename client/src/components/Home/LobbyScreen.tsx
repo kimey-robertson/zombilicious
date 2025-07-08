@@ -3,6 +3,8 @@ import { useLobbyStore } from "../../store/useLobbyStore";
 import { getSocket } from "../../socket";
 import { toast } from "react-hot-toast";
 import { usePlayerStore } from "../../store/usePlayerStore";
+import { useHandleError } from "../../hooks/useHandleError";
+import { SocketResponse } from "../../../../shared/types";
 
 const LobbyScreen = ({
   setLobbyScreen,
@@ -10,6 +12,8 @@ const LobbyScreen = ({
   setLobbyScreen?: (value: boolean) => void;
 }) => {
   const socket = getSocket();
+  const handleError = useHandleError();
+
   const myLobbyId = useLobbyStore((state) => state.myLobbyId);
   const setMyLobbyId = useLobbyStore((state) => state.setMyLobbyId);
   const lobbies = useLobbyStore((state) => state.lobbies);
@@ -29,38 +33,37 @@ const LobbyScreen = ({
       socket.emit(
         "delete-game-lobby",
         myLobbyId,
-        (data: { success: boolean; errorMessage?: string }) => {
-          if (data.success) {
+        (response: SocketResponse) => {
+          if (response.success) {
             setLobbyScreen?.(false);
             toast.success("Lobby deleted");
           } else {
-            toast.error(data.errorMessage || "Failed to delete lobby");
+            handleError(response?.error);
           }
         }
       );
     } else {
-      socket.emit(
-        "leave-lobby",
-        myLobbyId,
-        (data: { success: boolean; errorMessage?: string }) => {
-          if (data.success) {
-            setLobbyScreen?.(false);
-            setMyLobbyId("");
-          } else {
-            toast.error(data.errorMessage || "Failed to leave lobby");
-          }
+      socket.emit("leave-lobby", myLobbyId, (response: SocketResponse) => {
+        if (response.success) {
+          setLobbyScreen?.(false);
+          setMyLobbyId("");
+        } else {
+          handleError(response?.error);
         }
-      );
+      });
     }
   };
 
-  const handleToggleIsReadyLobbyPlayer = (playerId: string, lobbyId: string) => {
+  const handleToggleIsReadyLobbyPlayer = (
+    playerId: string,
+    lobbyId: string
+  ) => {
     socket.emit(
       "toggle-is-ready-lobby-player",
       { playerId, lobbyId },
-      (data: { success: boolean; errorMessage?: string }) => {
-        if (!data.success) {
-          toast.error(data.errorMessage || "Failed to ready player");
+      (response: SocketResponse) => {
+        if (!response.success) {
+          handleError(response?.error);
         }
       }
     );
@@ -78,24 +81,20 @@ const LobbyScreen = ({
         gameName: e.target.value,
         playerId: currentPlayer?.id,
       },
-      (data: { success: boolean; errorMessage?: string }) => {
-        if (!data.success) {
-          toast.error(data.errorMessage || "Failed to change game name");
+      (response: SocketResponse) => {
+        if (!response.success) {
+          handleError(response?.error);
         }
       }
     );
   };
 
   const handleCreateGame = () => {
-    socket.emit(
-      "create-game",
-      myLobby,
-      (data: { success: boolean; errorMessage?: string }) => {
-        if (!data.success) {
-          toast.error(data.errorMessage || "Failed to start game");
-        }
+    socket.emit("create-game", myLobby, (response: SocketResponse) => {
+      if (!response.success) {
+        handleError(response?.error);
       }
-    );
+    });
   };
 
   return (

@@ -13,29 +13,8 @@ import { toast } from "react-hot-toast";
 import { useEffect, useState } from "react";
 import LobbyScreen from "./LobbyScreen";
 import { usePlayerStore } from "../../store/usePlayerStore";
-
-// Mock data for demonstration - replace with actual lobby data later
-// const mockLobbies = [
-//   {
-//     id: "LOBBY001",
-//     gameName: "Zombie Survival Arena",
-//     players: 2,
-//     maxPlayers: 4,
-//   },
-//   {
-//     id: "LOBBY002",
-//     gameName: "Undead Battleground",
-//     players: 1,
-//     maxPlayers: 6,
-//   },
-//   { id: "LOBBY003", gameName: "Apocalypse Zone", players: 3, maxPlayers: 4 },
-//   {
-//     id: "LOBBY004",
-//     gameName: "Dead City Challenge",
-//     players: 1,
-//     maxPlayers: 8,
-//   },
-// ];
+import { useHandleError } from "../../hooks/useHandleError";
+import { SocketResponse } from "../../../../shared/types";
 
 const JoinLobbiesScreen = ({
   setJoinLobbiesScreen,
@@ -43,6 +22,8 @@ const JoinLobbiesScreen = ({
   setJoinLobbiesScreen: (value: boolean) => void;
 }) => {
   const socket = getSocket();
+  const handleError = useHandleError();
+
   const lobbies = useLobbyStore((state) => state.lobbies);
   const myLobbyId = useLobbyStore((state) => state.myLobbyId);
   const setMyLobbyId = useLobbyStore((state) => state.setMyLobbyId);
@@ -69,14 +50,11 @@ const JoinLobbiesScreen = ({
     socket.emit(
       "join-lobby",
       { lobbyId, playerName },
-      (response: { success: boolean; errorMessage?: string }) => {
-        console.log("response", response);
+      (response: SocketResponse) => {
         if (response.success) {
-          console.log("Joined lobby successfully");
           setMyLobbyId(lobbyId);
         } else {
-          console.log("Failed to join lobby:", response.errorMessage);
-          toast.error(response.errorMessage || "Failed to join lobby");
+          handleError(response?.error);
         }
         setJoinLobbyLoading(false);
       }
@@ -89,9 +67,9 @@ const JoinLobbiesScreen = ({
 
   // TODO: move this onto connect socket and a refresh buton on lobby screen
   useEffect(() => {
-    socket.emit("fetch-lobbies", {}, (response: { success: boolean }) => {
+    socket.emit("fetch-lobbies", {}, (response: SocketResponse) => {
       if (!response.success) {
-        toast.error("Failed to fetch lobbies");
+        handleError(response?.error);
       }
     });
   }, []);
