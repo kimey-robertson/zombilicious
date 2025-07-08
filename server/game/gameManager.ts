@@ -128,6 +128,8 @@ function removePlayerFromGame(
   const reasonMessage =
     reason === "vote-kick"
       ? `has been voted to be kicked from game`
+      : reason === "chose-to-leave"
+      ? `has chosen to abandon you..`
       : `has left the game`;
 
   // Send the game log event

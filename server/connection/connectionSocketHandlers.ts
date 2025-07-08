@@ -34,7 +34,7 @@ export const handleConnectionEvents = (io: Server, socket: Socket) => {
     playerId: string;
   }>("leave-disconnected-game", async (io, socket, { gameId, playerId }) => {
     const playerName = getPlayerNameBySocketId(playerId);
-    const game = removePlayerFromGame(gameId, playerId, io);
+    const game = removePlayerFromGame(gameId, playerId, io, "chose-to-leave");
 
     // Emit the game update
     io.to(gameId).emit("game-updated", game);
@@ -45,14 +45,6 @@ export const handleConnectionEvents = (io: Server, socket: Socket) => {
     // Emit the games with disconnected players
     const gamesWithDisconnectedPlayers = getGamesWithDisconnectedPlayers();
     io.emit("games-with-disconnected-players", gamesWithDisconnectedPlayers);
-
-    sendGameLogEvent(io, game.id, {
-      id: (game.gameLogs.length + 1).toString(),
-      timestamp: new Date(),
-      type: "system",
-      message: `Player ${playerName} has chosen to abandon you..`,
-      icon: "🚫",
-    });
 
     return { success: true };
   });
