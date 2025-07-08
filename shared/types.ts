@@ -102,13 +102,15 @@ export type Card = {
   name: string;
 };
 
+export type SocketError = {
+  code: string;
+  message: string;
+  details?: any; //TODO: make this more specific
+};
+
 export type SocketResponse = {
   success: boolean;
-  error?: {
-    code: string;
-    message: string;
-    details?: any; //TODO: make this more specific
-  };
+  error?: SocketError;
 };
 
 export type SocketCallback = (response: SocketResponse) => void;

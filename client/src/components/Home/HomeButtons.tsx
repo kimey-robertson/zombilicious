@@ -1,8 +1,9 @@
-import toast from "react-hot-toast";
 import { getSocket } from "../../socket";
 import { Button } from "../UI/Button";
 import { useRef } from "react";
 import { usePlayerStore } from "../../store/usePlayerStore";
+import { SocketResponse } from "../../../../shared/types";
+import { useHandleError } from "../../hooks/useHandleError";
 
 const HomeButtons = ({
   setLobbyScreen,
@@ -18,6 +19,8 @@ const HomeButtons = ({
   const setPlayerName = usePlayerStore((state) => state.setPlayerName);
   const setPlayerId = usePlayerStore((state) => state.setPlayerId);
 
+  const handleError = useHandleError();
+
   const handleCreateLobby = () => {
     if (!playerName) {
       inputRef.current?.focus();
@@ -28,9 +31,9 @@ const HomeButtons = ({
     socket.emit(
       "create-game-lobby",
       { playerName },
-      (response: { success: boolean; errorMessage?: string }) => {
+      (response: SocketResponse) => {
         if (!response.success) {
-          toast.error(response.errorMessage || "Failed to create lobby");
+          handleError(response?.error);
           return;
         } else {
           setLobbyScreen(true);
