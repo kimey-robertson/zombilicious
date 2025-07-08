@@ -117,6 +117,7 @@ const tutorialMap: Map = {
       transform: "translate(30px, 139px) rotate(0)",
     },
   ],
+  startingZone: '1B-6'
 };
 
 export { tutorialMap };

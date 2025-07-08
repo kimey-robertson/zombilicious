@@ -36,6 +36,7 @@ export type Map = {
   tiles: Tile[];
   zones: Zone[];
   doors: Door[];
+  startingZone: string;
 };
 
 export type Player = {
@@ -49,6 +50,7 @@ export type Player = {
     inReserve: Card[];
     inHand: Card[];
   };
+  currentZone: string;
 };
 
 export type LobbyPlayer = {

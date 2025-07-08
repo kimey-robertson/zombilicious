@@ -74,7 +74,7 @@ export type GameStore = {
   setGameLogs: (
     gameLogs: LogEvent[] | ((prev: LogEvent[]) => LogEvent[])
   ) => void;
-  map: Map | object;
+  map: Map;
   setMap: (map: Map) => void;
 };
 

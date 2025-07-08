@@ -25,6 +25,8 @@ function createGame(lobby: Lobby, io: Server): Game {
     });
   }
 
+  const chosenMap = tutorialMap; // Will be dynamic in the future
+
   const game: Game = {
     id: lobby.id,
     name: lobby.gameName,
@@ -36,11 +38,12 @@ function createGame(lobby: Lobby, io: Server): Game {
       actionsRemaining: 3,
       XP: 0,
       playerCards: { inReserve: [], inHand: [] },
+      currentZone: chosenMap.startingZone,
     })),
     status: "active",
     disconnectedPlayers: {},
     gameLogs: [],
-    map: tutorialMap,
+    map: chosenMap,
   };
 
   // Join all players from the lobby to the game
@@ -57,6 +60,16 @@ function createGame(lobby: Lobby, io: Server): Game {
   });
 
   games.push(game);
+
+  game.players.forEach((player) => {
+    sendGameLogEvent(io, game.id, {
+      id: (game.gameLogs.length + 1).toString(),
+      timestamp: new Date(),
+      type: "system",
+      message: `Player ${player.name} has joined the game`,
+      icon: "💪",
+    });
+  });
 
   return game;
 }

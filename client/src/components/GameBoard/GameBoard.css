@@ -53,14 +53,12 @@
 }
 
 .grid-cell {
-  /* border: 1px solid rgb(221, 36, 36); */
   box-sizing: border-box;
-  /* padding: 1.2rem; */
   z-index: 10;
 }
 
 .door {
-  position: relative;
+  position: absolute;
   width: 45px;
   height: 10px;
   background: green;
