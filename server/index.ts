@@ -7,7 +7,6 @@ const { server, io, PORT } = createServer();
 
 io.on("connection", (socket) => {
   handleConnectionEvents(io, socket);
-
   handleLobbyEvents(io, socket);
   handleGameEvents(io, socket);
 });

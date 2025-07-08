@@ -10,6 +10,11 @@ import {
   getGamesWithDisconnectedPlayers,
   sendGameLogEvent,
 } from "../game/gameUtils";
+import { OperationFailedError } from "../utils/socketErrors";
+
+// Handles receiving events from the client, responding with callbacks,
+// and emitting events to the client. Shouldn't have logic.
+// Should return success true boolean or throw an error somewhere in the handler.
 
 function handleConnect(io: Server) {
   const gamesWithDisconnectedPlayers = getGamesWithDisconnectedPlayers();
@@ -74,29 +79,36 @@ function handleDisconnectFromGame(socketId: string, io: Server) {
 // If the player is in a lobby, remove them from the lobby, and if the lobby is empty, delete the lobby
 function handleDisconnectFromLobby(playerSocketId: string, io: Server) {
   const lobby = getLobbyByPlayerSocketId(playerSocketId);
-  if (lobby) {
+  if (!lobby) {
+    throw new OperationFailedError("Couldn't find lobby");
+  } else {
+    // Find the player
     const disconnectedPlayer = lobby.players.find(
       (player) => player.id === playerSocketId
     );
     if (!disconnectedPlayer) {
-      return;
-    }
-    lobby.players = lobby.players.filter(
-      (player) => player.id !== disconnectedPlayer?.id
-    );
-    if (lobby.players.length === 0) {
-      deleteLobby(lobby.id);
+      throw new OperationFailedError("Couldn't find player in lobby");
     } else {
-      if (disconnectedPlayer.isHost) {
-        if (lobby.players.length > 0) {
-          const newHost = lobby.players[0];
-          newHost.isHost = true;
+      // Remove the player from the lobby
+      lobby.players = lobby.players.filter(
+        (player) => player.id !== disconnectedPlayer?.id
+      );
+      // If the lobby is empty, delete the lobby
+      if (lobby.players.length === 0) {
+        deleteLobby(lobby.id);
+      } else {
+        // If the player is the host, find a new host
+        if (disconnectedPlayer.isHost) {
+          if (lobby.players.length > 0) {
+            const newHost = lobby.players[0];
+            newHost.isHost = true;
+          }
         }
+        io.emit("lobby-updated", {
+          lobbyId: lobby.id,
+          players: lobby.players,
+        });
       }
-      io.emit("lobby-updated", {
-        lobbyId: lobby.id,
-        players: lobby.players,
-      });
     }
   }
 }

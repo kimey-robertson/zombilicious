@@ -16,8 +16,16 @@ export const handleConnectionEvents = (io: Server, socket: Socket) => {
   handleConnect(io);
 
   socket.on("disconnect", () => {
-    handleDisconnectFromLobby(socket.id, io);
-    handleDisconnectFromGame(socket.id, io);
+    // Manual error handling for disconnect, we don't want to wrap it in the socket wrapper
+    try {
+      handleDisconnectFromLobby(socket.id, io);
+      handleDisconnectFromGame(socket.id, io);
+    } catch (error) {
+      console.error(
+        `[disconnect] Error handling disconnect for ${socket.id}:`,
+        error
+      );
+    }
   });
 
   socket.on(

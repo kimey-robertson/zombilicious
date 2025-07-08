@@ -14,7 +14,7 @@ import { OperationFailedError } from "../utils/socketErrors";
 
 // Handles receiving events from the client, responding with callbacks,
 // and emitting events to the client. Shouldn't have logic.
-// Callbacks should only ever contain success boolean and error message if success is false.
+// Should return success true boolean or throw an error somewhere in the handler.
 
 export const handleLobbyEvents = (io: Server, socket: Socket) => {
   const createGameLobbyHandler = createSocketHandler<{ playerName: string }>(

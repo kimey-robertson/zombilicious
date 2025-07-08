@@ -14,7 +14,7 @@ import { deleteLobby } from "../lobby/lobbyManager";
 
 // Handles receiving events from the client, responding with callbacks,
 // and emitting events to the client. Shouldn't have logic.
-// Callbacks should only ever contain success boolean and error message if success is false.
+// Should return success true boolean or throw an error somewhere in the handler.
 
 export const handleGameEvents = (io: Server, socket: Socket) => {
   socket.on(

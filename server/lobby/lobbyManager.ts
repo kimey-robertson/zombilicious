@@ -2,6 +2,7 @@ import { Lobby } from "../../shared/types";
 import {
   LobbyNotFoundError,
   LobbyPlayerNotFoundError,
+  OperationFailedError,
 } from "../utils/socketErrors";
 
 export const lobbies: Lobby[] = [];
@@ -32,14 +33,15 @@ function createLobby(
   return lobby;
 }
 
-function deleteLobby(lobbyId: string): Lobby | undefined {
-  if (!lobbyId) return undefined;
+function deleteLobby(lobbyId: string): Lobby {
+  if (!lobbyId) throw new OperationFailedError("Delete lobby");
+  // Find the lobby
   const lobby = lobbies.find((lobby) => lobby.id === lobbyId);
-  if (lobby) {
+  if (!lobby) {
+    throw new LobbyNotFoundError(lobbyId);
+  } else {
     lobbies.splice(lobbies.indexOf(lobby), 1);
     return lobby;
-  } else {
-    return undefined;
   }
 }
 
