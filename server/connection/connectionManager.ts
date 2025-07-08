@@ -25,7 +25,6 @@ function handleConnect(io: Server) {
 
 function handleDisconnectFromGame(socketId: string, io: Server) {
   const game = getGameBySocketId(socketId);
-  if (!game) return;
   const disconnectedPlayer = getPlayerNameBySocketId(socketId);
 
   sendGameLogEvent(io, game.id, {

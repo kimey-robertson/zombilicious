@@ -52,11 +52,13 @@ function deleteGame(gameId: string): Game {
   return game;
 }
 
-function getGameBySocketId(socketId: string): Game | undefined {
-  if (!socketId) return undefined;
-  return games.find((game) =>
+function getGameBySocketId(socketId: string): Game {
+  if (!socketId) throw new OperationFailedError("Get game by socket id");
+  const game = games.find((game) =>
     game.players.some((player) => player.id === socketId)
   );
+  if (!game) throw new GameNotFoundError(socketId, "in getGameBySocketId");
+  return game;
 }
 
 function getGameById(gameId: string): Game {
