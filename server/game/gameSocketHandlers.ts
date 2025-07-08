@@ -4,7 +4,6 @@ import {
   createGame,
   rejoinGame,
   updatePlayerTurn,
-  getGameById,
   voteKickPlayerFromGame,
 } from "./gameManager";
 import { getGamesWithDisconnectedPlayers, sendGameLogEvent } from "./gameUtils";
@@ -58,48 +57,36 @@ export const handleGameEvents = (io: Server, socket: Socket) => {
     }
   );
 
-  socket.on(
+  const rejoinGameHandler = createSocketHandler<{
+    gameId: string;
+    playerIdFromLocalStorage: string;
+    newPlayerId: string;
+  }>(
     "rejoin-game",
-    (
-      {
-        gameId,
-        playerIdFromLocalStorage,
-        newPlayerId,
-      }: {
-        gameId: string;
-        playerIdFromLocalStorage: string;
-        newPlayerId: string;
-      },
-      callback: (data: { success: boolean; errorMessage?: string }) => void
-    ) => {
+    async (io, socket, { gameId, playerIdFromLocalStorage, newPlayerId }) => {
+      // Get the player socket
+      const playerSocket = io.sockets.sockets.get(newPlayerId);
+
+      // Rejoin the game
       const game = rejoinGame(
         gameId,
         playerIdFromLocalStorage,
         newPlayerId,
+        playerSocket,
         io
       );
-      if (game) {
-        // Emit game-updated to all players in the game
-        io.to(game.id).emit("game-updated", game);
 
-        // Update the list of games with disconnected players
-        const gamesWithDisconnectedPlayers = getGamesWithDisconnectedPlayers();
-        io.emit(
-          "games-with-disconnected-players",
-          gamesWithDisconnectedPlayers
-        );
+      // Emit game-updated to all players in the game
+      io.to(game.id).emit("game-updated", game);
 
-        // Send the game state to the rejoining player
-        const playerSocket = io.sockets.sockets.get(newPlayerId);
-        if (playerSocket) {
-          // Not sure about this
-          playerSocket.emit("game-created", game);
-        }
+      // Update the list of games with disconnected players
+      const gamesWithDisconnectedPlayers = getGamesWithDisconnectedPlayers();
+      io.emit("games-with-disconnected-players", gamesWithDisconnectedPlayers);
 
-        callback({ success: true });
-      } else {
-        callback({ success: false, errorMessage: "Failed to rejoin game" });
-      }
+      // Send the game state to the rejoining player
+      playerSocket?.emit("game-created", game);
+
+      return { success: true };
     }
   );
 
@@ -122,4 +109,5 @@ export const handleGameEvents = (io: Server, socket: Socket) => {
 
   createGameHandler(io, socket);
   voteKickPlayerFromGameHandler(io, socket);
+  rejoinGameHandler(io, socket);
 };

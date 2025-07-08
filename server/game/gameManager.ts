@@ -1,4 +1,4 @@
-import { Server } from "socket.io";
+import { Server, Socket } from "socket.io";
 import { Game, Lobby } from "../../shared/types";
 import {
   getPlayerNameBySocketId,
@@ -146,19 +146,19 @@ function rejoinGame(
   gameId: string,
   playerIdFromLocalStorage: string,
   newPlayerId: string,
+  playerSocket: Socket | undefined,
   io: Server
-): Game | undefined {
+): Game {
   if (!gameId || !playerIdFromLocalStorage || !newPlayerId || !io) {
-    return undefined;
+    throw new OperationFailedError("Rejoin game");
   }
   const game = getGameById(gameId);
-  if (!game) {
-    return undefined;
-  }
 
   // Check if player is actually disconnected from this game
   if (!game.disconnectedPlayers[playerIdFromLocalStorage]) {
-    return undefined;
+    throw new OperationFailedError("Rejoin game", {
+      message: `Player ${playerIdFromLocalStorage} is not disconnected from game ${gameId}`,
+    });
   }
 
   // Stop the disconnect timer for this player
@@ -168,8 +168,11 @@ function rejoinGame(
   delete game.disconnectedPlayers[playerIdFromLocalStorage];
 
   // Join the player's socket to the game room
-  const playerSocket = io.sockets.sockets.get(newPlayerId);
-  if (playerSocket) {
+  if (!playerSocket) {
+    throw new OperationFailedError("Rejoin game", {
+      message: `Player socket not found with id ${newPlayerId}`,
+    });
+  } else {
     playerSocket.join(gameId);
     console.log(
       `Player ${newPlayerId} with previous id ${playerIdFromLocalStorage} rejoined game ${gameId}`
