@@ -5,7 +5,7 @@ import {
   sendGameLogEvent,
   stopPlayerDisconnectTimer,
 } from "./gameUtils";
-import { tutorialMap } from "../maps";
+import { tutorialMap } from "../maps/maps";
 import { GameNotFoundError, OperationFailedError } from "../utils/socketErrors";
 
 export const games: Game[] = [];

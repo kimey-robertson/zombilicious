@@ -39,7 +39,6 @@ const GameBoard = () => {
   };
 
   const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
-    e.preventDefault();
     const zoomAmount = e.deltaY > 0 ? -0.01 : 0.01;
     setZoom((prev: number) => Math.max(0.5, Math.min(prev + zoomAmount, 2)));
   };

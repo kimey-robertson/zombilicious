@@ -1,5 +1,5 @@
-import { getTileCells } from "./utils/helpers";
-import type { Map } from "../shared/types";
+import { getTileCells } from "../utils/helpers";
+import type { Map } from "../../shared/types";
 
 const tutorialMap: Map = {
   id: "tutorial",
@@ -117,7 +117,7 @@ const tutorialMap: Map = {
       transform: "translate(30px, 139px) rotate(0)",
     },
   ],
-  startingZone: '1B-6'
+  startingZone: "1B-6",
 };
 
 export { tutorialMap };
