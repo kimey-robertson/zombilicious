@@ -16,6 +16,10 @@ const Cell: React.FC<CellProps> = ({ cell, zone, door }) => {
   const panMode = usePlayerStore((state) => state.panMode);
   const players = useGameStore((state) => state.players);
   const map = useGameStore((state) => state.map);
+  const playerId = usePlayerStore((state) => state.playerId);
+  const selectedAction = usePlayerStore((state) => state.selectedAction);
+
+  const currentPlayer = players.find((player) => player.id === playerId);
 
   const playerInZone = players.find((player) =>
     player.currentZone.includes(zone?.id ?? "")
@@ -24,11 +28,14 @@ const Cell: React.FC<CellProps> = ({ cell, zone, door }) => {
   const hDoubleZone = isHorizontalDoubleZone(zone, map);
   const vDoubleZone = isVerticalDoubleZone(zone, map);
 
-
   const showPlayerToken =
     hDoubleZone || vDoubleZone
       ? playerInZone && cell.id.includes(zone?.id.split("/")[0] ?? "")
       : playerInZone;
+
+  const isMovableZone = currentPlayer?.movableZones.find(
+    (movableZone) => movableZone.id === zone?.id
+  );
 
   const handleClick = () => {
     if (zone && !panMode) {
@@ -37,7 +44,13 @@ const Cell: React.FC<CellProps> = ({ cell, zone, door }) => {
   };
 
   return (
-    <div key={cell.id} className="grid-cell" onClick={handleClick}>
+    <div
+      key={cell.id}
+      className={`grid-cell ${
+        isMovableZone && selectedAction?.id === "move" ? "movable-zone" : ""
+      }`}
+      onClick={handleClick}
+    >
       {door ? <DoorComponent door={door} cellId={cell.id} /> : null}
       {showPlayerToken ? (
         <PlayerToken

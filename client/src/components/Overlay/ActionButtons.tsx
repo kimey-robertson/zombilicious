@@ -7,9 +7,17 @@ import { LuAxe } from "react-icons/lu";
 import { GiSawedOffShotgun } from "react-icons/gi";
 import { FaRegHand } from "react-icons/fa6";
 import { BsVolumeUp } from "react-icons/bs";
+import { IconType } from "react-icons/lib";
+import { usePlayerStore } from "../../store/usePlayerStore";
+
+export type GameAction = {
+  id: string;
+  icon: IconType;
+  label: string;
+};
 
 const ActionButtons = () => {
-  const gameActions = [
+  const gameActions: GameAction[] = [
     { id: "search", icon: FaSearch, label: "Search" },
     { id: "move", icon: IoMdMove, label: "Move" },
     { id: "door", icon: FaDoorOpen, label: "Open Door" },
@@ -19,8 +27,14 @@ const ActionButtons = () => {
     { id: "take", icon: FaRegHand, label: "Take Object" },
     { id: "noise", icon: BsVolumeUp, label: "Make Noise" },
   ];
-  const selectedAction = "search";
-  const actionsRemaining = 4;
+  const selectedAction = usePlayerStore((state) => state.selectedAction);
+  const actionsRemaining = usePlayerStore((state) => state.actionsRemaining);
+  const setSelectedAction = usePlayerStore((state) => state.setSelectedAction);
+
+  const handleActionClick = (action: GameAction) => {
+    setSelectedAction(action);
+  };
+
   return (
     <div className="space-y-4">
       <h4 className="text-red-400 font-bold text-center tracking-wider border-b border-red-900/50 pb-2 font-mono">
@@ -32,14 +46,14 @@ const ActionButtons = () => {
           return (
             <Button
               key={action.id}
-              //   onClick={() => handleActionClick(action.id)}
-              //   disabled={actionsRemaining === 0}
+              onClick={() => handleActionClick(action)}
+              disabled={actionsRemaining === 0}
               className={`bg-gradient-to-b text-stone-200 p-3 h-auto flex flex-col items-center gap-2 transition-all duration-300 border-2 shadow-lg relative overflow-hidden font-mono ${
-                selectedAction === action.id
+                selectedAction?.id === action.id
                   ? "scale-110 border-red-400/80 shadow-red-900/50 bg-gradient-to-b from-red-800/90 to-red-950/90"
                   : ""
               } ${
-                actionsRemaining === 0 as number
+                actionsRemaining === 0
                   ? "opacity-30 cursor-not-allowed grayscale"
                   : "hover:scale-105 hover:shadow-xl"
               }`}

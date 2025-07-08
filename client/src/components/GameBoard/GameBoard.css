@@ -57,13 +57,29 @@
   z-index: 10;
 }
 
+.movable-zone {
+  background-color: #c9cccb57;
+  animation: movable-zone-pulse 1s infinite;
+}
+
+@keyframes movable-zone-pulse {
+  0% {
+    background-color: #c9cccb57;
+  }
+  50% {
+    background-color: #c9cccb80;
+  }
+  100% {
+    background-color: #c9cccb57;
+  }
+}
+
 .door {
   position: absolute;
   width: 45px;
   height: 10px;
   background: green;
   z-index: 13;
-
 }
 
 /* .grid-cell:hover {

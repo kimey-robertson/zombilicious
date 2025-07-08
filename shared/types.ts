@@ -51,6 +51,7 @@ export type Player = {
     inHand: Card[];
   };
   currentZone: string;
+  movableZones: Zone[];
 };
 
 export type LobbyPlayer = {

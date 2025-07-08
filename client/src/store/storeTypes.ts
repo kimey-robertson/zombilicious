@@ -8,6 +8,7 @@ import {
   Card,
   Map,
 } from "../../../shared/types";
+import { GameAction } from "../components/Overlay/ActionButtons";
 
 export type Offset = { x: number; y: number };
 
@@ -42,6 +43,8 @@ export type PlayerStore = {
   setPlayerCards: (playerCards: { inReserve: Card[]; inHand: Card[] }) => void;
   isMyTurn: boolean;
   setIsMyTurn: (isMyTurn: boolean) => void;
+  selectedAction: GameAction | undefined;
+  setSelectedAction: (selectedAction: GameAction | undefined) => void;
 };
 
 export type LobbyStore = {
