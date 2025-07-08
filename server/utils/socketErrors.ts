@@ -39,3 +39,13 @@ export class LobbyPlayerNotFoundError extends SocketError {
     );
   }
 }
+
+export class GameNotFoundError extends SocketError {
+  constructor(gameId: string, details?: any) {
+    super(
+      SocketErrorCodes.GAME_NOT_FOUND,
+      `Game not found: ${gameId}`,
+      details
+    );
+  }
+}

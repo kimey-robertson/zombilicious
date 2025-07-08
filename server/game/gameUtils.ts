@@ -22,16 +22,20 @@ function sendGameLogEvent(
   io: Server,
   gameId: string,
   logEvent: LogEvent
-): void | undefined {
+): void {
   const game = getGameById(gameId);
-  if (game) {
-    io.to(gameId).emit("log-event", logEvent);
-    game.gameLogs.push(logEvent);
-  }
+  io.to(gameId).emit("log-event", logEvent);
+  game.gameLogs.push(logEvent);
+}
+
+function stopPlayerDisconnectTimer(gameId: string, playerId: string): void {
+  const game = getGameById(gameId);
+  game.disconnectedPlayers[playerId]?.stopDisconnectTimer?.();
 }
 
 export {
   getPlayerNameBySocketId,
   getGamesWithDisconnectedPlayers,
   sendGameLogEvent,
+  stopPlayerDisconnectTimer,
 };

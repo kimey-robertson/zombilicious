@@ -1,11 +1,17 @@
 import { Server } from "socket.io";
 import { Game, Lobby } from "../../shared/types";
-import { getPlayerNameBySocketId, sendGameLogEvent } from "./gameUtils";
+import {
+  getPlayerNameBySocketId,
+  sendGameLogEvent,
+  stopPlayerDisconnectTimer,
+} from "./gameUtils";
 import { tutorialMap } from "../maps";
+import { GameNotFoundError, OperationFailedError } from "../utils/socketErrors";
 
 export const games: Game[] = [];
 
-// All function in this file should return Game | undefined
+// All function in this file should return Game or throw an error
+// There should be no emits in this file
 
 function createGame(lobby: Lobby): Game | undefined {
   if (games.find((game) => game.id === lobby.id) || !lobby) {
@@ -35,14 +41,15 @@ function createGame(lobby: Lobby): Game | undefined {
   return game;
 }
 
-function deleteGame(gameId: string): Game | undefined {
-  if (!gameId) return undefined;
+function deleteGame(gameId: string): Game {
+  if (!gameId) throw new OperationFailedError("Delete game");
+
   const game = games.find((game) => game.id === gameId);
-  if (game) {
-    games.splice(games.indexOf(game), 1);
-    return game;
-  }
-  return undefined;
+  if (!game) throw new GameNotFoundError(gameId);
+
+  // Remove the game from the games array
+  games.splice(games.indexOf(game), 1);
+  return game;
 }
 
 function getGameBySocketId(socketId: string): Game | undefined {
@@ -52,43 +59,45 @@ function getGameBySocketId(socketId: string): Game | undefined {
   );
 }
 
-function getGameById(gameId: string): Game | undefined {
-  if (!gameId) return undefined;
-  return games.find((game) => game.id === gameId);
+function getGameById(gameId: string): Game {
+  if (!gameId) throw new OperationFailedError("Get game by id");
+  const game = games.find((game) => game.id === gameId);
+  if (!game) throw new GameNotFoundError(gameId, "in getGameById");
+  return game;
 }
 
 function removePlayerFromGame(
   gameId: string,
   targetPlayerId: string,
   io: Server
-): Game | undefined {
-  if (!gameId || !targetPlayerId || !io) return undefined;
-  let game = getGameById(gameId);
-  if (game) {
-    if (game.players.find((player) => player.myTurn)?.id === targetPlayerId) {
-      game = updatePlayerTurn(gameId, io);
-      if (!game) {
-        return undefined;
-      }
-    }
-    stopPlayerDisconnectTimer(gameId, targetPlayerId);
-    delete game.disconnectedPlayers[targetPlayerId];
-    game.players = game.players.filter(
-      (player) => player.id !== targetPlayerId
-    );
-    io.to(gameId).emit("game-updated", game);
-    io.emit("player-removed-from-game", targetPlayerId);
-    return game;
-  } else {
-    return undefined;
-  }
-}
+): Game {
+  console.log("removePlayerFromGame");
+  if (!gameId || !targetPlayerId || !io)
+    throw new OperationFailedError("Remove player from game");
 
-function stopPlayerDisconnectTimer(gameId: string, playerId: string) {
-  const game = getGameById(gameId);
-  if (game) {
-    game.disconnectedPlayers[playerId]?.stopDisconnectTimer?.();
+  let game = getGameById(gameId);
+
+  if (game.players.find((player) => player.myTurn)?.id === targetPlayerId) {
+    game = updatePlayerTurn(gameId, io);
   }
+
+  // Stop the disconnect timer for this player
+  stopPlayerDisconnectTimer(gameId, targetPlayerId);
+
+  // Remove the player from the game
+  delete game.disconnectedPlayers[targetPlayerId];
+  game.players = game.players.filter((player) => player.id !== targetPlayerId);
+
+  // Need to sort this
+  // Check if the game is empty
+  //   if (game?.players.length === 0) {
+  //     game = deleteGame(gameId);
+  //   }
+
+  // Set the game status to active
+  game.status = "active";
+
+  return game;
 }
 
 function rejoinGame(
@@ -151,27 +160,24 @@ function rejoinGame(
   return game;
 }
 
-function updatePlayerTurn(gameId: string, io: Server): Game | undefined {
+function updatePlayerTurn(gameId: string, io: Server): Game {
   const game = getGameById(gameId);
-  if (game) {
-    const playerIndex = game.players.findIndex((player) => player.myTurn);
-    if (playerIndex !== -1) {
-      game.players[playerIndex].myTurn = false;
-    }
-    const nextPlayer = game.players[playerIndex + 1];
-    if (nextPlayer) {
-      nextPlayer.myTurn = true;
-      sendGameLogEvent(io, gameId, {
-        id: (game.gameLogs.length + 1).toString(),
-        timestamp: new Date(),
-        type: "system",
-        message: `It's now player ${nextPlayer.name}'s turn`,
-        icon: "🔥",
-      });
-    }
-    // io.to(gameId).emit("game-updated", game);
-    return game;
+  const playerIndex = game.players.findIndex((player) => player.myTurn);
+  if (playerIndex !== -1) {
+    game.players[playerIndex].myTurn = false;
   }
+  const nextPlayer = game.players[playerIndex + 1];
+  if (nextPlayer) {
+    nextPlayer.myTurn = true;
+    sendGameLogEvent(io, gameId, {
+      id: (game.gameLogs.length + 1).toString(),
+      timestamp: new Date(),
+      type: "system",
+      message: `It's now player ${nextPlayer.name}'s turn`,
+      icon: "🔥",
+    });
+  }
+  return game;
 }
 
 export {

@@ -71,11 +71,14 @@ function joinLobby(
   return lobby;
 }
 
-function getLobbyByPlayerSocketId(playerSocketId: string): Lobby | undefined {
-  if (!playerSocketId) return undefined;
-  return lobbies.find((lobby) =>
+function getLobbyByPlayerSocketId(playerSocketId: string): Lobby {
+  if (!playerSocketId)
+    throw new OperationFailedError("Get lobby by player socket id");
+  const lobby = lobbies.find((lobby) =>
     lobby.players.some((player) => player.id === playerSocketId)
   );
+  if (!lobby) throw new LobbyNotFoundError('', { playerSocketId });
+  return lobby;
 }
 
 function leaveLobby(

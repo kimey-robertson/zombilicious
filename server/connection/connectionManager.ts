@@ -5,12 +5,13 @@ import {
   removePlayerFromGame,
 } from "../game/gameManager";
 import { countDownTimer } from "../utils/helpers";
-import { deleteLobby, getLobbyByPlayerSocketId } from "../lobby/lobbyManager";
+import { deleteLobby } from "../lobby/lobbyManager";
 import {
   getGamesWithDisconnectedPlayers,
   sendGameLogEvent,
 } from "../game/gameUtils";
 import { OperationFailedError } from "../utils/socketErrors";
+import { getAllLobbies } from "../lobby/lobbyUtils";
 
 // Handles receiving events from the client, responding with callbacks,
 // and emitting events to the client. Shouldn't have logic.
@@ -77,38 +78,43 @@ function handleDisconnectFromGame(socketId: string, io: Server) {
 }
 
 // If the player is in a lobby, remove them from the lobby, and if the lobby is empty, delete the lobby
-function handleDisconnectFromLobby(playerSocketId: string, io: Server) {
-  const lobby = getLobbyByPlayerSocketId(playerSocketId);
-  if (!lobby) {
-    throw new OperationFailedError("Couldn't find lobby");
+function handleDisconnectFromLobby(playerSocketId: string, io: Server): void {
+  // If the player is in a game, or there is no lobby, ignore this functon
+  // This is custom and doesn't follow the same pattern as the other sockets, just because it's a special case
+
+  const game = getGameBySocketId(playerSocketId);
+
+  let lobby = getAllLobbies().find((lobby) =>
+    lobby.players.some((player) => player.id === playerSocketId)
+  );
+  if (game || !lobby) return;
+
+  // Find the player
+  const disconnectedPlayer = lobby.players.find(
+    (player) => player.id === playerSocketId
+  );
+  if (!disconnectedPlayer) {
+    throw new OperationFailedError("Couldn't find player in lobby");
   } else {
-    // Find the player
-    const disconnectedPlayer = lobby.players.find(
-      (player) => player.id === playerSocketId
+    // Remove the player from the lobby
+    lobby.players = lobby.players.filter(
+      (player) => player.id !== disconnectedPlayer?.id
     );
-    if (!disconnectedPlayer) {
-      throw new OperationFailedError("Couldn't find player in lobby");
+    // If the lobby is empty, delete the lobby
+    if (lobby.players.length === 0) {
+      lobby = deleteLobby(lobby.id);
     } else {
-      // Remove the player from the lobby
-      lobby.players = lobby.players.filter(
-        (player) => player.id !== disconnectedPlayer?.id
-      );
-      // If the lobby is empty, delete the lobby
-      if (lobby.players.length === 0) {
-        deleteLobby(lobby.id);
-      } else {
-        // If the player is the host, find a new host
-        if (disconnectedPlayer.isHost) {
-          if (lobby.players.length > 0) {
-            const newHost = lobby.players[0];
-            newHost.isHost = true;
-          }
+      // If the player is the host, find a new host
+      if (disconnectedPlayer.isHost) {
+        if (lobby.players.length > 0) {
+          const newHost = lobby.players[0];
+          newHost.isHost = true;
         }
-        io.emit("lobby-updated", {
-          lobbyId: lobby.id,
-          players: lobby.players,
-        });
       }
+      io.emit("lobby-updated", {
+        lobbyId: lobby.id,
+        players: lobby.players,
+      });
     }
   }
 }

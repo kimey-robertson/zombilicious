@@ -7,6 +7,7 @@ import {
   sendGameLogEvent,
 } from "../game/gameUtils";
 import { removePlayerFromGame } from "../game/gameManager";
+import { createSocketHandler } from "../utils/socketWrapper";
 
 // Handles receiving events from the client, responding with callbacks,
 // and emitting events to the client. Shouldn't have logic.
@@ -28,33 +29,33 @@ export const handleConnectionEvents = (io: Server, socket: Socket) => {
     }
   });
 
-  socket.on(
-    "leave-disconnected-game",
-    (
-      { gameId, playerId }: { gameId: string; playerId: string },
-      callback: (data: { success: boolean; errorMessage?: string }) => void
-    ) => {
-      const playerName = getPlayerNameBySocketId(playerId);
-      const game = removePlayerFromGame(gameId, playerId, io);
-      if (game) {
-        game.status = "active";
-        const gamesWithDisconnectedPlayers = getGamesWithDisconnectedPlayers();
-        io.emit(
-          "games-with-disconnected-players",
-          gamesWithDisconnectedPlayers
-        );
-        io.to(game.id).emit("game-updated", game);
-        sendGameLogEvent(io, game.id, {
-          id: (game.gameLogs.length + 1).toString(),
-          timestamp: new Date(),
-          type: "system",
-          message: `Player ${playerName} has chosen to abandon you..`,
-          icon: "🚫",
-        });
-        callback({ success: true });
-      } else {
-        callback({ success: false, errorMessage: "Game not found" });
-      }
-    }
-  );
+  const leaveDisconnectedGameHandler = createSocketHandler<{
+    gameId: string;
+    playerId: string;
+  }>("leave-disconnected-game", async (io, socket, { gameId, playerId }) => {
+    const playerName = getPlayerNameBySocketId(playerId);
+    const game = removePlayerFromGame(gameId, playerId, io);
+
+    // Emit the game update
+    io.to(gameId).emit("game-updated", game);
+
+    // Emit the player removed from game
+    io.emit("player-removed-from-game", playerId);
+
+    // Emit the games with disconnected players
+    const gamesWithDisconnectedPlayers = getGamesWithDisconnectedPlayers();
+    io.emit("games-with-disconnected-players", gamesWithDisconnectedPlayers);
+
+    sendGameLogEvent(io, game.id, {
+      id: (game.gameLogs.length + 1).toString(),
+      timestamp: new Date(),
+      type: "system",
+      message: `Player ${playerName} has chosen to abandon you..`,
+      icon: "🚫",
+    });
+
+    return { success: true };
+  });
+
+  leaveDisconnectedGameHandler(io, socket);
 };
