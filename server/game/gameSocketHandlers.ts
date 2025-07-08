@@ -90,24 +90,21 @@ export const handleGameEvents = (io: Server, socket: Socket) => {
     }
   );
 
-  socket.on(
+  const endTurnHandler = createSocketHandler<{ gameId: string }>(
     "end-turn",
-    (
-      { gameId }: { gameId: string },
-      callback: (data: { success: boolean; errorMessage?: string }) => void
-    ) => {
-      console.log("end turn");
+    async (io, socket, { gameId }) => {
+      // End the turn
       const game = updatePlayerTurn(gameId, io);
-      if (game) {
-        callback({ success: true });
-        io.to(gameId).emit("game-updated", game);
-      } else {
-        callback({ success: false, errorMessage: "Failed to end turn" });
-      }
+
+      // Emit the game updated
+      io.to(gameId).emit("game-updated", game);
+
+      return { success: true };
     }
   );
 
   createGameHandler(io, socket);
   voteKickPlayerFromGameHandler(io, socket);
   rejoinGameHandler(io, socket);
+  endTurnHandler(io, socket);
 };
