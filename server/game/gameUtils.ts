@@ -33,9 +33,14 @@ function stopPlayerDisconnectTimer(gameId: string, playerId: string): void {
   game.disconnectedPlayers[playerId]?.stopDisconnectTimer?.();
 }
 
+function getAllGames(): Game[] {
+  return games;
+}
+
 export {
   getPlayerNameBySocketId,
   getGamesWithDisconnectedPlayers,
   sendGameLogEvent,
   stopPlayerDisconnectTimer,
+  getAllGames,
 };

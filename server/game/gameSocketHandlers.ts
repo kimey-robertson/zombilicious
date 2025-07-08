@@ -2,7 +2,6 @@ import { Server, Socket } from "socket.io";
 import { Lobby } from "../../shared/types";
 import {
   createGame,
-  deleteGame,
   getGameBySocketId,
   removePlayerFromGame,
   rejoinGame,
@@ -11,53 +10,22 @@ import {
 } from "./gameManager";
 import { getGamesWithDisconnectedPlayers, sendGameLogEvent } from "./gameUtils";
 import { deleteLobby } from "../lobby/lobbyManager";
+import { createSocketHandler } from "../utils/socketWrapper";
 
 // Handles receiving events from the client, responding with callbacks,
 // and emitting events to the client. Shouldn't have logic.
 // Should return success true boolean or throw an error somewhere in the handler.
 
 export const handleGameEvents = (io: Server, socket: Socket) => {
-  socket.on(
+  const createGameHandler = createSocketHandler<Lobby>(
     "create-game",
-    (
-      lobby: Lobby,
-      callback: (data: { success: boolean; errorMessage?: string }) => void
-    ) => {
-      // Create game. If successful, delete lobby. If lobby not deleted, delete game.
-      // If game not deleted, return error. Shouldn't get that far!
-      const game = createGame(lobby);
-      if (game) {
-        const deletedLobby = deleteLobby(lobby.id);
-        if (!deletedLobby) {
-          const deletedGame = deleteGame(game.id);
-          if (!deletedGame) {
-            return callback({
-              success: false,
-              errorMessage:
-                "Failed to delete game. Lobby not deleted. Find help.",
-            });
-          }
-          return callback({
-            success: false,
-            errorMessage: "Failed to delete lobby. Game not created.",
-          });
-        } else {
-          // Join all players from the lobby to the game
-          lobby.players.forEach((player) => {
-            const playerSocket = io.sockets.sockets.get(player.id);
-            if (playerSocket) {
-              playerSocket.join(game.id);
-              console.log(`Player ${player.name} joined game ${game.id}`);
-            }
-          });
-          // Emit game-created only to players in this game
-          io.to(game.id).emit("game-created", game);
-          console.log("game created", game);
-          return callback({ success: true });
-        }
-      } else {
-        callback({ success: false, errorMessage: "Failed to create game" });
-      }
+    async (io, socket, lobby) => {
+      const game = createGame(lobby, io);
+      deleteLobby(lobby.id);
+
+      io.to(game.id).emit("game-created", game);
+
+      return { success: true };
     }
   );
 
@@ -177,4 +145,6 @@ export const handleGameEvents = (io: Server, socket: Socket) => {
       }
     }
   );
+
+  createGameHandler(io, socket);
 };

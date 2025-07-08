@@ -13,9 +13,16 @@ export const games: Game[] = [];
 // All function in this file should return Game or throw an error
 // There should be no emits in this file
 
-function createGame(lobby: Lobby): Game | undefined {
-  if (games.find((game) => game.id === lobby.id) || !lobby) {
-    return undefined;
+function createGame(lobby: Lobby, io: Server): Game {
+  if (games.find((game) => game.id === lobby.id)) {
+    throw new OperationFailedError("Create game", {
+      message: `Game already exists with id ${lobby.id}`,
+    });
+  }
+  if (!lobby) {
+    throw new OperationFailedError("Create game", {
+      message: `No lobby provided`,
+    });
   }
 
   const game: Game = {
@@ -35,6 +42,19 @@ function createGame(lobby: Lobby): Game | undefined {
     gameLogs: [],
     map: tutorialMap,
   };
+
+  // Join all players from the lobby to the game
+  lobby.players.forEach((player) => {
+    const playerSocket = io.sockets.sockets.get(player.id);
+    if (!playerSocket) {
+      throw new OperationFailedError("Create game", {
+        message: `Player socket not found with id ${player.id}`,
+      });
+    } else {
+      playerSocket.join(game.id);
+      console.log(`Player ${player.name} joined game ${game.id}`);
+    }
+  });
 
   games.push(game);
 
