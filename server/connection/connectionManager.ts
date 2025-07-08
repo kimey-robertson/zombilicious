@@ -7,6 +7,7 @@ import {
 import { countDownTimer } from "../utils/helpers";
 import { deleteLobby } from "../lobby/lobbyManager";
 import {
+  getAllGames,
   getGamesWithDisconnectedPlayers,
   sendGameLogEvent,
 } from "../game/gameUtils";
@@ -24,7 +25,13 @@ function handleConnect(io: Server) {
 }
 
 function handleDisconnectFromGame(socketId: string, io: Server) {
-  const game = getGameBySocketId(socketId);
+  // If no game is found, ignore this functon
+  // This is custom and doesn't follow the same pattern as the other sockets, just because it's a special case
+
+  const game = getAllGames().find((game) =>
+    game.players.some((player) => player.id === socketId)
+  );
+  if (!game) return;
   const disconnectedPlayer = getPlayerNameBySocketId(socketId);
 
   sendGameLogEvent(io, game.id, {
@@ -81,7 +88,9 @@ function handleDisconnectFromLobby(playerSocketId: string, io: Server): void {
   // If the player is in a game, or there is no lobby, ignore this functon
   // This is custom and doesn't follow the same pattern as the other sockets, just because it's a special case
 
-  const game = getGameBySocketId(playerSocketId);
+  const game = getAllGames().find((game) =>
+    game.players.some((player) => player.id === playerSocketId)
+  );
 
   let lobby = getAllLobbies().find((lobby) =>
     lobby.players.some((player) => player.id === playerSocketId)
