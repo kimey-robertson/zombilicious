@@ -10,8 +10,18 @@ import { BsVolumeUp } from "react-icons/bs";
 import { IconType } from "react-icons/lib";
 import { usePlayerStore } from "../../store/usePlayerStore";
 
+export type ActionType =
+  | "search"
+  | "move"
+  | "door"
+  | "inventory"
+  | "melee"
+  | "ranged"
+  | "take"
+  | "noise";
+
 export type GameAction = {
-  id: string;
+  id: ActionType;
   icon: IconType;
   label: string;
 };
