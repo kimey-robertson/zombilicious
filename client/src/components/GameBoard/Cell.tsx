@@ -1,6 +1,7 @@
 import type {
   Cell,
   Door,
+  Player,
   SocketResponse,
   Zone,
 } from "../../../../shared/types";
@@ -32,17 +33,23 @@ const Cell: React.FC<CellProps> = ({ cell, zone, door }) => {
 
   const currentPlayer = players.find((player) => player.id === playerId);
 
-  const playerInZone = players.find((player) =>
+  const playersInZone = players.filter((player) =>
     player.currentZoneId.includes(zone?.id ?? "")
   );
 
   const hDoubleZone = isHorizontalDoubleZone(zone, map);
   const vDoubleZone = isVerticalDoubleZone(zone, map);
 
-  const showPlayerToken =
-    hDoubleZone || vDoubleZone
+  const showPlayerToken = (player: Player) => {
+    const playerInZone = playersInZone.find((p) => p.id === player.id);
+    return hDoubleZone || vDoubleZone
       ? playerInZone && cell.id.includes(zone?.id.split("/")[0] ?? "")
       : playerInZone;
+  };
+
+  const tokensToShow = playersInZone.filter((player) =>
+    showPlayerToken(player)
+  );
 
   const isMovableZone = currentPlayer?.movableZones.find(
     (movableZone) => movableZone.id === zone?.id
@@ -80,17 +87,20 @@ const Cell: React.FC<CellProps> = ({ cell, zone, door }) => {
       onClick={handleClick}
     >
       {door ? <DoorComponent door={door} cellId={cell.id} /> : null}
-      {showPlayerToken ? (
+      {tokensToShow.map((player, index) => (
         <PlayerToken
-          player={playerInZone}
-          showHorizontalDoubleZoneToken={
+          key={player.id}
+          player={player}
+          isHorizontalDoubleZone={
             hDoubleZone && cell.id.includes(zone?.id.split("/")[0] ?? "")
           }
-          showVerticalDoubleZoneToken={
+          isVerticalDoubleZone={
             vDoubleZone && cell.id.includes(zone?.id.split("/")[0] ?? "")
           }
+          index={index}
+          totalTokens={tokensToShow.length}
         />
-      ) : null}
+      ))}
     </div>
   );
 };

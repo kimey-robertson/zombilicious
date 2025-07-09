@@ -1,19 +1,8 @@
 import { useGameStore } from "../../store/useGameStore";
+import { getPlayerColor } from "./overlayUtils";
 
 const Players = () => {
   const players = useGameStore((state) => state.players);
-
-  // Player colors - using a variety of border colors
-  const playerColors = [
-    "border-red-500",
-    "border-blue-500",
-    "border-green-500",
-    "border-yellow-500",
-    "border-purple-500",
-    "border-pink-500",
-    "border-indigo-500",
-    "border-orange-500",
-  ];
 
   return (
     <div className="side-panel overlay-item">
@@ -21,8 +10,8 @@ const Players = () => {
         PLAYERS
       </h3>
       <div className="space-y-3">
-        {players.map((player, index) => {
-          const colorClass = playerColors[index % playerColors.length];
+        {players.map((player) => {
+          const colorClass = getPlayerColor(player.id);
 
           return (
             <div
