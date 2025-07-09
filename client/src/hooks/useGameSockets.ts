@@ -44,8 +44,6 @@ export const useGameSockets = () => {
     resetBoardPosition();
     localStorage.setItem("playerId", playerId || socket.id || "");
   };
-  
-  // TODO: add a reconnect handler to update the player state
 
   const handleGameUpdated = (game: Game) => {
     console.log("game updated", game);
@@ -69,16 +67,36 @@ export const useGameSockets = () => {
     setGameLogs((prev) => [...prev, logEvent]);
   };
 
+  const handleGameRejoined = ({
+    game,
+    newPlayerId,
+  }: {
+    game: Game;
+    newPlayerId: string;
+  }) => {
+    setGameId(game.id);
+    setPlayers(game.players);
+    setStatus(game.status);
+    setGameLogs(game.gameLogs);
+    setMap(game.map);
+    setDisconnectedPlayers(game.disconnectedPlayers);
+    updatePlayerState(game.players.find((p) => p.id === newPlayerId));
+    resetBoardPosition();
+    localStorage.setItem("playerId", playerId || socket.id || "");
+  };
+
   useEffect(() => {
     socket.on("game-created", handleGameCreated);
     socket.on("game-updated", handleGameUpdated);
     socket.on("updated-disconnect-timer", handleUpdateDisconnectTimer);
     socket.on("log-event", handleLogEvent);
+    socket.on("game-rejoined", handleGameRejoined);
     return () => {
       socket.off("game-created", handleGameCreated);
       socket.off("game-updated", handleGameUpdated);
       socket.off("updated-disconnect-timer", handleUpdateDisconnectTimer);
       socket.off("log-event", handleLogEvent);
+      socket.off("game-rejoined", handleGameRejoined);
     };
   });
 };

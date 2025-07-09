@@ -86,7 +86,7 @@ export const handleGameEvents = (io: Server, socket: Socket) => {
       io.emit("games-with-disconnected-players", gamesWithDisconnectedPlayers);
 
       // Send the game state to the rejoining player
-      playerSocket?.emit("game-created", game);
+      playerSocket?.emit("game-rejoined", { game, newPlayerId });
 
       return { success: true };
     }
