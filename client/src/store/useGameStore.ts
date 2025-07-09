@@ -9,7 +9,7 @@ export const useGameStore = create<GameStore>((set) => ({
   players: [],
   setPlayers: (players: Player[]) => set({ players }),
   status: "active",
-  setStatus: (status: "active" | "paused") => set({ status }),
+  setStatus: (status: "active" | "paused" | "zombies-turn") => set({ status }),
   disconnectedPlayers: {},
   setDisconnectedPlayers: (disconnectedPlayers: {
     [key: string]: DisconnectedPlayer;
