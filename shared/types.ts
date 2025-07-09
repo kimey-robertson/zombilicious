@@ -104,6 +104,7 @@ export type LogEvent = {
 export type Card = {
   id: string;
   name: string;
+  canOpenDoors: boolean;
 };
 
 export type SocketError = {

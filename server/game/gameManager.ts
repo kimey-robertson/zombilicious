@@ -8,6 +8,7 @@ import {
 import { tutorialMap } from "../maps/maps";
 import { GameNotFoundError, OperationFailedError } from "../utils/socketErrors";
 import { calculateMovableZones } from "../maps/mapUtils";
+import { cards } from "../cards";
 
 export const games: Game[] = [];
 
@@ -38,7 +39,7 @@ function createGame(lobby: Lobby, io: Server): Game {
       totalActions: 3,
       actionsRemaining: 3,
       XP: 0,
-      playerCards: { inReserve: [], inHand: [] },
+      playerCards: { inReserve: [], inHand: [cards[0]] },
       currentZoneId: chosenMap.startingZone,
       movableZones: calculateMovableZones(chosenMap, chosenMap.startingZone),
     })),

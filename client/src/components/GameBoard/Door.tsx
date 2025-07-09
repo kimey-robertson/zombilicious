@@ -6,6 +6,10 @@ const DoorComponent = ({ door, cellId }: { door: Door; cellId: string }) => {
   return (
     <div
       className="door"
+      onClick={(e) => {
+        e.stopPropagation();
+        console.log("door clicked");
+      }}
       style={{
         transform: door.transform,
         backgroundColor: door.state === "open" ? "green" : "red",
