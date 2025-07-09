@@ -1,11 +1,35 @@
+import { SocketResponse } from "../../../../shared/types";
+import { getSocket } from "../../socket";
 import { useGameStore } from "../../store/useGameStore";
 import { getPlayerColor } from "./overlayUtils";
 
 const Players = () => {
+  const socket = getSocket();
   const players = useGameStore((state) => state.players);
+  const status = useGameStore((state) => state.status);
+  const gameId = useGameStore((state) => state.gameId);
+
+  const handleSkipZombiesTurn = () => {
+    socket.emit("skip-zombies-turn", { gameId }, (response: SocketResponse) => {
+      if (response.success) {
+        console.log("skipped zombies turn");
+      } else {
+        console.log("failed to skip zombies turn");
+      }
+    });
+  };
 
   return (
     <div className="side-panel overlay-item">
+      {status === "zombies-turn" && (
+        // temporary
+        <div
+          onClick={handleSkipZombiesTurn}
+          className="text-red-400 font-bold text-center tracking-wider border-b border-red-900/50 pb-2 mb-3 font-mono cursor-pointer"
+        >
+          SKIP ZOMBIES TURN
+        </div>
+      )}
       <h3 className="text-red-400 font-bold text-center tracking-wider border-b border-red-900/50 pb-2 mb-3 font-mono">
         PLAYERS
       </h3>

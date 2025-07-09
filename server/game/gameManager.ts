@@ -347,10 +347,6 @@ function startZombiesTurn(gameId: string, io: Server): Game {
 
   game.status = "zombies-turn";
 
-  game.players.forEach(
-    (player) => (player.actionsRemaining = player.totalActions)
-  );
-
   sendGameLogEvent(io, gameId, {
     id: (game.gameLogs.length + 1).toString(),
     timestamp: new Date(),

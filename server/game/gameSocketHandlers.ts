@@ -3,9 +3,9 @@ import { Lobby } from "../../shared/types";
 import {
   createGame,
   endTurn,
+  getGameById,
   movePlayerToZone,
   rejoinGame,
-  updatePlayerTurn,
   voteKickPlayerFromGame,
 } from "./gameManager";
 import { getGamesWithDisconnectedPlayers, sendGameLogEvent } from "./gameUtils";
@@ -123,9 +123,40 @@ export const handleGameEvents = (io: Server, socket: Socket) => {
     }
   );
 
+  // Temporary but can probably use similar logic later
+  const skipZombiesTurnHandler = createSocketHandler<{ gameId: string }>(
+    "skip-zombies-turn",
+    async (io, socket, { gameId }) => {
+      // Skip the zombies turn
+      const game = getGameById(gameId);
+
+      game.players[0].myTurn = true;
+      game.status = "active";
+
+      game.players.forEach(
+        (player) => (player.actionsRemaining = player.totalActions)
+      );
+
+      // Send a log event
+      sendGameLogEvent(io, game.id, {
+        id: (game.gameLogs.length + 1).toString(),
+        timestamp: new Date(),
+        type: "system",
+        message: `It's now player ${game.players[0].name}'s turn`,
+        icon: "🔥",
+      });
+
+      // Emit the game updated
+      io.to(gameId).emit("game-updated", game);
+
+      return { success: true };
+    }
+  );
+
   createGameHandler(io, socket);
   voteKickPlayerFromGameHandler(io, socket);
   rejoinGameHandler(io, socket);
   endTurnHandler(io, socket);
   movePlayerToZoneHandler(io, socket);
+  skipZombiesTurnHandler(io, socket);
 };

@@ -13,10 +13,13 @@ const ActionsRemaining = () => {
   const actionsRemaining = usePlayerStore((state) => state.actionsRemaining);
   const totalActions = usePlayerStore((state) => state.totalActions);
   const isMyTurn = usePlayerStore((state) => state.isMyTurn);
+  const setSelectedAction = usePlayerStore((state) => state.setSelectedAction);
 
   const gameId = useGameStore((state) => state.gameId);
 
   const handleEndTurn = () => {
+    setSelectedAction(undefined);
+
     socket.emit("end-turn", { gameId }, (response: SocketResponse) => {
       if (!response.success) {
         handleError(response?.error);
