@@ -80,6 +80,12 @@
   height: 10px;
   background: green;
   z-index: 13;
+  border: 2px solid yellow;
+  box-shadow: 0 0 10px rgba(255, 255, 0, 0.5);
+}
+
+.door:hover {
+  box-shadow: 0 0 20px rgba(255, 0, 0, 1);
 }
 
 /* .grid-cell:hover {
