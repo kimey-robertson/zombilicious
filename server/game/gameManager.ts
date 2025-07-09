@@ -1,5 +1,5 @@
 import { Server, Socket } from "socket.io";
-import { Game, Lobby } from "../../shared/types";
+import { Game, Lobby, Player } from "../../shared/types";
 import {
   getPlayerNameBySocketId,
   sendGameLogEvent,
@@ -121,7 +121,7 @@ function removePlayerFromGame(
 
   // If the target player is the current player, update the turn
   if (game.players.find((player) => player.myTurn)?.id === targetPlayerId) {
-    game = updatePlayerTurn(gameId, io);
+    game = endTurn(gameId, io);
   }
 
   // Stop the disconnect timer for this player
@@ -222,23 +222,21 @@ function rejoinGame(
   return game;
 }
 
-function updatePlayerTurn(gameId: string, io: Server): Game {
-  const game = getGameById(gameId);
-  const playerIndex = game.players.findIndex((player) => player.myTurn);
-  if (playerIndex !== -1) {
-    game.players[playerIndex].myTurn = false;
-  }
-  const nextPlayer = game.players[playerIndex + 1];
-  if (nextPlayer) {
-    nextPlayer.myTurn = true;
-    sendGameLogEvent(io, gameId, {
-      id: (game.gameLogs.length + 1).toString(),
-      timestamp: new Date(),
-      type: "system",
-      message: `It's now player ${nextPlayer.name}'s turn`,
-      icon: "🔥",
+function updatePlayerTurn(game: Game, nextPlayer: Player, io: Server): Game {
+  if (!nextPlayer) {
+    throw new OperationFailedError("Update player turn", {
+      message: `No next player provided`,
     });
   }
+
+  nextPlayer.myTurn = true;
+  sendGameLogEvent(io, game.id, {
+    id: (game.gameLogs.length + 1).toString(),
+    timestamp: new Date(),
+    type: "system",
+    message: `It's now player ${nextPlayer.name}'s turn`,
+    icon: "🔥",
+  });
   return game;
 }
 
@@ -322,6 +320,48 @@ function movePlayerToZone(
   return game;
 }
 
+function endTurn(gameId: string, io: Server): Game {
+  let game = getGameById(gameId);
+  const playerIndex = game.players.findIndex((player) => player.myTurn);
+
+  if (playerIndex !== -1) {
+    game.players[playerIndex].myTurn = false;
+  }
+
+  const nextPlayer = game.players[playerIndex + 1];
+  if (nextPlayer) {
+    game = updatePlayerTurn(game, nextPlayer, io);
+  } else {
+    game = startZombiesTurn(gameId, io);
+  }
+  return game;
+}
+
+function startZombiesTurn(gameId: string, io: Server): Game {
+  let game = getGameById(gameId);
+  if (game.players.some((player) => player.myTurn)) {
+    throw new OperationFailedError("Start zombies turn", {
+      message: `Some players are still in their turn`,
+    });
+  }
+
+  game.status = "zombies-turn";
+
+  game.players.forEach(
+    (player) => (player.actionsRemaining = player.totalActions)
+  );
+
+  sendGameLogEvent(io, gameId, {
+    id: (game.gameLogs.length + 1).toString(),
+    timestamp: new Date(),
+    type: "system",
+    message: `It's now the zombies turn!`,
+    icon: "🧟",
+  });
+
+  return game;
+}
+
 export {
   createGame,
   deleteGame,
@@ -334,4 +374,5 @@ export {
   updatePlayerTurn,
   voteKickPlayerFromGame,
   movePlayerToZone,
+  endTurn,
 };

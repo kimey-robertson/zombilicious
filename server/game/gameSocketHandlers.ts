@@ -2,6 +2,7 @@ import { Server, Socket } from "socket.io";
 import { Lobby } from "../../shared/types";
 import {
   createGame,
+  endTurn,
   movePlayerToZone,
   rejoinGame,
   updatePlayerTurn,
@@ -95,7 +96,7 @@ export const handleGameEvents = (io: Server, socket: Socket) => {
     "end-turn",
     async (io, socket, { gameId }) => {
       // End the turn
-      const game = updatePlayerTurn(gameId, io);
+      const game = endTurn(gameId, io);
 
       // Emit the game updated
       io.to(gameId).emit("game-updated", game);
