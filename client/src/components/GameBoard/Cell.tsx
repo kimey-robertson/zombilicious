@@ -25,10 +25,13 @@ const Cell: React.FC<CellProps> = ({ cell, zone, door }) => {
 
   const setSelectedZone = usePlayerStore((state) => state.setSelectedZone);
   const panMode = usePlayerStore((state) => state.panMode);
-  const players = useGameStore((state) => state.players);
-  const map = useGameStore((state) => state.map);
   const playerId = usePlayerStore((state) => state.playerId);
   const selectedAction = usePlayerStore((state) => state.selectedAction);
+  const actionsRemaining = usePlayerStore((state) => state.actionsRemaining);
+  const isMyTurn = usePlayerStore((state) => state.isMyTurn);
+
+  const players = useGameStore((state) => state.players);
+  const map = useGameStore((state) => state.map);
   const gameId = useGameStore((state) => state.gameId);
 
   const currentPlayer = players.find((player) => player.id === playerId);
@@ -55,11 +58,17 @@ const Cell: React.FC<CellProps> = ({ cell, zone, door }) => {
     (movableZone) => movableZone.id === zone?.id
   );
 
+  const canMove =
+    isMovableZone &&
+    selectedAction?.id === "move" &&
+    actionsRemaining > 0 &&
+    isMyTurn;
+
   const handleClick = () => {
     if (zone && !panMode) {
       setSelectedZone(zone);
     }
-    if (isMovableZone && selectedAction?.id === "move") {
+    if (canMove) {
       socket.emit(
         "move-player-to-zone",
         {
@@ -81,9 +90,7 @@ const Cell: React.FC<CellProps> = ({ cell, zone, door }) => {
   return (
     <div
       key={cell.id}
-      className={`grid-cell ${
-        isMovableZone && selectedAction?.id === "move" ? "movable-zone" : ""
-      }`}
+      className={`grid-cell ${canMove ? "movable-zone" : ""}`}
       onClick={handleClick}
     >
       {door ? <DoorComponent door={door} cellId={cell.id} /> : null}

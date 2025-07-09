@@ -4,6 +4,7 @@ import { Game, LogEvent } from "../../../shared/types";
 import { useGameStore } from "../store/useGameStore";
 import { usePlayerStore } from "../store/usePlayerStore";
 import { useResetPlayerGame } from "./useResetPlayerGame";
+import { useUpdatePlayerState } from "./useUpdatePlayerState";
 
 export const useGameSockets = () => {
   const socketRef = useRef(getSocket());
@@ -29,6 +30,7 @@ export const useGameSockets = () => {
   const setIsMyTurn = usePlayerStore((state) => state.setIsMyTurn);
 
   const resetPlayerGame = useResetPlayerGame();
+  const updatePlayerState = useUpdatePlayerState();
 
   const handleGameCreated = (game: Game) => {
     console.log("game created", game);
@@ -42,13 +44,15 @@ export const useGameSockets = () => {
     resetBoardPosition();
     localStorage.setItem("playerId", playerId || socket.id || "");
   };
+  
+  // TODO: add a reconnect handler to update the player state
 
   const handleGameUpdated = (game: Game) => {
     console.log("game updated", game);
     setPlayers(game.players);
     setStatus(game.status);
     setDisconnectedPlayers(game.disconnectedPlayers);
-    setIsMyTurn(game.players.find((p) => p.id === playerId)?.myTurn || false);
+    updatePlayerState(game.players.find((p) => p.id === playerId));
   };
 
   const handleUpdateDisconnectTimer = ({

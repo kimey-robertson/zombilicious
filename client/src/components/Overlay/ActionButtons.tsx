@@ -30,8 +30,17 @@ const ActionButtons = () => {
   const selectedAction = usePlayerStore((state) => state.selectedAction);
   const actionsRemaining = usePlayerStore((state) => state.actionsRemaining);
   const setSelectedAction = usePlayerStore((state) => state.setSelectedAction);
+  const isMyTurn = usePlayerStore((state) => state.isMyTurn);
+
+  const buttonDisabled = actionsRemaining <= 0 || !isMyTurn;
 
   const handleActionClick = (action: GameAction) => {
+    if (buttonDisabled) return;
+
+    if (action.id === selectedAction?.id) {
+      setSelectedAction(undefined);
+      return;
+    }
     setSelectedAction(action);
   };
 
@@ -47,13 +56,13 @@ const ActionButtons = () => {
             <Button
               key={action.id}
               onClick={() => handleActionClick(action)}
-              disabled={actionsRemaining === 0}
+              disabled={buttonDisabled}
               className={`bg-gradient-to-b text-stone-200 p-3 h-auto flex flex-col items-center gap-2 transition-all duration-300 border-2 shadow-lg relative overflow-hidden font-mono ${
-                selectedAction?.id === action.id
-                  ? "scale-110 border-red-400/80 shadow-red-900/50 bg-gradient-to-b from-red-800/90 to-red-950/90"
+                selectedAction?.id === action.id && !buttonDisabled
+                  ? "border-red-400/80 shadow-red-900/50 bg-gradient-to-b from-red-800/90 to-red-950/90"
                   : ""
               } ${
-                actionsRemaining === 0
+                buttonDisabled
                   ? "opacity-30 cursor-not-allowed grayscale"
                   : "hover:scale-105 hover:shadow-xl"
               }`}
