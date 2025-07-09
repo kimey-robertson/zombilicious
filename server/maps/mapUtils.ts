@@ -15,7 +15,7 @@ function getGlobalCoordinates(cellId: string, map: Map) {
   };
 }
 
-// Helper function to check if there's a door connecting two zones
+// Helper function to check if there's an open door connecting two zones
 function isDoorBetweenZones(zone1: Zone, zone2: Zone, map: Map): boolean {
   // Find doors that connect cells from both zones
   for (const door of map.doors) {
@@ -26,8 +26,12 @@ function isDoorBetweenZones(zone1: Zone, zone2: Zone, map: Map): boolean {
       door.cellIds.includes(cellId)
     );
 
-    // If the door connects cells from both zones, there's a door between them
-    if (zone1CellsInDoor.length > 0 && zone2CellsInDoor.length > 0) {
+    // If the door connects cells from both zones AND is open, movement is allowed
+    if (
+      zone1CellsInDoor.length > 0 &&
+      zone2CellsInDoor.length > 0 &&
+      door.state === "open"
+    ) {
       return true;
     }
   }

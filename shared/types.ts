@@ -29,6 +29,7 @@ export type Door = {
   cellIds: string[];
   tileId: string;
   transform: string;
+  state: "open" | "closed";
 };
 
 export type Map = {
