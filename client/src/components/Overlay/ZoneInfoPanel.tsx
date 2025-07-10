@@ -1,12 +1,20 @@
 import React from "react";
 import { usePlayerStore } from "../../store/usePlayerStore";
 import { useDevStore } from "../../store/useDevStore";
+import { useGameStore } from "../../store/useGameStore";
 
 const ZoneInfoPanel: React.FC = () => {
-  const selectedZone = usePlayerStore((state) => state.selectedZone);
   const devMode = useDevStore((state) => state.devMode);
 
+  const selectedZone = usePlayerStore((state) => state.selectedZone);
+
+  const players = useGameStore((state) => state.players);
+
   if (!selectedZone) return null;
+
+  const playersInZone = players.filter((player) =>
+    player.currentZoneId.includes(selectedZone.id)
+  ).length;
 
   return (
     <div className="side-panel overlay-item">
@@ -17,11 +25,11 @@ const ZoneInfoPanel: React.FC = () => {
       </div>
       <div className="side-panel-detail">
         🧑 Survivors:
-        {/* <span>{zoneInfo.survivors}</span> */}
+        <span>{playersInZone}</span>
       </div>
       <div className="side-panel-detail">
         🔊 Noise:
-        {/* <span>{zoneInfo.noise}</span> */}
+        <span>{selectedZone.noiseTokens + playersInZone}</span>
       </div>
       {devMode ? (
         <>
