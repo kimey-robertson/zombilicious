@@ -7,6 +7,12 @@ const cards: Card[] = [
     canOpenDoorsWithoutNoise: true,
     canOpenDoorsWithNoise: false,
   },
+  {
+    id: "2",
+    name: "Fire Axe",
+    canOpenDoorsWithoutNoise: false,
+    canOpenDoorsWithNoise: true,
+  },
 ];
 
 export { cards };

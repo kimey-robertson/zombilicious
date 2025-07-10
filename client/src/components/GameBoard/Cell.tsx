@@ -11,6 +11,7 @@ import { getSocket } from "../../socket";
 import { useGameStore } from "../../store/useGameStore";
 import { usePlayerStore } from "../../store/usePlayerStore";
 import DoorComponent from "./Door";
+import NoiseToken from "./NoiseToken";
 import PlayerToken from "./PlayerToken";
 
 type CellProps = {
@@ -28,7 +29,7 @@ const Cell: React.FC<CellProps> = ({ cell, zone, door }) => {
 
   const gameId = useGameStore((state) => state.gameId);
 
-  const { hDoubleZone, vDoubleZone, playerTokensToShow, canMoveIntoZone } =
+  const { hDoubleZone, vDoubleZone, playerTokensInZone, canMoveIntoZone } =
     useZoneDetails(zone, cell);
 
   const { currentPlayer, canPerformAction } = useCurrentPlayer();
@@ -91,7 +92,7 @@ const Cell: React.FC<CellProps> = ({ cell, zone, door }) => {
           canPerformAction={canPerformAction}
         />
       ) : null}
-      {playerTokensToShow.map((player, index) => (
+      {playerTokensInZone.map((player, index) => (
         <PlayerToken
           key={player.id}
           player={player}
@@ -102,8 +103,11 @@ const Cell: React.FC<CellProps> = ({ cell, zone, door }) => {
             vDoubleZone && cell.id.includes(zone?.id.split("/")[0] ?? "")
           }
           index={index}
-          totalTokens={playerTokensToShow.length}
+          totalTokens={playerTokensInZone.length}
         />
+      ))}
+      {Array.from({ length: zone?.noiseTokens ?? 0 }).map((_, index) => (
+        <NoiseToken key={index} />
       ))}
     </div>
   );

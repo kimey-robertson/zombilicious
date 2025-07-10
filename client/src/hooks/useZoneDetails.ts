@@ -20,7 +20,7 @@ export const useZoneDetails = (zone: Zone | undefined, cell: Cell) => {
       currentPlayer: undefined,
       hDoubleZone: false,
       vDoubleZone: false,
-      playerTokensToShow: [],
+      playerTokensInZone: [],
       isMovableZone: false,
     };
 
@@ -38,7 +38,7 @@ export const useZoneDetails = (zone: Zone | undefined, cell: Cell) => {
       : playerInZone;
   };
 
-  const playerTokensToShow = playersInZone.filter((player) =>
+  const playerTokensInZone = playersInZone.filter((player) =>
     showPlayerToken(player)
   );
 
@@ -52,7 +52,7 @@ export const useZoneDetails = (zone: Zone | undefined, cell: Cell) => {
   return {
     hDoubleZone,
     vDoubleZone,
-    playerTokensToShow,
+    playerTokensInZone,
     isMovableZone,
     canMoveIntoZone,
   };
