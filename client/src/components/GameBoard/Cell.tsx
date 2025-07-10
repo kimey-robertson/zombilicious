@@ -107,7 +107,14 @@ const Cell: React.FC<CellProps> = ({ cell, zone, door }) => {
         />
       ))}
       {Array.from({ length: zone?.noiseTokens ?? 0 }).map((_, index) => (
-        <NoiseToken key={index} />
+        <NoiseToken
+          key={index}
+          index={index}
+          doubleZone={
+            (hDoubleZone || vDoubleZone) &&
+            cell.id.includes(zone?.id.split("/")[1] ?? "")
+          }
+        />
       ))}
     </div>
   );
