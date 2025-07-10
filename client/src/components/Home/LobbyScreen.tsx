@@ -1,7 +1,6 @@
 import { Button } from "../UI/Button";
 import { useLobbyStore } from "../../store/useLobbyStore";
 import { getSocket } from "../../socket";
-import { toast } from "react-hot-toast";
 import { usePlayerStore } from "../../store/usePlayerStore";
 import { useHandleError } from "../../hooks/useHandleError";
 import { SocketResponse } from "../../../../shared/types";
@@ -36,7 +35,6 @@ const LobbyScreen = ({
         (response: SocketResponse) => {
           if (response.success) {
             setLobbyScreen?.(false);
-            toast.success("Lobby deleted");
           } else {
             handleError(response?.error);
           }

@@ -1,6 +1,6 @@
 import { Server } from "socket.io";
 import {
-  getGameBySocketId,
+  deleteGame,
   getPlayerNameBySocketId,
   removePlayerFromGame,
 } from "../game/gameManager";
@@ -71,6 +71,10 @@ function handleDisconnectFromGame(socketId: string, io: Server) {
           "games-with-disconnected-players",
           gamesWithDisconnectedPlayers
         );
+      }
+      // If the game is empty, delete the game
+      if (newGame?.players.length === 0) {
+        deleteGame(newGame.id);
       }
     } else {
       io.emit("updated-disconnect-timer", {

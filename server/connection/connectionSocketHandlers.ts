@@ -1,12 +1,8 @@
 import { Server, Socket } from "socket.io";
 import { handleConnect, handleDisconnectFromLobby } from "./connectionManager";
 import { handleDisconnectFromGame } from "./connectionManager";
-import {
-  getGamesWithDisconnectedPlayers,
-  getPlayerNameBySocketId,
-  sendGameLogEvent,
-} from "../game/gameUtils";
-import { removePlayerFromGame } from "../game/gameManager";
+import { getGamesWithDisconnectedPlayers } from "../game/gameUtils";
+import { deleteGame, removePlayerFromGame } from "../game/gameManager";
 import { createSocketHandler } from "../utils/socketWrapper";
 
 // Handles receiving events from the client, responding with callbacks,
@@ -40,6 +36,11 @@ export const handleConnectionEvents = (io: Server, socket: Socket) => {
 
     // Emit the player removed from game
     io.emit("player-removed-from-game", playerId);
+
+    // If the game is empty, delete the game
+    if (game?.players.length === 0) {
+      deleteGame(gameId);
+    }
 
     // Emit the games with disconnected players
     const gamesWithDisconnectedPlayers = getGamesWithDisconnectedPlayers();

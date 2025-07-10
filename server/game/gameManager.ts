@@ -111,7 +111,6 @@ function removePlayerFromGame(
   io: Server,
   reason: string = "left"
 ): Game {
-  console.log("removePlayerFromGame");
   if (!gameId || !targetPlayerId || !io)
     throw new OperationFailedError("Remove player from game");
 
