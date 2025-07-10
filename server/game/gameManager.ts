@@ -27,7 +27,7 @@ function createGame(lobby: Lobby, io: Server): Game {
     });
   }
 
-  const chosenMap = tutorialMap; // Will be dynamic in the future
+  const chosenMap = structuredClone(tutorialMap); // Will be dynamic in the future
 
   const game: Game = {
     id: lobby.id,
