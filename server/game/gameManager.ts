@@ -361,7 +361,7 @@ function startZombiesTurn(gameId: string, io: Server): Game {
 }
 
 function openDoor(gameId: string, playerId: string, doorId: string): Game {
-  const game = getGameById(gameId);
+  let game = getGameById(gameId);
 
   const player = game.players.find((player) => player.id === playerId);
   if (!player) {
@@ -377,7 +377,20 @@ function openDoor(gameId: string, playerId: string, doorId: string): Game {
     });
   }
 
-  if (!player.playerCards?.inHand.some((card) => card.canOpenDoors)) {
+  const playerCurrentZone = game.players.find(
+    (player) => player.id === playerId
+  )?.currentZoneId;
+  if (!door.zoneIds.some((zoneId) => zoneId === playerCurrentZone)) {
+    throw new OperationFailedError("Open door", {
+      message: `Player is not in the same zone as the door ${doorId}`,
+    });
+  }
+
+  if (
+    !player.playerCards?.inHand.some(
+      (card) => card.canOpenDoorsWithoutNoise || card.canOpenDoorsWithNoise
+    )
+  ) {
     throw new OperationFailedError("Open door", {
       message: `Player does not have a card that can open doors`,
     });
@@ -388,11 +401,31 @@ function openDoor(gameId: string, playerId: string, doorId: string): Game {
       message: `Door is already open`,
     });
   }
-  
+
+  // If the player has a card that can open doors with noise, but not without noise, generate noise
+  if (
+    player.playerCards?.inHand.some((card) => card.canOpenDoorsWithNoise) &&
+    !player.playerCards?.inHand.some((card) => card.canOpenDoorsWithoutNoise)
+  ) {
+    game = generateNoise(gameId, player.currentZoneId);
+  }
+
   door.state = "open";
   player.actionsRemaining -= 1;
   player.movableZones = calculateMovableZones(game.map, player.currentZoneId);
 
+  return game;
+}
+
+function generateNoise(gameId: string, zoneId: string): Game {
+  const game = getGameById(gameId);
+  const zone = game.map.zones.find((zone) => zone.id === zoneId);
+  if (!zone) {
+    throw new OperationFailedError("Generate noise", {
+      message: `Zone not found in game ${gameId} with id ${zoneId}`,
+    });
+  }
+  zone.noiseTokens += 1;
   return game;
 }
 

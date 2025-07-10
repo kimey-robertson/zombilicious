@@ -32,7 +32,9 @@ const DoorComponent = ({
       selectedAction?.id === "door" &&
       isCurrentPlayerNextToDoor &&
       door.state === "closed" &&
-      currentPlayer?.playerCards?.inHand.some((card) => card.canOpenDoors) &&
+      currentPlayer?.playerCards?.inHand.some(
+        (card) => card.canOpenDoorsWithNoise || card.canOpenDoorsWithoutNoise
+      ) &&
       canPerformAction
     ) {
       socket.emit(

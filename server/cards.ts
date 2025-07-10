@@ -4,7 +4,8 @@ const cards: Card[] = [
   {
     id: "1",
     name: "Crowbar",
-    canOpenDoors: true,
+    canOpenDoorsWithoutNoise: true,
+    canOpenDoorsWithNoise: false,
   },
 ];
 

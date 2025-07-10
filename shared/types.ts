@@ -22,11 +22,13 @@ export type Zone = {
   cellIds: string[];
   tileIds: string[];
   room: boolean;
+  noiseTokens: number;
 };
 
 export type Door = {
   id: string;
   cellIds: string[];
+  zoneIds: string[];
   tileId: string;
   transform: string;
   state: "open" | "closed";
@@ -105,7 +107,8 @@ export type LogEvent = {
 export type Card = {
   id: string;
   name: string;
-  canOpenDoors: boolean;
+  canOpenDoorsWithoutNoise: boolean;
+  canOpenDoorsWithNoise: boolean;
 };
 
 export type SocketError = {
