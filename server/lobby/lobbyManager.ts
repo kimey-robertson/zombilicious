@@ -34,7 +34,7 @@ function createLobby(
 }
 
 function deleteLobby(lobbyId: string): Lobby {
-  if (!lobbyId) throw new OperationFailedError("Delete lobby");
+  if (!lobbyId) throw new OperationFailedError("Delete lobby", { lobbyId });
   // Find the lobby
   const lobby = lobbies.find((lobby) => lobby.id === lobbyId);
   if (!lobby) {
@@ -77,7 +77,7 @@ function getLobbyByPlayerSocketId(playerSocketId: string): Lobby {
   const lobby = lobbies.find((lobby) =>
     lobby.players.some((player) => player.id === playerSocketId)
   );
-  if (!lobby) throw new LobbyNotFoundError('', { playerSocketId });
+  if (!lobby) throw new LobbyNotFoundError("", { playerSocketId });
   return lobby;
 }
 

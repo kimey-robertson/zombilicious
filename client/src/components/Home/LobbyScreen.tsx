@@ -32,7 +32,7 @@ const LobbyScreen = ({
     if (currentPlayer?.isHost) {
       socket.emit(
         "delete-game-lobby",
-        myLobbyId,
+        { lobbyId: myLobbyId },
         (response: SocketResponse) => {
           if (response.success) {
             setLobbyScreen?.(false);
