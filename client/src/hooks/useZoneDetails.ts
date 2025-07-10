@@ -4,13 +4,16 @@ import {
   isVerticalDoubleZone,
 } from "../components/GameBoard/gameBoardUtils";
 import { useGameStore } from "../store/useGameStore";
+import { usePlayerStore } from "../store/usePlayerStore";
 import { useCurrentPlayer } from "./useCurrentPlayer";
 
 export const useZoneDetails = (zone: Zone | undefined, cell: Cell) => {
   const players = useGameStore((state) => state.players);
   const map = useGameStore((state) => state.map);
 
-  const { currentPlayer } = useCurrentPlayer();
+  const selectedAction = usePlayerStore((state) => state.selectedAction);
+
+  const { currentPlayer, canPerformAction } = useCurrentPlayer();
 
   if (!zone)
     return {
@@ -43,10 +46,14 @@ export const useZoneDetails = (zone: Zone | undefined, cell: Cell) => {
     (movableZone) => movableZone.id === zone?.id
   );
 
+  const canMoveIntoZone =
+    isMovableZone && selectedAction?.id === "move" && canPerformAction;
+
   return {
     hDoubleZone,
     vDoubleZone,
     playerTokensToShow,
     isMovableZone,
+    canMoveIntoZone,
   };
 };

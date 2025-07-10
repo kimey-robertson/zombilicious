@@ -58,20 +58,45 @@
 }
 
 .movable-zone {
-  background-color: #c9cccb57;
+  background-color: #b3b3b370;
   animation: movable-zone-pulse 1s infinite;
 }
 
 @keyframes movable-zone-pulse {
   0% {
-    background-color: #c9cccb57;
+    background-color: #c9cccb70;
   }
   50% {
-    background-color: #c9cccb80;
+    background-color: #d4d7d6b8;
   }
   100% {
-    background-color: #c9cccb57;
+    background-color: #c9cccb70;
   }
+}
+
+.movable-zone.single-zone {
+  margin: 1rem;
+  border-radius: 10px;
+}
+
+.movable-zone.h-double-zone-left {
+  margin: 1rem 0 1rem 1rem;
+  border-radius: 10px 0 0 10px;
+}
+
+.movable-zone.h-double-zone-right {
+  margin: 1rem 1rem 1rem 0;
+  border-radius: 0 10px 10px 0;
+}
+
+.movable-zone.v-double-zone-top {
+  margin: 1rem 1rem 0 1rem;
+  border-radius: 10px 10px 0 0;
+}
+
+.movable-zone.v-double-zone-bottom {
+  margin: 0 1rem 1rem 1rem;
+  border-radius: 0 0 10px 10px;
 }
 
 /* Door Container */
