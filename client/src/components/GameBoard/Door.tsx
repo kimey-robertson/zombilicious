@@ -1,15 +1,54 @@
-import { useState } from "react";
-import { Door } from "../../../../shared/types";
+import { Door, Player, SocketResponse } from "../../../../shared/types";
+import { useHandleError } from "../../hooks/useHandleError";
+import { getSocket } from "../../socket";
+import { useGameStore } from "../../store/useGameStore";
 import { usePlayerStore } from "../../store/usePlayerStore";
 
-const DoorComponent = ({ door, cellId }: { door: Door; cellId: string }) => {
+const DoorComponent = ({
+  door,
+  cellId,
+  currentPlayer,
+  canPerformAction,
+}: {
+  door: Door;
+  cellId: string;
+  currentPlayer: Player | undefined;
+  canPerformAction: boolean;
+}) => {
+  const socket = getSocket();
+  const handleError = useHandleError();
+
+  const gameId = useGameStore((state) => state.gameId);
+
+  const playerId = usePlayerStore((state) => state.playerId);
   const selectedAction = usePlayerStore((state) => state.selectedAction);
-  const [isOpen, setIsOpen] = useState(false);
+
+  const isCurrentPlayerNextToDoor =
+    currentPlayer?.currentZoneId.includes(door.cellIds[0]) ||
+    currentPlayer?.currentZoneId.includes(door.cellIds[1]);
 
   const handleDoorClick = () => {
-    if (selectedAction?.id === "door") {
-      console.log("door clicked");
-      setIsOpen(!isOpen);
+    if (
+      selectedAction?.id === "door" &&
+      isCurrentPlayerNextToDoor &&
+      door.state === "closed" &&
+      currentPlayer?.playerCards?.inHand.some((card) => card.canOpenDoors) &&
+      canPerformAction
+    ) {
+      socket.emit(
+        "open-door",
+        {
+          gameId,
+          playerId,
+          doorId: door.id,
+        },
+        (response: SocketResponse) => {
+          if (!response.success) {
+            handleError(response?.error);
+            return;
+          }
+        }
+      );
     }
   };
 
@@ -17,7 +56,7 @@ const DoorComponent = ({ door, cellId }: { door: Door; cellId: string }) => {
 
   return (
     <div
-      className={`door-container ${isOpen ? "open" : "closed"}`}
+      className={`door-container ${door.state}`}
       onClick={handleDoorClick}
       style={{
         transform: door.transform,

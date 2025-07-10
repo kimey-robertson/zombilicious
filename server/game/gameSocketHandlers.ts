@@ -5,10 +5,15 @@ import {
   endTurn,
   getGameById,
   movePlayerToZone,
+  openDoor,
   rejoinGame,
   voteKickPlayerFromGame,
 } from "./gameManager";
-import { getGamesWithDisconnectedPlayers, sendGameLogEvent } from "./gameUtils";
+import {
+  getGamesWithDisconnectedPlayers,
+  getPlayerNameBySocketId,
+  sendGameLogEvent,
+} from "./gameUtils";
 import { deleteLobby } from "../lobby/lobbyManager";
 import { createSocketHandler } from "../utils/socketWrapper";
 
@@ -153,10 +158,36 @@ export const handleGameEvents = (io: Server, socket: Socket) => {
     }
   );
 
+  const openDoorHandler = createSocketHandler<{
+    gameId: string;
+    playerId: string;
+    doorId: string;
+  }>("open-door", async (io, socket, { gameId, playerId, doorId }) => {
+    // Open the door
+    const game = openDoor(gameId, playerId, doorId);
+
+    // Send a log event
+    sendGameLogEvent(io, game.id, {
+      id: (game.gameLogs.length + 1).toString(),
+      timestamp: new Date(),
+      type: "system",
+      message: `Player ${getPlayerNameBySocketId(
+        playerId
+      )} opened door ${doorId}`,
+      icon: "🚪",
+    });
+
+    // Emit the game updated
+    io.to(gameId).emit("game-updated", game);
+
+    return { success: true };
+  });
+
   createGameHandler(io, socket);
   voteKickPlayerFromGameHandler(io, socket);
   rejoinGameHandler(io, socket);
   endTurnHandler(io, socket);
   movePlayerToZoneHandler(io, socket);
   skipZombiesTurnHandler(io, socket);
+  openDoorHandler(io, socket);
 };

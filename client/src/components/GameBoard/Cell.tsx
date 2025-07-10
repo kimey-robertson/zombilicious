@@ -58,11 +58,10 @@ const Cell: React.FC<CellProps> = ({ cell, zone, door }) => {
     (movableZone) => movableZone.id === zone?.id
   );
 
+  const canPerformAction = actionsRemaining > 0 && isMyTurn;
+
   const canMove =
-    isMovableZone &&
-    selectedAction?.id === "move" &&
-    actionsRemaining > 0 &&
-    isMyTurn;
+    isMovableZone && selectedAction?.id === "move" && canPerformAction;
 
   const handleClick = () => {
     if (zone && !panMode) {
@@ -93,7 +92,14 @@ const Cell: React.FC<CellProps> = ({ cell, zone, door }) => {
       className={`grid-cell ${canMove ? "movable-zone" : ""}`}
       onClick={handleClick}
     >
-      {door ? <DoorComponent door={door} cellId={cell.id} /> : null}
+      {door ? (
+        <DoorComponent
+          door={door}
+          cellId={cell.id}
+          currentPlayer={currentPlayer}
+          canPerformAction={canPerformAction}
+        />
+      ) : null}
       {tokensToShow.map((player, index) => (
         <PlayerToken
           key={player.id}

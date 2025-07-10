@@ -33,7 +33,6 @@ export const handleConnectionEvents = (io: Server, socket: Socket) => {
     gameId: string;
     playerId: string;
   }>("leave-disconnected-game", async (io, socket, { gameId, playerId }) => {
-    const playerName = getPlayerNameBySocketId(playerId);
     const game = removePlayerFromGame(gameId, playerId, io, "chose-to-leave");
 
     // Emit the game update

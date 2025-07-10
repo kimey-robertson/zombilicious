@@ -359,6 +359,42 @@ function startZombiesTurn(gameId: string, io: Server): Game {
   return game;
 }
 
+function openDoor(gameId: string, playerId: string, doorId: string): Game {
+  const game = getGameById(gameId);
+
+  const player = game.players.find((player) => player.id === playerId);
+  if (!player) {
+    throw new OperationFailedError("Open door", {
+      message: `Player not found in game ${gameId} with id ${playerId}`,
+    });
+  }
+
+  const door = game.map.doors.find((door) => door.id === doorId);
+  if (!door) {
+    throw new OperationFailedError("Open door", {
+      message: `Door not found in game ${gameId} with id ${doorId}`,
+    });
+  }
+
+  if (!player.playerCards?.inHand.some((card) => card.canOpenDoors)) {
+    throw new OperationFailedError("Open door", {
+      message: `Player does not have a card that can open doors`,
+    });
+  }
+
+  if (door.state === "open") {
+    throw new OperationFailedError("Open door", {
+      message: `Door is already open`,
+    });
+  }
+  
+  door.state = "open";
+  player.actionsRemaining -= 1;
+  player.movableZones = calculateMovableZones(game.map, player.currentZoneId);
+
+  return game;
+}
+
 export {
   createGame,
   deleteGame,
@@ -372,4 +408,5 @@ export {
   voteKickPlayerFromGame,
   movePlayerToZone,
   endTurn,
+  openDoor,
 };
