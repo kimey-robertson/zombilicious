@@ -412,7 +412,9 @@ function openDoor(gameId: string, playerId: string, doorId: string): Game {
 
   door.state = "open";
   player.actionsRemaining -= 1;
-  player.movableZones = calculateMovableZones(game.map, player.currentZoneId);
+  game.players.forEach((player) => {
+    player.movableZones = calculateMovableZones(game.map, player.currentZoneId);
+  });
 
   return game;
 }

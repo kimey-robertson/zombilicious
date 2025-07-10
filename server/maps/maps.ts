@@ -129,7 +129,7 @@ const tutorialMap: Map = {
     {
       id: "2B-4/2B-7",
       cellIds: ["2B-4", "2B-7"],
-      zoneIds: ["2B-4", "2B-7"],
+      zoneIds: ["2B-4", "2B-7/1B-1"],
       tileId: "2B",
       transform: "translate(30px, 6px) rotate(0)",
       state: "closed",
