@@ -47,6 +47,7 @@ function createGame(lobby: Lobby, io: Server): Game {
     disconnectedPlayers: {},
     gameLogs: [],
     map: chosenMap,
+    isZombiesTurn: false,
   };
 
   // Join all players from the lobby to the game
@@ -346,7 +347,7 @@ function startZombiesTurn(gameId: string, io: Server): Game {
     });
   }
 
-  game.status = "zombies-turn";
+  game.isZombiesTurn = true;
 
   sendGameLogEvent(io, gameId, {
     id: (game.gameLogs.length + 1).toString(),

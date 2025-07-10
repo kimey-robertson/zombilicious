@@ -136,7 +136,7 @@ export const handleGameEvents = (io: Server, socket: Socket) => {
       const game = getGameById(gameId);
 
       game.players[0].myTurn = true;
-      game.status = "active";
+      game.isZombiesTurn = false;
 
       game.players.forEach(
         (player) => (player.actionsRemaining = player.totalActions)

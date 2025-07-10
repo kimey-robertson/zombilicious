@@ -80,10 +80,11 @@ export type Game = {
   id: string;
   name: string;
   players: Player[];
-  status: "active" | "paused" | "zombies-turn";
+  status: "active" | "paused";
   disconnectedPlayers: { [socketId: string]: DisconnectedPlayer };
   gameLogs: LogEvent[];
   map: Map;
+  isZombiesTurn: boolean;
 };
 
 export type LogEvent = {

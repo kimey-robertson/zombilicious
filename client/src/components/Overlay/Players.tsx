@@ -6,7 +6,7 @@ import { getPlayerColor } from "./overlayUtils";
 const Players = () => {
   const socket = getSocket();
   const players = useGameStore((state) => state.players);
-  const status = useGameStore((state) => state.status);
+  const isZombiesTurn = useGameStore((state) => state.isZombiesTurn);
   const gameId = useGameStore((state) => state.gameId);
 
   const handleSkipZombiesTurn = () => {
@@ -21,7 +21,7 @@ const Players = () => {
 
   return (
     <div className="side-panel overlay-item">
-      {status === "zombies-turn" && (
+      {isZombiesTurn && (
         // temporary
         <div
           onClick={handleSkipZombiesTurn}

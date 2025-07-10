@@ -25,6 +25,7 @@ export const useGameSockets = () => {
   );
   const setGameLogs = useGameStore((state) => state.setGameLogs);
   const setMap = useGameStore((state) => state.setMap);
+  const setIsZombiesTurn = useGameStore((state) => state.setIsZombiesTurn);
 
   const playerId = usePlayerStore((state) => state.playerId);
   const setIsMyTurn = usePlayerStore((state) => state.setIsMyTurn);
@@ -40,6 +41,7 @@ export const useGameSockets = () => {
     setGameLogs(game.gameLogs);
     setIsMyTurn(game.players.find((p) => p.id === playerId)?.myTurn || false);
     setMap(game.map);
+    setIsZombiesTurn(game.isZombiesTurn);
     resetPlayerGame(game.players.find((p) => p.id === playerId));
     resetBoardPosition();
     localStorage.setItem("playerId", playerId || socket.id || "");
@@ -51,6 +53,7 @@ export const useGameSockets = () => {
     setStatus(game.status);
     setDisconnectedPlayers(game.disconnectedPlayers);
     setMap(game.map);
+    setIsZombiesTurn(game.isZombiesTurn);
     updatePlayerState(game.players.find((p) => p.id === playerId));
   };
 
@@ -81,6 +84,7 @@ export const useGameSockets = () => {
     setGameLogs(game.gameLogs);
     setMap(game.map);
     setDisconnectedPlayers(game.disconnectedPlayers);
+    setIsZombiesTurn(game.isZombiesTurn);
     updatePlayerState(game.players.find((p) => p.id === newPlayerId));
     resetBoardPosition();
     localStorage.setItem("playerId", playerId || socket.id || "");

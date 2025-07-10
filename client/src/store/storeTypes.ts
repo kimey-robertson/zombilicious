@@ -61,8 +61,8 @@ export type GameStore = {
   setGameId: (gameId: string) => void;
   players: Player[];
   setPlayers: (players: Player[]) => void;
-  status: "active" | "paused" | "zombies-turn";
-  setStatus: (status: "active" | "paused" | "zombies-turn") => void;
+  status: "active" | "paused";
+  setStatus: (status: "active" | "paused") => void;
   disconnectedPlayers: { [key: string]: DisconnectedPlayer };
   setDisconnectedPlayers: (disconnectedPlayers: {
     [key: string]: DisconnectedPlayer;
@@ -79,6 +79,8 @@ export type GameStore = {
   ) => void;
   map: Map;
   setMap: (map: Map) => void;
+  isZombiesTurn: boolean;
+  setIsZombiesTurn: (isZombiesTurn: boolean) => void;
 };
 
 export type DevStore = {

@@ -9,7 +9,7 @@ export const useGameStore = create<GameStore>((set) => ({
   players: [],
   setPlayers: (players: Player[]) => set({ players }),
   status: "active",
-  setStatus: (status: "active" | "paused" | "zombies-turn") => set({ status }),
+  setStatus: (status: "active" | "paused") => set({ status }),
   disconnectedPlayers: {},
   setDisconnectedPlayers: (disconnectedPlayers: {
     [key: string]: DisconnectedPlayer;
@@ -36,4 +36,6 @@ export const useGameStore = create<GameStore>((set) => ({
     startingZone: "",
   },
   setMap: (map) => set({ map }),
+  isZombiesTurn: false,
+  setIsZombiesTurn: (isZombiesTurn: boolean) => set({ isZombiesTurn }),
 }));
