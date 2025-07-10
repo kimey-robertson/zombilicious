@@ -9,6 +9,11 @@ import { FaRegHand } from "react-icons/fa6";
 import { BsVolumeUp } from "react-icons/bs";
 import { IconType } from "react-icons/lib";
 import { usePlayerStore } from "../../store/usePlayerStore";
+import { getSocket } from "../../socket";
+import { useGameStore } from "../../store/useGameStore";
+import { SocketResponse } from "../../../../shared/types";
+import { useHandleError } from "../../hooks/useHandleError";
+import { useCurrentPlayer } from "../../hooks/useCurrentPlayer";
 
 export type ActionType =
   | "search"
@@ -37,15 +42,41 @@ const ActionButtons = () => {
     { id: "take", icon: FaRegHand, label: "Take Object" },
     { id: "noise", icon: BsVolumeUp, label: "Make Noise" },
   ];
+
   const selectedAction = usePlayerStore((state) => state.selectedAction);
   const actionsRemaining = usePlayerStore((state) => state.actionsRemaining);
   const setSelectedAction = usePlayerStore((state) => state.setSelectedAction);
   const isMyTurn = usePlayerStore((state) => state.isMyTurn);
 
+  const gameId = useGameStore((state) => state.gameId);
+
+  const { currentPlayer } = useCurrentPlayer();
+
   const buttonDisabled = actionsRemaining <= 0 || !isMyTurn;
+
+  const socket = getSocket();
+  const handleError = useHandleError();
 
   const handleActionClick = (action: GameAction) => {
     if (buttonDisabled) return;
+
+    if (action.id === "noise") {
+      socket.emit(
+        "make-noise",
+        {
+          gameId,
+          zoneId: currentPlayer?.currentZoneId ?? "",
+          playerId: currentPlayer?.id ?? "",
+        },
+        (response: SocketResponse) => {
+          if (!response.success) {
+            handleError(response.error);
+          } else {
+            setSelectedAction(undefined);
+          }
+        }
+      );
+    }
 
     if (action.id === selectedAction?.id) {
       setSelectedAction(undefined);

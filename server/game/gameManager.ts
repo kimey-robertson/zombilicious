@@ -419,7 +419,12 @@ function openDoor(gameId: string, playerId: string, doorId: string): Game {
   return game;
 }
 
-function generateNoise(gameId: string, zoneId: string): Game {
+function generateNoise(
+  gameId: string,
+  zoneId: string,
+  playerId?: string,
+  asAction: boolean = false
+): Game {
   const game = getGameById(gameId);
   const zone = game.map.zones.find((zone) => zone.id === zoneId);
   if (!zone) {
@@ -428,6 +433,17 @@ function generateNoise(gameId: string, zoneId: string): Game {
     });
   }
   zone.noiseTokens += 1;
+
+  if (asAction && playerId) {
+    const player = game.players.find((player) => player.id === playerId);
+    if (!player) {
+      throw new OperationFailedError("Generate noise", {
+        message: `Player not found in game ${gameId} with id ${playerId}`,
+      });
+    }
+    player.actionsRemaining -= 1;
+  }
+
   return game;
 }
 
@@ -445,4 +461,5 @@ export {
   movePlayerToZone,
   endTurn,
   openDoor,
+  generateNoise,
 };

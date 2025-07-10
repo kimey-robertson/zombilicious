@@ -3,6 +3,7 @@ import { Lobby } from "../../shared/types";
 import {
   createGame,
   endTurn,
+  generateNoise,
   getGameById,
   movePlayerToZone,
   openDoor,
@@ -183,6 +184,31 @@ export const handleGameEvents = (io: Server, socket: Socket) => {
     return { success: true };
   });
 
+  const makeNoiseHandler = createSocketHandler<{
+    gameId: string;
+    zoneId: string;
+    playerId: string;
+  }>("make-noise", async (io, socket, { gameId, zoneId, playerId }) => {
+    // Make noise
+    const game = generateNoise(gameId, zoneId, playerId, true);
+
+    // Send a log event
+    sendGameLogEvent(io, game.id, {
+      id: (game.gameLogs.length + 1).toString(),
+      timestamp: new Date(),
+      type: "system",
+      message: `Player ${getPlayerNameBySocketId(
+        socket.id
+      )} made noise in zone ${zoneId}`,
+      icon: "🔊",
+    });
+
+    // Emit the game updated
+    io.to(gameId).emit("game-updated", game);
+
+    return { success: true };
+  });
+
   createGameHandler(io, socket);
   voteKickPlayerFromGameHandler(io, socket);
   rejoinGameHandler(io, socket);
@@ -190,4 +216,5 @@ export const handleGameEvents = (io: Server, socket: Socket) => {
   movePlayerToZoneHandler(io, socket);
   skipZombiesTurnHandler(io, socket);
   openDoorHandler(io, socket);
+  makeNoiseHandler(io, socket);
 };
