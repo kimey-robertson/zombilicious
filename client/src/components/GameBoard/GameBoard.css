@@ -58,8 +58,20 @@
 }
 
 .movable-zone {
+  position: relative;
+}
+
+.movable-zone::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background-color: #b3b3b370;
   animation: movable-zone-pulse 1s infinite;
+  pointer-events: none;
+  z-index: 1;
 }
 
 @keyframes movable-zone-pulse {
@@ -74,27 +86,27 @@
   }
 }
 
-.movable-zone.single-zone {
+.movable-zone.single-zone::before {
   margin: 1rem;
   border-radius: 10px;
 }
 
-.movable-zone.h-double-zone-left {
+.movable-zone.h-double-zone-left::before {
   margin: 1rem 0 1rem 1rem;
   border-radius: 10px 0 0 10px;
 }
 
-.movable-zone.h-double-zone-right {
+.movable-zone.h-double-zone-right::before {
   margin: 1rem 1rem 1rem 0;
   border-radius: 0 10px 10px 0;
 }
 
-.movable-zone.v-double-zone-top {
+.movable-zone.v-double-zone-top::before {
   margin: 1rem 1rem 0 1rem;
   border-radius: 10px 10px 0 0;
 }
 
-.movable-zone.v-double-zone-bottom {
+.movable-zone.v-double-zone-bottom::before {
   margin: 0 1rem 1rem 1rem;
   border-radius: 0 0 10px 10px;
 }
