@@ -1,16 +1,16 @@
 import type {
   Cell,
   Door,
-  Player,
   SocketResponse,
   Zone,
 } from "../../../../shared/types";
+import { useCurrentPlayer } from "../../hooks/useCurrentPlayer";
 import { useHandleError } from "../../hooks/useHandleError";
+import { useZoneDetails } from "../../hooks/useZoneDetails";
 import { getSocket } from "../../socket";
 import { useGameStore } from "../../store/useGameStore";
 import { usePlayerStore } from "../../store/usePlayerStore";
 import DoorComponent from "./Door";
-import { isHorizontalDoubleZone, isVerticalDoubleZone } from "./gameBoardUtils";
 import PlayerToken from "./PlayerToken";
 
 type CellProps = {
@@ -25,46 +25,20 @@ const Cell: React.FC<CellProps> = ({ cell, zone, door }) => {
 
   const setSelectedZone = usePlayerStore((state) => state.setSelectedZone);
   const panMode = usePlayerStore((state) => state.panMode);
-  const playerId = usePlayerStore((state) => state.playerId);
   const selectedAction = usePlayerStore((state) => state.selectedAction);
-  const actionsRemaining = usePlayerStore((state) => state.actionsRemaining);
-  const isMyTurn = usePlayerStore((state) => state.isMyTurn);
 
-  const players = useGameStore((state) => state.players);
-  const map = useGameStore((state) => state.map);
   const gameId = useGameStore((state) => state.gameId);
 
-  const currentPlayer = players.find((player) => player.id === playerId);
+  const { hDoubleZone, vDoubleZone, playerTokensToShow, isMovableZone } =
+    useZoneDetails(zone, cell);
 
-  const playersInZone = players.filter((player) =>
-    player.currentZoneId.includes(zone?.id ?? "")
-  );
-
-  const hDoubleZone = isHorizontalDoubleZone(zone, map);
-  const vDoubleZone = isVerticalDoubleZone(zone, map);
-
-  const showPlayerToken = (player: Player) => {
-    const playerInZone = playersInZone.find((p) => p.id === player.id);
-    return hDoubleZone || vDoubleZone
-      ? playerInZone && cell.id.includes(zone?.id.split("/")[0] ?? "")
-      : playerInZone;
-  };
-
-  const tokensToShow = playersInZone.filter((player) =>
-    showPlayerToken(player)
-  );
-
-  const isMovableZone = currentPlayer?.movableZones.find(
-    (movableZone) => movableZone.id === zone?.id
-  );
-
-  const canPerformAction = actionsRemaining > 0 && isMyTurn;
+  const { currentPlayer, canPerformAction } = useCurrentPlayer();
 
   const canMove =
     isMovableZone && selectedAction?.id === "move" && canPerformAction;
 
   const handleClick = () => {
-    if (zone && !panMode) {
+    if (zone && !panMode && !canMove) {
       setSelectedZone(zone);
     }
     if (canMove) {
@@ -72,7 +46,7 @@ const Cell: React.FC<CellProps> = ({ cell, zone, door }) => {
         "move-player-to-zone",
         {
           gameId: gameId,
-          playerId: playerId,
+          playerId: currentPlayer?.id ?? "",
           fromZoneId: currentPlayer?.currentZoneId,
           toZoneId: zone?.id,
         },
@@ -100,7 +74,7 @@ const Cell: React.FC<CellProps> = ({ cell, zone, door }) => {
           canPerformAction={canPerformAction}
         />
       ) : null}
-      {tokensToShow.map((player, index) => (
+      {playerTokensToShow.map((player, index) => (
         <PlayerToken
           key={player.id}
           player={player}
@@ -111,7 +85,7 @@ const Cell: React.FC<CellProps> = ({ cell, zone, door }) => {
             vDoubleZone && cell.id.includes(zone?.id.split("/")[0] ?? "")
           }
           index={index}
-          totalTokens={tokensToShow.length}
+          totalTokens={playerTokensToShow.length}
         />
       ))}
     </div>
