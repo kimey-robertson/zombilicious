@@ -32,9 +32,12 @@
 
 .left-side-bar {
   position: absolute;
-  top: 7%;
+  top: 10%;
   margin-right: 1rem;
   height: 80%;
+  @media screen and (max-width: 1510px) {
+    top: 7%;
+  }
 }
 
 .side-panel {

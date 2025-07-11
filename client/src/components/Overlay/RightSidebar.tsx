@@ -4,10 +4,8 @@ import Players from "./Players";
 const RightSidebar = () => {
   return (
     <div className="right-side-bar">
+      <Players />
       <ZoneInfoPanel />
-      <div className="mt-4">
-        <Players />
-      </div>
     </div>
   );
 };

@@ -17,7 +17,7 @@ const ZoneInfoPanel: React.FC = () => {
   ).length;
 
   return (
-    <div className="side-panel overlay-item">
+    <div className="side-panel overlay-item mt-4">
       <h3>Selected Zone: {selectedZone.id}</h3>
       <div className="side-panel-detail">
         🧟 Zombies:
