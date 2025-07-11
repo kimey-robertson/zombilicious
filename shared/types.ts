@@ -49,12 +49,14 @@ export type Player = {
   totalActions: number;
   actionsRemaining: number;
   XP: number;
-  playerCards: {
-    inReserve: Card[];
-    inHand: Card[];
-  };
+  playerCards: PlayerCards;
   currentZoneId: string;
   movableZones: Zone[];
+};
+
+export type PlayerCards = {
+  inReserve: (Card | null)[];
+  inHand: (Card | null)[];
 };
 
 export type LobbyPlayer = {

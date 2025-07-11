@@ -1,5 +1,5 @@
 import { Server, Socket } from "socket.io";
-import { Game, Lobby, Player } from "../../shared/types";
+import { Game, Lobby, Player, PlayerCards } from "../../shared/types";
 import {
   getPlayerNameBySocketId,
   sendGameLogEvent,
@@ -387,7 +387,7 @@ function openDoor(gameId: string, playerId: string, doorId: string): Game {
 
   if (
     !player.playerCards?.inHand.some(
-      (card) => card.canOpenDoorsWithoutNoise || card.canOpenDoorsWithNoise
+      (card) => card?.canOpenDoorsWithoutNoise || card?.canOpenDoorsWithNoise
     )
   ) {
     throw new OperationFailedError("Open door", {
@@ -403,8 +403,8 @@ function openDoor(gameId: string, playerId: string, doorId: string): Game {
 
   // If the player has a card that can open doors with noise, but not without noise, generate noise
   if (
-    player.playerCards?.inHand.some((card) => card.canOpenDoorsWithNoise) &&
-    !player.playerCards?.inHand.some((card) => card.canOpenDoorsWithoutNoise)
+    player.playerCards?.inHand.some((card) => card?.canOpenDoorsWithNoise) &&
+    !player.playerCards?.inHand.some((card) => card?.canOpenDoorsWithoutNoise)
   ) {
     game = generateNoise(gameId, player.currentZoneId);
   }
@@ -446,6 +446,28 @@ function generateNoise(
   return game;
 }
 
+function organiseInventory(
+  gameId: string,
+  playerId: string,
+  playerCards: PlayerCards,
+  asAction: boolean = false
+): Game {
+  const game = getGameById(gameId);
+  const player = game.players.find((player) => player.id === playerId);
+  if (!player) {
+    throw new OperationFailedError("Organise inventory", {
+      message: `Player not found in game ${gameId} with id ${playerId}`,
+    });
+  }
+  player.playerCards = playerCards;
+  if (asAction) {
+    player.actionsRemaining -= 1;
+  }
+  console.log("organiseInventory", playerCards);
+
+  return game;
+}
+
 export {
   createGame,
   deleteGame,
@@ -461,4 +483,5 @@ export {
   endTurn,
   openDoor,
   generateNoise,
+  organiseInventory,
 };

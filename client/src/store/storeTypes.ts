@@ -5,8 +5,8 @@ import {
   Player,
   Zone,
   LogEvent,
-  Card,
   Map,
+  PlayerCards,
 } from "../../../shared/types";
 import { GameAction } from "../components/Overlay/ActionButtons";
 
@@ -36,14 +36,8 @@ export type PlayerStore = {
   setActionsRemaining: (actionsRemaining: number) => void;
   XP: number;
   setXP: (XP: number) => void;
-  playerCards: {
-    inReserve: (Card | null)[];
-    inHand: (Card | null)[];
-  };
-  setPlayerCards: (playerCards: {
-    inReserve: (Card | null)[];
-    inHand: (Card | null)[];
-  }) => void;
+  playerCards: PlayerCards;
+  setPlayerCards: (playerCards: PlayerCards) => void;
   isMyTurn: boolean;
   setIsMyTurn: (isMyTurn: boolean) => void;
   selectedAction: GameAction | undefined;

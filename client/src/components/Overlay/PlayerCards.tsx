@@ -1,11 +1,26 @@
 import { usePlayerStore } from "../../store/usePlayerStore";
 import { Card, CardContent } from "../UI/Card";
 import { useCardDragAndDrop } from "../../hooks/useCardDragAndDrop";
-import { Card as CardType } from "../../../../shared/types";
+import { Card as CardType, SocketResponse } from "../../../../shared/types";
+import { Button } from "../UI/Button";
+import { FaCheck, FaTimes } from "react-icons/fa";
+import { useGameStore } from "../../store/useGameStore";
+import { getSocket } from "../../socket";
+import { useCurrentPlayer } from "../../hooks/useCurrentPlayer";
+import { useHandleError } from "../../hooks/useHandleError";
 
 const PlayerCards = () => {
+  const socket = getSocket();
+  const handleError = useHandleError();
   const reserveCards = usePlayerStore((state) => state.playerCards.inReserve);
   const handCards = usePlayerStore((state) => state.playerCards.inHand);
+  const setPlayerCards = usePlayerStore((state) => state.setPlayerCards);
+  const selectedAction = usePlayerStore((state) => state.selectedAction);
+  const setSelectedAction = usePlayerStore((state) => state.setSelectedAction);
+
+  const gameId = useGameStore((state) => state.gameId);
+
+  const { currentPlayer, canPerformAction } = useCurrentPlayer();
 
   const {
     draggedCard,
@@ -44,7 +59,9 @@ const PlayerCards = () => {
               ? "bg-gradient-to-b from-red-950/80 to-black/90 border-2 border-red-700/60 w-32 h-40 hover:scale-110"
               : "bg-gradient-to-b from-stone-800/70 to-stone-900/90 border-2 border-red-800/40 w-28 h-36 hover:scale-105"
           }
-          transition-all duration-300 shadow-xl relative overflow-hidden
+          transition-all duration-300 shadow-xl relative overflow-hidden ${
+            selectedAction?.id === "inventory" ? "" : "user-select-none"
+          }
           ${isDragging ? "opacity-50 rotate-3 scale-105" : ""}
           ${
             isDropTarget && isValidTarget
@@ -125,6 +142,33 @@ const PlayerCards = () => {
     );
   };
 
+  const handleOrganiseInventory = () => {
+    if (!canPerformAction || !currentPlayer) return;
+    socket.emit(
+      "organise-inventory",
+      {
+        gameId: gameId,
+        playerId: currentPlayer.id,
+        playerCards: {
+          inReserve: reserveCards,
+          inHand: handCards,
+        },
+      },
+      (response: SocketResponse) => {
+        if (!response.success) {
+          handleError(response.error);
+        }
+      }
+    );
+    setSelectedAction(undefined);
+  };
+
+  const handleCancelOrganiseInventory = () => {
+    if (!currentPlayer) return;
+    setPlayerCards(currentPlayer.playerCards);
+    setSelectedAction(undefined);
+  };
+
   return (
     <div className="space-y-4">
       {/* Reserve Cards */}
@@ -150,17 +194,20 @@ const PlayerCards = () => {
             const card = handCards[index];
             return renderCard(card, "hand", index, true);
           })}
+          {selectedAction?.id === "inventory" && (
+            <div className="absolute m-0 gap-0">
+              <div className="absolute top-10 left-40 w-10 h-10">
+                <Button onClick={handleOrganiseInventory} className="mb-1 p-0">
+                  <FaCheck />
+                </Button>
+                <Button onClick={handleCancelOrganiseInventory}>
+                  <FaTimes />
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
-
-      {/* Drag Instructions */}
-      {draggedCard && (
-        <div className="text-center">
-          <div className="text-xs text-stone-400 font-mono opacity-75">
-            Drop on empty slot to move • Drop on occupied slot to swap
-          </div>
-        </div>
-      )}
     </div>
   );
 };

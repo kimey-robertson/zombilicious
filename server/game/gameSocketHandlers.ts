@@ -1,5 +1,5 @@
 import { Server, Socket } from "socket.io";
-import { Lobby } from "../../shared/types";
+import { Card, Lobby, PlayerCards } from "../../shared/types";
 import {
   createGame,
   endTurn,
@@ -7,6 +7,7 @@ import {
   getGameById,
   movePlayerToZone,
   openDoor,
+  organiseInventory,
   rejoinGame,
   voteKickPlayerFromGame,
 } from "./gameManager";
@@ -209,6 +210,23 @@ export const handleGameEvents = (io: Server, socket: Socket) => {
     return { success: true };
   });
 
+  const organiseInventoryHandler = createSocketHandler<{
+    gameId: string;
+    playerId: string;
+    playerCards: PlayerCards;
+  }>(
+    "organise-inventory",
+    async (io, socket, { gameId, playerId, playerCards }) => {
+      // Organise the inventory
+      const game = organiseInventory(gameId, playerId, playerCards, true);
+
+      // Emit the game updated
+      io.to(gameId).emit("game-updated", game);
+
+      return { success: true };
+    }
+  );
+
   createGameHandler(io, socket);
   voteKickPlayerFromGameHandler(io, socket);
   rejoinGameHandler(io, socket);
@@ -217,4 +235,5 @@ export const handleGameEvents = (io: Server, socket: Socket) => {
   skipZombiesTurnHandler(io, socket);
   openDoorHandler(io, socket);
   makeNoiseHandler(io, socket);
+  organiseInventoryHandler(io, socket);
 };

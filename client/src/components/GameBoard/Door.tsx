@@ -33,7 +33,7 @@ const DoorComponent = ({
       isCurrentPlayerNextToDoor &&
       door.state === "closed" &&
       currentPlayer?.playerCards?.inHand.some(
-        (card) => card.canOpenDoorsWithNoise || card.canOpenDoorsWithoutNoise
+        (card) => card?.canOpenDoorsWithNoise || card?.canOpenDoorsWithoutNoise
       ) &&
       canPerformAction
     ) {
