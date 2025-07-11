@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { Card } from "../../../shared/types";
 import { usePlayerStore } from "../store/usePlayerStore";
 
@@ -16,9 +16,27 @@ export type DropResult = {
 export const useCardDragAndDrop = () => {
   const [draggedCard, setDraggedCard] = useState<DragData | null>(null);
   const [dragOverTarget, setDragOverTarget] = useState<DropResult | null>(null);
+  const dragTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const playerCards = usePlayerStore((state) => state.playerCards);
   const setPlayerCards = usePlayerStore((state) => state.setPlayerCards);
+
+  // Cleanup function to reset all drag state
+  const cleanupDragState = useCallback(() => {
+    setDraggedCard(null);
+    setDragOverTarget(null);
+    if (dragTimeoutRef.current) {
+      clearTimeout(dragTimeoutRef.current);
+      dragTimeoutRef.current = null;
+    }
+  }, []);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      cleanupDragState();
+    };
+  }, [cleanupDragState]);
 
   const handleDragStart = useCallback(
     (
@@ -41,19 +59,27 @@ export const useCardDragAndDrop = () => {
       if (e.currentTarget instanceof HTMLElement) {
         e.currentTarget.style.opacity = "0.5";
       }
+
+      // Safety timeout to clean up if drag end doesn't fire
+      dragTimeoutRef.current = setTimeout(() => {
+        cleanupDragState();
+      }, 10000); // 10 second timeout
     },
-    []
+    [cleanupDragState]
   );
 
-  const handleDragEnd = useCallback((e: React.DragEvent) => {
-    setDraggedCard(null);
-    setDragOverTarget(null);
+  const handleDragEnd = useCallback(
+    (e: React.DragEvent) => {
+      // Reset visual feedback
+      if (e.currentTarget instanceof HTMLElement) {
+        e.currentTarget.style.opacity = "1";
+      }
 
-    // Reset visual feedback
-    if (e.currentTarget instanceof HTMLElement) {
-      e.currentTarget.style.opacity = "1";
-    }
-  }, []);
+      // Clean up drag state
+      cleanupDragState();
+    },
+    [cleanupDragState]
+  );
 
   const handleDragOver = useCallback(
     (
@@ -83,7 +109,9 @@ export const useCardDragAndDrop = () => {
       targetIndex: number
     ) => {
       e.preventDefault();
-      setDragOverTarget(null);
+
+      // Always clean up drag state first
+      cleanupDragState();
 
       try {
         const dragData: DragData = JSON.parse(
@@ -177,7 +205,7 @@ export const useCardDragAndDrop = () => {
         console.error("Error handling card drop:", error);
       }
     },
-    [playerCards, setPlayerCards]
+    [playerCards, setPlayerCards, cleanupDragState]
   );
 
   const isValidDropTarget = useCallback(

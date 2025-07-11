@@ -90,7 +90,7 @@ const PlayerCards = () => {
             <div
               className={`${isInHand ? "text-sm" : "text-xs"} font-bold ${
                 isInHand ? "text-red-200" : "text-stone-300"
-              } font-mono`}
+              } font-mono select-none`}
             >
               {card.name}
             </div>
