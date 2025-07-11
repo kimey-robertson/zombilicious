@@ -109,8 +109,14 @@ export type LogEvent = {
 export type Card = {
   id: string;
   name: string;
-  canOpenDoorsWithoutNoise: boolean;
-  canOpenDoorsWithNoise: boolean;
+  canOpenDoorsWithoutNoise: boolean | undefined;
+  canOpenDoorsWithNoise: boolean | undefined;
+  createsNoiseWhenAttacking: boolean | undefined;
+  minRange: number | undefined;
+  maxRange: number | undefined;
+  numberOfDice: number | undefined;
+  rollRequired: number | undefined;
+  damage: number | undefined;
 };
 
 export type SocketError = {
