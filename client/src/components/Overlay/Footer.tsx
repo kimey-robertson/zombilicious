@@ -32,18 +32,10 @@ const Footer = () => {
       <div className={`footer-panel ${isOpen ? "open" : "closed"}`}>
         <XPTracker />
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          <ActionsRemaining />
           <PlayerCards />
+          <ActionsRemaining />
           <ActionButtons />
         </div>
-        {/* <div className="footer-panel-content">
-            <h2>Action Panel</h2>
-            <div className="footer-panel-actions">
-                <button>Action 1</button>
-                <button>Action 2</button>
-                <button>Action 3</button>
-            </div>
-            </div> */}
       </div>
     </>
   );

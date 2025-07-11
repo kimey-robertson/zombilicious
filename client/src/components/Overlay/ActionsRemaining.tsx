@@ -28,20 +28,20 @@ const ActionsRemaining = () => {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="col-span-2 space-y-3 px-30">
       <h4 className="text-red-400 font-bold text-center tracking-wider border-b border-red-900/50 pb-2 font-mono">
         ACTIONS LEFT
       </h4>
       <div className="text-center">
-        <div className="text-4xl font-bold text-red-500 mb-4 drop-shadow-lg font-mono">
+        <div className="text-4xl font-bold text-red-500 mb-1 drop-shadow-lg font-mono">
           {actionsRemaining}
         </div>
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-6 gap-2">
           {Array.from({ length: totalActions }, (_, i) => i + 1).map(
             (actionNum) => (
               <div
                 key={actionNum}
-                className={`p-3 text-left font-bold transition-all duration-300 font-mono rounded-[50px] ${
+                className={`p-1 text-center font-bold transition-all duration-300 font-mono rounded-[50px] ${
                   actionNum <= actionsRemaining
                     ? "bg-gradient-to-b from-red-800/80 to-red-900/90 text-red-100 border-2 border-red-600/60 shadow-lg"
                     : "bg-gradient-to-b from-stone-800/80 to-stone-900/90 text-stone-500 border-2 border-stone-700/40"
@@ -54,7 +54,7 @@ const ActionsRemaining = () => {
         </div>
       </div>
       {isMyTurn ? (
-        <div className="flex justify-center items-center mt-4">
+        <div className="flex justify-center items-center mt-10">
           <Button
             onClick={handleEndTurn}
             variant="destructive"

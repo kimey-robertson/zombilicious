@@ -126,7 +126,7 @@ const PlayerCards = () => {
   };
 
   return (
-    <div className="col-span-2 space-y-3">
+    <div className="space-y-4">
       {/* Reserve Cards */}
       <div>
         <h4 className="text-red-400 font-bold text-center tracking-wider border-b border-red-900/50 pb-2 mb-3 font-mono">
