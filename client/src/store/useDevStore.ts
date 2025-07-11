@@ -36,6 +36,7 @@ const testCards: Card[] = [
     numberOfDice: 1,
     rollRequired: 4,
     damage: 1,
+    rarity: "common",
   },
   {
     id: "2",
@@ -48,6 +49,7 @@ const testCards: Card[] = [
     numberOfDice: 1,
     rollRequired: 4,
     damage: 2,
+    rarity: "common",
   },
   {
     id: "3",
@@ -60,6 +62,7 @@ const testCards: Card[] = [
     numberOfDice: 1,
     rollRequired: 6,
     damage: 1,
+    rarity: "common",
   },
   {
     id: "4",
@@ -72,6 +75,7 @@ const testCards: Card[] = [
     numberOfDice: 1,
     rollRequired: 4,
     damage: 1,
+    rarity: "uncommon",
   },
   {
     id: "5",
@@ -84,5 +88,6 @@ const testCards: Card[] = [
     numberOfDice: 1,
     rollRequired: 3,
     damage: 1,
+    rarity: "rare",
   },
 ];

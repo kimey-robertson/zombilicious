@@ -44,25 +44,52 @@ const ActionButtons = () => {
   ];
 
   const selectedAction = usePlayerStore((state) => state.selectedAction);
-  const actionsRemaining = usePlayerStore((state) => state.actionsRemaining);
   const setSelectedAction = usePlayerStore((state) => state.setSelectedAction);
-  const isMyTurn = usePlayerStore((state) => state.isMyTurn);
 
   const gameId = useGameStore((state) => state.gameId);
+  const map = useGameStore((state) => state.map);
 
-  const { currentPlayer } = useCurrentPlayer();
-
-  const buttonDisabled = actionsRemaining <= 0 || !isMyTurn;
+  const { currentPlayer, canPerformAction } = useCurrentPlayer();
 
   const socket = getSocket();
   const handleError = useHandleError();
 
   const handleActionClick = (action: GameAction) => {
-    if (buttonDisabled) return;
+    if (!canPerformAction) return;
 
     if (action.id === "noise") {
       socket.emit(
         "make-noise",
+        {
+          gameId,
+          zoneId: currentPlayer?.currentZoneId ?? "",
+          playerId: currentPlayer?.id ?? "",
+        },
+        (response: SocketResponse) => {
+          if (!response.success) {
+            handleError(response.error);
+          } else {
+            setSelectedAction(undefined);
+          }
+        }
+      );
+    } else if (
+      action.id === "search" &&
+      canPerformAction &&
+      !currentPlayer?.searchedThisTurn
+    ) {
+      const zone = map.zones.find(
+        (zone) => zone.id === currentPlayer?.currentZoneId
+      );
+      if (!zone) {
+        return handleError({
+          code: "OPERATION_FAILED",
+          message: "Zone not found",
+        });
+      }
+      if (!zone.room) return;
+      socket.emit(
+        "search-for-items",
         {
           gameId,
           zoneId: currentPlayer?.currentZoneId ?? "",
@@ -97,13 +124,16 @@ const ActionButtons = () => {
             <Button
               key={action.id}
               onClick={() => handleActionClick(action)}
-              disabled={buttonDisabled}
+              disabled={
+                !canPerformAction ||
+                (action.id === "search" && currentPlayer?.searchedThisTurn)
+              }
               className={`bg-gradient-to-b text-stone-200 p-3 h-auto flex flex-col items-center gap-2 transition-all duration-300 border-2 shadow-lg relative overflow-hidden font-mono ${
-                selectedAction?.id === action.id && !buttonDisabled
+                selectedAction?.id === action.id && canPerformAction
                   ? "border-red-400/80 shadow-red-900/50 bg-gradient-to-b from-red-800/90 to-red-950/90"
                   : ""
               } ${
-                buttonDisabled
+                !canPerformAction
                   ? "opacity-30 cursor-not-allowed grayscale"
                   : "hover:scale-105 hover:shadow-xl"
               }`}

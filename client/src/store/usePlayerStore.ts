@@ -38,7 +38,7 @@ export const usePlayerStore = create<PlayerStore>((set) => ({
   setActionsRemaining: (actionsRemaining) => set({ actionsRemaining }),
   XP: 0,
   setXP: (XP) => set({ XP }),
-  playerCards: { inReserve: [], inHand: [] },
+  playerCards: { inReserve: [], inHand: [], foundCard: null },
   setPlayerCards: (playerCards) => set({ playerCards }),
   isMyTurn: false,
   setIsMyTurn: (isMyTurn) => set({ isMyTurn }),

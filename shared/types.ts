@@ -52,11 +52,13 @@ export type Player = {
   playerCards: PlayerCards;
   currentZoneId: string;
   movableZones: Zone[];
+  searchedThisTurn: boolean;
 };
 
 export type PlayerCards = {
   inReserve: (Card | null)[];
   inHand: (Card | null)[];
+  foundCard?: Card | null;
 };
 
 export type LobbyPlayer = {
@@ -117,7 +119,10 @@ export type Card = {
   numberOfDice: number | undefined;
   rollRequired: number | undefined;
   damage: number | undefined;
+  rarity: CardRarity;
 };
+
+export type CardRarity = "common" | "uncommon" | "rare" | "epic" | "legendary";
 
 export type SocketError = {
   code: string;

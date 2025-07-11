@@ -1,4 +1,5 @@
-import type { Cell } from "../../shared/types";
+import type { Card, Cell } from "../../shared/types";
+import { cards } from "../cards";
 
 function getTileCells(tileId: string) {
   const cells: Cell[] = [];
@@ -38,4 +39,27 @@ function countDownTimer(onTick: (time: string) => void) {
   return () => clearInterval(intervalId);
 }
 
-export { getTileCells, countDownTimer };
+const rarityWeights = {
+  common: 8,
+  uncommon: 5,
+  rare: 3,
+  epic: 2,
+  legendary: 1,
+};
+
+function getRandomCard() {
+  const weightedPool: Card[] = [];
+
+  cards.forEach((card) => {
+    const weight = rarityWeights[card.rarity];
+    for (let i = 0; i < weight; i++) {
+      weightedPool.push(card);
+    }
+  });
+
+  console.log({ weightedPool });
+
+  return weightedPool[Math.floor(Math.random() * weightedPool.length)];
+}
+
+export { getTileCells, countDownTimer, getRandomCard };

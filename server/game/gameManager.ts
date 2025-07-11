@@ -9,6 +9,7 @@ import { tutorialMap } from "../maps/maps";
 import { GameNotFoundError, OperationFailedError } from "../utils/socketErrors";
 import { calculateMovableZones } from "../maps/mapUtils";
 import { cards } from "../cards";
+import { getRandomCard } from "../utils/helpers";
 
 export const games: Game[] = [];
 
@@ -39,9 +40,10 @@ function createGame(lobby: Lobby, io: Server): Game {
       totalActions: 3,
       actionsRemaining: 3,
       XP: 0,
-      playerCards: { inReserve: [], inHand: [cards[1]] },
+      playerCards: { inReserve: [], inHand: [cards[1]], foundCard: null },
       currentZoneId: chosenMap.startingZone,
       movableZones: calculateMovableZones(chosenMap, chosenMap.startingZone),
+      searchedThisTurn: false,
     })),
     status: "active",
     disconnectedPlayers: {},
@@ -468,6 +470,43 @@ function organiseInventory(
   return game;
 }
 
+function searchForItems(
+  gameId: string,
+  zoneId: string,
+  playerId: string
+): Game {
+  const game = getGameById(gameId);
+  const zone = game.map.zones.find((zone) => zone.id === zoneId);
+  const player = game.players.find((player) => player.id === playerId);
+
+  if (!player) {
+    throw new OperationFailedError("Search for items", {
+      message: `Player not found in game ${gameId} with id ${playerId}`,
+    });
+  }
+  if (!zone) {
+    throw new OperationFailedError("Search for items", {
+      message: `Zone not found in game ${gameId} with id ${zoneId}`,
+    });
+  }
+  if (!zone.room) {
+    throw new OperationFailedError("Search for items", {
+      message: `Zone ${zoneId} is not a room`,
+    });
+  }
+  if (player.searchedThisTurn) {
+    throw new OperationFailedError("Search for items", {
+      message: `Player has already searched this turn`,
+    });
+  }
+  const card = getRandomCard();
+  player.playerCards.foundCard = card;
+  player.searchedThisTurn = true;
+  player.actionsRemaining -= 1;
+
+  return game;
+}
+
 export {
   createGame,
   deleteGame,
@@ -484,4 +523,5 @@ export {
   openDoor,
   generateNoise,
   organiseInventory,
+  searchForItems,
 };

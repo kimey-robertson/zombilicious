@@ -9,6 +9,7 @@ import {
   openDoor,
   organiseInventory,
   rejoinGame,
+  searchForItems,
   voteKickPlayerFromGame,
 } from "./gameManager";
 import {
@@ -140,9 +141,10 @@ export const handleGameEvents = (io: Server, socket: Socket) => {
       game.players[0].myTurn = true;
       game.isZombiesTurn = false;
 
-      game.players.forEach(
-        (player) => (player.actionsRemaining = player.totalActions)
-      );
+      game.players.forEach((player) => {
+        player.actionsRemaining = player.totalActions;
+        player.searchedThisTurn = false;
+      });
 
       // Send a log event
       sendGameLogEvent(io, game.id, {
@@ -227,6 +229,35 @@ export const handleGameEvents = (io: Server, socket: Socket) => {
     }
   );
 
+  const searchForItemsHandler = createSocketHandler<{
+    gameId: string;
+    zoneId: string;
+    playerId: string;
+  }>("search-for-items", async (io, socket, { gameId, zoneId, playerId }) => {
+    // Search the zone
+    const game = searchForItems(gameId, zoneId, playerId);
+
+    const foundCard =
+      game.players.find((player) => player.id === playerId)?.playerCards
+        .foundCard ?? null;
+
+    // Send a log event
+    sendGameLogEvent(io, game.id, {
+      id: (game.gameLogs.length + 1).toString(),
+      timestamp: new Date(),
+      type: "system",
+      message: `Player ${getPlayerNameBySocketId(playerId)} found a ${
+        foundCard?.name
+      } in zone ${zoneId}`,
+      icon: "🎁",
+    });
+
+    // Emit the game updated
+    io.to(gameId).emit("game-updated", game);
+
+    return { success: true };
+  });
+
   createGameHandler(io, socket);
   voteKickPlayerFromGameHandler(io, socket);
   rejoinGameHandler(io, socket);
@@ -236,4 +267,5 @@ export const handleGameEvents = (io: Server, socket: Socket) => {
   openDoorHandler(io, socket);
   makeNoiseHandler(io, socket);
   organiseInventoryHandler(io, socket);
+  searchForItemsHandler(io, socket);
 };
