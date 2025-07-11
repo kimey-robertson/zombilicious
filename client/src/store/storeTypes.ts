@@ -37,10 +37,13 @@ export type PlayerStore = {
   XP: number;
   setXP: (XP: number) => void;
   playerCards: {
-    inReserve: Card[];
-    inHand: Card[];
+    inReserve: (Card | null)[];
+    inHand: (Card | null)[];
   };
-  setPlayerCards: (playerCards: { inReserve: Card[]; inHand: Card[] }) => void;
+  setPlayerCards: (playerCards: {
+    inReserve: (Card | null)[];
+    inHand: (Card | null)[];
+  }) => void;
   isMyTurn: boolean;
   setIsMyTurn: (isMyTurn: boolean) => void;
   selectedAction: GameAction | undefined;
@@ -88,4 +91,6 @@ export type DevStore = {
   setDevMode: (devMode: boolean) => void;
   hideOverlay: boolean;
   setHideOverlay: (hideOverlay: boolean) => void;
+  addTestCards: () => void;
+  clearAllCards: () => void;
 };

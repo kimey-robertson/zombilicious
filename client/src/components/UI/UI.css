@@ -1,62 +1,213 @@
 /* The switch - the box around the slider */
 .switch {
-    position: relative;
-    display: inline-block;
-    width: 60px;
-    height: 34px;
-  }
-  
-  /* Hide default HTML checkbox */
-  .switch input {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* The slider */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+}
+
+input:checked + .slider {
+  background-color: #2196f3;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196f3;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+/* Drag and Drop Styles */
+.draggable-card {
+  transition: all 0.3s ease;
+  cursor: grab;
+}
+
+.draggable-card:active {
+  cursor: grabbing;
+}
+
+.draggable-card.dragging {
+  opacity: 0.5;
+  transform: rotate(3deg) scale(1.05);
+  z-index: 1000;
+}
+
+.drop-zone {
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.drop-zone.valid-target {
+  border-color: #10b981;
+  background-color: rgba(16, 185, 129, 0.1);
+  transform: scale(1.05);
+}
+
+.drop-zone.invalid-target {
+  border-color: #ef4444;
+  background-color: rgba(239, 68, 68, 0.1);
+}
+
+.drop-zone.empty.valid-target {
+  border-style: dashed;
+  border-color: #3b82f6;
+  background-color: rgba(59, 130, 246, 0.1);
+}
+
+.drop-zone.empty.valid-target::before {
+  content: "Drop here";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.75rem;
+  color: #93c5fd;
+  font-family: monospace;
+  opacity: 0.7;
+}
+
+.drop-zone.empty.valid-target::after {
+  content: "↓";
+  position: absolute;
+  top: 65%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.75rem;
+  color: #93c5fd;
+  opacity: 0.7;
+}
+
+.drag-ghost {
+  opacity: 0.8;
+  transform: rotate(5deg) scale(1.1);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  border: 2px solid #10b981;
+  pointer-events: none;
+}
+
+.drag-instructions {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
     opacity: 0;
-    width: 0;
-    height: 0;
+    transform: translateY(10px);
   }
-  
-  /* The slider */
-  .slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ccc;
-    -webkit-transition: .4s;
-    transition: .4s;
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
-  
-  .slider:before {
-    position: absolute;
-    content: "";
-    height: 26px;
-    width: 26px;
-    left: 4px;
-    bottom: 4px;
-    background-color: white;
-    -webkit-transition: .4s;
-    transition: .4s;
+}
+
+/* Pulse animation for valid drop targets */
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
   }
-  
-  input:checked + .slider {
-    background-color: #2196F3;
+  50% {
+    transform: scale(1.05);
+    opacity: 0.8;
   }
-  
-  input:focus + .slider {
-    box-shadow: 0 0 1px #2196F3;
+}
+
+.drop-zone.valid-target.pulse {
+  animation: pulse 1s ease-in-out infinite;
+}
+
+/* Shake animation for invalid drops */
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
   }
-  
-  input:checked + .slider:before {
-    -webkit-transform: translateX(26px);
-    -ms-transform: translateX(26px);
-    transform: translateX(26px);
+  25% {
+    transform: translateX(-5px);
   }
-  
-  /* Rounded sliders */
-  .slider.round {
-    border-radius: 34px;
+  75% {
+    transform: translateX(5px);
   }
-  
-  .slider.round:before {
-    border-radius: 50%;
+}
+
+.drop-zone.invalid-target.shake {
+  animation: shake 0.5s ease-in-out;
+}
+
+/* Smooth transitions for card movements */
+.card-slot {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-slot:hover {
+  transform: translateY(-2px);
+}
+
+/* Prevent text selection during drag */
+.dragging-active {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+/* Touch device support */
+@media (hover: none) and (pointer: coarse) {
+  .draggable-card {
+    cursor: default;
   }
+
+  .draggable-card:active {
+    cursor: default;
+  }
+
+  .drop-zone.valid-target {
+    transform: scale(1.08);
+  }
+}
