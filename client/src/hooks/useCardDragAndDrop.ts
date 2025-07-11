@@ -4,14 +4,16 @@ import { usePlayerStore } from "../store/usePlayerStore";
 
 export type DragData = {
   cardId: string;
-  sourceType: "reserve" | "hand";
+  sourceType: TargetType;
   sourceIndex: number;
 };
 
 export type DropResult = {
-  targetType: "reserve" | "hand";
+  targetType: TargetType;
   targetIndex: number;
 };
+
+export type TargetType = "reserve" | "hand" | "found";
 
 export const useCardDragAndDrop = () => {
   const [draggedCard, setDraggedCard] = useState<DragData | null>(null);
@@ -42,7 +44,7 @@ export const useCardDragAndDrop = () => {
     (
       e: React.DragEvent,
       card: Card,
-      sourceType: "reserve" | "hand",
+      sourceType: TargetType,
       sourceIndex: number
     ) => {
       const dragData: DragData = {
@@ -82,11 +84,7 @@ export const useCardDragAndDrop = () => {
   );
 
   const handleDragOver = useCallback(
-    (
-      e: React.DragEvent,
-      targetType: "reserve" | "hand",
-      targetIndex: number
-    ) => {
+    (e: React.DragEvent, targetType: TargetType, targetIndex: number) => {
       e.preventDefault();
       e.dataTransfer.dropEffect = "move";
 
@@ -103,11 +101,7 @@ export const useCardDragAndDrop = () => {
   }, []);
 
   const handleDrop = useCallback(
-    (
-      e: React.DragEvent,
-      targetType: "reserve" | "hand",
-      targetIndex: number
-    ) => {
+    (e: React.DragEvent, targetType: TargetType, targetIndex: number) => {
       e.preventDefault();
 
       // Always clean up drag state first
@@ -209,7 +203,7 @@ export const useCardDragAndDrop = () => {
   );
 
   const isValidDropTarget = useCallback(
-    (targetType: "reserve" | "hand", targetIndex: number) => {
+    (targetType: TargetType, targetIndex: number) => {
       if (!draggedCard) return false;
 
       // Can't drop on the same slot
@@ -221,7 +215,14 @@ export const useCardDragAndDrop = () => {
       }
 
       // Check if the target index is within valid bounds
-      const maxSlots = targetType === "reserve" ? 3 : 2;
+      const maxSlots =
+        targetType === "reserve"
+          ? 3
+          : targetType === "hand"
+          ? 2
+          : targetType === "found"
+          ? 1
+          : 0;
       if (targetIndex >= maxSlots) {
         return false;
       }
