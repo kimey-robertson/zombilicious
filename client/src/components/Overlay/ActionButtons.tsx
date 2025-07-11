@@ -9,21 +9,8 @@ import { FaRegHand } from "react-icons/fa6";
 import { BsVolumeUp } from "react-icons/bs";
 import { IconType } from "react-icons/lib";
 import { usePlayerStore } from "../../store/usePlayerStore";
-import { getSocket } from "../../socket";
-import { useGameStore } from "../../store/useGameStore";
-import { SocketResponse } from "../../../../shared/types";
-import { useHandleError } from "../../hooks/useHandleError";
-import { useCurrentPlayer } from "../../hooks/useCurrentPlayer";
-
-export type ActionType =
-  | "search"
-  | "move"
-  | "door"
-  | "inventory"
-  | "melee"
-  | "ranged"
-  | "take"
-  | "noise";
+import { ActionType } from "../../../../shared/types";
+import { useActionButtons } from "../../hooks/useActionButtons";
 
 export type GameAction = {
   id: ActionType;
@@ -44,73 +31,7 @@ const ActionButtons = () => {
   ];
 
   const selectedAction = usePlayerStore((state) => state.selectedAction);
-  const setSelectedAction = usePlayerStore((state) => state.setSelectedAction);
-
-  const gameId = useGameStore((state) => state.gameId);
-  const map = useGameStore((state) => state.map);
-
-  const { currentPlayer, canPerformAction } = useCurrentPlayer();
-
-  const socket = getSocket();
-  const handleError = useHandleError();
-
-  const handleActionClick = (action: GameAction) => {
-    if (!canPerformAction) return;
-
-    if (action.id === "noise") {
-      socket.emit(
-        "make-noise",
-        {
-          gameId,
-          zoneId: currentPlayer?.currentZoneId ?? "",
-          playerId: currentPlayer?.id ?? "",
-        },
-        (response: SocketResponse) => {
-          if (!response.success) {
-            handleError(response.error);
-          } else {
-            setSelectedAction(undefined);
-          }
-        }
-      );
-    } else if (
-      action.id === "search" &&
-      canPerformAction &&
-      !currentPlayer?.searchedThisTurn
-    ) {
-      const zone = map.zones.find(
-        (zone) => zone.id === currentPlayer?.currentZoneId
-      );
-      if (!zone) {
-        return handleError({
-          code: "OPERATION_FAILED",
-          message: "Zone not found",
-        });
-      }
-      if (!zone.room) return;
-      socket.emit(
-        "search-for-items",
-        {
-          gameId,
-          zoneId: currentPlayer?.currentZoneId ?? "",
-          playerId: currentPlayer?.id ?? "",
-        },
-        (response: SocketResponse) => {
-          if (!response.success) {
-            handleError(response.error);
-          } else {
-            setSelectedAction(undefined);
-          }
-        }
-      );
-    }
-
-    if (action.id === selectedAction?.id) {
-      setSelectedAction(undefined);
-      return;
-    }
-    setSelectedAction(action);
-  };
+  const { buttonDisabled, handleActionButtonClick } = useActionButtons();
 
   return (
     <div className="space-y-4">
@@ -120,20 +41,18 @@ const ActionButtons = () => {
       <div className="grid grid-cols-2 gap-2">
         {gameActions.map((action) => {
           const IconComponent = action.icon;
+          const isButtonDisabled = buttonDisabled(action.id);
           return (
             <Button
               key={action.id}
-              onClick={() => handleActionClick(action)}
-              disabled={
-                !canPerformAction ||
-                (action.id === "search" && currentPlayer?.searchedThisTurn)
-              }
+              onClick={() => handleActionButtonClick(action)}
+              disabled={isButtonDisabled}
               className={`bg-gradient-to-b text-stone-200 p-3 h-auto flex flex-col items-center gap-2 transition-all duration-300 border-2 shadow-lg relative overflow-hidden font-mono ${
-                selectedAction?.id === action.id && canPerformAction
+                selectedAction?.id === action.id && !isButtonDisabled
                   ? "border-red-400/80 shadow-red-900/50 bg-gradient-to-b from-red-800/90 to-red-950/90"
                   : ""
               } ${
-                !canPerformAction
+                isButtonDisabled
                   ? "opacity-30 cursor-not-allowed grayscale"
                   : "hover:scale-105 hover:shadow-xl"
               }`}

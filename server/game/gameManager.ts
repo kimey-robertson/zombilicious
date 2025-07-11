@@ -40,7 +40,7 @@ function createGame(lobby: Lobby, io: Server): Game {
       totalActions: 3,
       actionsRemaining: 3,
       XP: 0,
-      playerCards: { inReserve: [], inHand: [cards[1]], foundCard: null },
+      playerCards: { inReserve: [], inHand: [], foundCard: null },
       currentZoneId: chosenMap.startingZone,
       movableZones: calculateMovableZones(chosenMap, chosenMap.startingZone),
       searchedThisTurn: false,

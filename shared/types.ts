@@ -124,6 +124,16 @@ export type Card = {
 
 export type CardRarity = "common" | "uncommon" | "rare" | "epic" | "legendary";
 
+export type ActionType =
+  | "search"
+  | "move"
+  | "door"
+  | "inventory"
+  | "melee"
+  | "ranged"
+  | "take"
+  | "noise";
+
 export type SocketError = {
   code: string;
   message: string;
