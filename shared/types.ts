@@ -58,7 +58,7 @@ export type Player = {
 export type PlayerCards = {
   inReserve: (Card | null)[];
   inHand: (Card | null)[];
-  foundCard?: Card | null;
+  swappableCard?: Card | null;
 };
 
 export type LobbyPlayer = {

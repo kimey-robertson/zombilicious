@@ -14,7 +14,9 @@ const PlayerCards = () => {
   const handleError = useHandleError();
   const reserveCards = usePlayerStore((state) => state.playerCards.inReserve);
   const handCards = usePlayerStore((state) => state.playerCards.inHand);
-  const foundCard = usePlayerStore((state) => state.playerCards.foundCard);
+  const swappableCard = usePlayerStore(
+    (state) => state.playerCards.swappableCard
+  );
   const setPlayerCards = usePlayerStore((state) => state.setPlayerCards);
   const selectedAction = usePlayerStore((state) => state.selectedAction);
   const setSelectedAction = usePlayerStore((state) => state.setSelectedAction);
@@ -64,7 +66,7 @@ const PlayerCards = () => {
           transition-all duration-300 shadow-xl relative overflow-hidden ${
             selectedAction?.id === "inventory" ? "" : ""
           }
-          ${isDragging ? "opacity-50 rotate-3 scale-105" : ""}
+          ${isDragging ? "opacity-50 scale-105" : ""}
           ${
             isDropTarget && isValidTarget
               ? "border-green-500/80 bg-green-900/20 scale-110"
@@ -185,9 +187,7 @@ const PlayerCards = () => {
     <div className="space-y-4 relative">
       {/* Found Card */}
       <div className="flex justify-center gap-2 absolute bottom-66 space-y-4 w-full">
-        {Array.from({ length: 1 }, (_, index) => {
-          return renderCard(foundCard, "found", index, false);
-        })}
+        {swappableCard ? renderCard(swappableCard, "found", 0, false) : null}
       </div>
 
       {/* Reserve Cards */}

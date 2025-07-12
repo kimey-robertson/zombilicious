@@ -57,8 +57,6 @@ function getRandomCard() {
     }
   });
 
-  console.log({ weightedPool });
-
   return weightedPool[Math.floor(Math.random() * weightedPool.length)];
 }
 

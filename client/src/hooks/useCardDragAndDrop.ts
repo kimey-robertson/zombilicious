@@ -137,38 +137,55 @@ export const useCardDragAndDrop = () => {
         // Get current arrays with proper length (3 for reserve, 2 for hand)
         const currentReserve = ensureArrayLength(playerCards.inReserve, 3);
         const currentHand = ensureArrayLength(playerCards.inHand, 2);
+        const currentSwappableCard = playerCards.swappableCard;
 
         // Get the card being moved
-        const sourceArray =
-          dragData.sourceType === "reserve" ? currentReserve : currentHand;
-        const cardToMove = sourceArray[dragData.sourceIndex];
+        let cardToMove: Card | null = null;
+        if (dragData.sourceType === "reserve") {
+          cardToMove = currentReserve[dragData.sourceIndex];
+        } else if (dragData.sourceType === "hand") {
+          cardToMove = currentHand[dragData.sourceIndex];
+        } else if (dragData.sourceType === "found") {
+          cardToMove = currentSwappableCard || null;
+        }
 
         if (!cardToMove) return;
 
-        // Get target info
-        const targetArray =
-          targetType === "reserve" ? currentReserve : currentHand;
-        const targetCard = targetArray[targetIndex];
+        // Get target card
+        let targetCard: Card | null = null;
+        if (targetType === "reserve") {
+          targetCard = currentReserve[targetIndex];
+        } else if (targetType === "hand") {
+          targetCard = currentHand[targetIndex];
+        } else if (targetType === "found") {
+          targetCard = currentSwappableCard || null;
+        }
+
         const isEmptySlot = !targetCard;
 
         // Create new arrays for the swap/move
         const newReserve = [...currentReserve];
         const newHand = [...currentHand];
+        let newSwappableCard = currentSwappableCard;
 
         if (isEmptySlot) {
           // Moving to empty slot - just move the card
           // Clear source position
           if (dragData.sourceType === "reserve") {
             newReserve[dragData.sourceIndex] = null;
-          } else {
+          } else if (dragData.sourceType === "hand") {
             newHand[dragData.sourceIndex] = null;
+          } else if (dragData.sourceType === "found") {
+            newSwappableCard = null;
           }
 
           // Place at target position
           if (targetType === "reserve") {
             newReserve[targetIndex] = cardToMove;
-          } else {
+          } else if (targetType === "hand") {
             newHand[targetIndex] = cardToMove;
+          } else if (targetType === "found") {
+            newSwappableCard = cardToMove;
           }
         } else {
           // Occupied slot - SWAP the cards
@@ -178,22 +195,27 @@ export const useCardDragAndDrop = () => {
           // Place source card at target position
           if (targetType === "reserve") {
             newReserve[targetIndex] = sourceCardToSwap;
-          } else {
+          } else if (targetType === "hand") {
             newHand[targetIndex] = sourceCardToSwap;
+          } else if (targetType === "found") {
+            newSwappableCard = sourceCardToSwap;
           }
 
           // Place target card at source position
           if (dragData.sourceType === "reserve") {
             newReserve[dragData.sourceIndex] = targetCardToSwap;
-          } else {
+          } else if (dragData.sourceType === "hand") {
             newHand[dragData.sourceIndex] = targetCardToSwap;
+          } else if (dragData.sourceType === "found") {
+            newSwappableCard = targetCardToSwap;
           }
         }
 
-        // Update the store with new arrays (keeping null values for empty slots)
+        // Update the store with new arrays and swappable card
         setPlayerCards({
           inReserve: newReserve,
           inHand: newHand,
+          swappableCard: newSwappableCard,
         });
       } catch (error) {
         console.error("Error handling card drop:", error);

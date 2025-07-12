@@ -40,7 +40,11 @@ function createGame(lobby: Lobby, io: Server): Game {
       totalActions: 3,
       actionsRemaining: 3,
       XP: 0,
-      playerCards: { inReserve: [], inHand: [], foundCard: null },
+      playerCards: {
+        inReserve: [null, null, null],
+        inHand: [null, null],
+        swappableCard: null,
+      },
       currentZoneId: chosenMap.startingZone,
       movableZones: calculateMovableZones(chosenMap, chosenMap.startingZone),
       searchedThisTurn: false,
@@ -473,7 +477,8 @@ function organiseInventory(
 function searchForItems(
   gameId: string,
   zoneId: string,
-  playerId: string
+  playerId: string,
+  io: Server
 ): Game {
   const game = getGameById(gameId);
   const zone = game.map.zones.find((zone) => zone.id === zoneId);
@@ -500,9 +505,34 @@ function searchForItems(
     });
   }
   const card = getRandomCard();
-  player.playerCards.foundCard = card;
+
+  const emptyInHandSlot = player.playerCards.inHand.findIndex(
+    (card) => card == null
+  );
+  const emptyInReserveSlot = player.playerCards.inReserve.findIndex(
+    (card) => card == null
+  );
+  if (emptyInHandSlot !== -1) {
+    player.playerCards.inHand[emptyInHandSlot] = card;
+  } else if (emptyInReserveSlot !== -1) {
+    player.playerCards.inReserve[emptyInReserveSlot] = card;
+  } else {
+    player.playerCards.swappableCard = card;
+  }
+
   player.searchedThisTurn = true;
   player.actionsRemaining -= 1;
+
+  // Send a log event
+  sendGameLogEvent(io, game.id, {
+    id: (game.gameLogs.length + 1).toString(),
+    timestamp: new Date(),
+    type: "system",
+    message: `Player ${getPlayerNameBySocketId(playerId)} found a ${
+      card?.name
+    } in zone ${zoneId}`,
+    icon: "🎁",
+  });
 
   return game;
 }
