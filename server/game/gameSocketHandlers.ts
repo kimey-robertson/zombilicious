@@ -1,7 +1,8 @@
 import { Server, Socket } from "socket.io";
-import { Card, Lobby, PlayerCards } from "../../shared/types";
+import { Lobby, PlayerCards } from "../../shared/types";
 import {
   createGame,
+  discardSwappableCard,
   endTurn,
   generateNoise,
   getGameById,
@@ -246,6 +247,23 @@ export const handleGameEvents = (io: Server, socket: Socket) => {
     return { success: true };
   });
 
+  const discardSwappableCardHandler = createSocketHandler<{
+    gameId: string;
+    playerId: string;
+    playerCards: PlayerCards;
+  }>(
+    "discard-swappable-card",
+    async (io, socket, { gameId, playerId, playerCards }) => {
+      // Discard the swappable card
+      const game = discardSwappableCard(gameId, playerId, playerCards, io);
+
+      // Emit the game updated
+      io.to(gameId).emit("game-updated", game);
+
+      return { success: true };
+    }
+  );
+
   createGameHandler(io, socket);
   voteKickPlayerFromGameHandler(io, socket);
   rejoinGameHandler(io, socket);
@@ -256,4 +274,5 @@ export const handleGameEvents = (io: Server, socket: Socket) => {
   makeNoiseHandler(io, socket);
   organiseInventoryHandler(io, socket);
   searchForItemsHandler(io, socket);
+  discardSwappableCardHandler(io, socket);
 };

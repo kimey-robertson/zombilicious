@@ -53,6 +53,23 @@ const PlayerCards = () => {
       dragOverTarget?.targetIndex === index;
     const isValidTarget = isValidDropTarget(cardType, index);
 
+    const handleDiscardSwappableCard = () => {
+      if (!canPerformAction || !currentPlayer || !swappableCard) return;
+      socket.emit(
+        "discard-swappable-card",
+        {
+          gameId: gameId,
+          playerId: currentPlayer.id,
+          playerCards: currentPlayer.playerCards,
+        },
+        (response: SocketResponse) => {
+          if (!response.success) {
+            handleError(response.error);
+          }
+        }
+      );
+    };
+
     return (
       <>
         <Card
@@ -148,7 +165,10 @@ const PlayerCards = () => {
           {/* Trash icon for found cards - positioned relative to Card, not CardContent */}
           {card && cardType === "found" && !isDragging && (
             <div className="absolute top-2 right-2">
-              <FaTrash className="text-red-700 cursor-pointer hover:text-red-500 transition-colors text-sm" />
+              <FaTrash
+                className="text-red-700 cursor-pointer hover:text-red-500 transition-colors text-sm"
+                onClick={handleDiscardSwappableCard}
+              />
             </div>
           )}
         </Card>

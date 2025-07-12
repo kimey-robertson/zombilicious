@@ -6,6 +6,7 @@ import { getSocket } from "../../socket";
 import { useGameStore } from "../../store/useGameStore";
 import { SocketResponse } from "../../../../shared/types";
 import { useHandleError } from "../../hooks/useHandleError";
+import { useCurrentPlayer } from "../../hooks/useCurrentPlayer";
 
 const ActionsRemaining = () => {
   const socket = getSocket();
@@ -17,7 +18,16 @@ const ActionsRemaining = () => {
 
   const gameId = useGameStore((state) => state.gameId);
 
+  const { currentPlayer } = useCurrentPlayer();
+
   const handleEndTurn = () => {
+    if (currentPlayer?.playerCards.swappableCard) {
+      return handleError({
+        code: "OPERATION_FAILED",
+        message: "You must discard your extra card before ending your turn",
+      });
+    }
+
     setSelectedAction(undefined);
 
     socket.emit("end-turn", { gameId }, (response: SocketResponse) => {

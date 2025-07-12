@@ -537,6 +537,43 @@ function searchForItems(
   return game;
 }
 
+function discardSwappableCard(
+  gameId: string,
+  playerId: string,
+  updatedPlayerCards: PlayerCards,
+  io: Server
+): Game {
+  const game = getGameById(gameId);
+  const player = game.players.find((player) => player.id === playerId);
+  if (!player) {
+    throw new OperationFailedError("Discard swappable card", {
+      message: `Player not found in game ${gameId} with id ${playerId}`,
+    });
+  }
+  if (!updatedPlayerCards.swappableCard) {
+    throw new OperationFailedError("Discard swappable card", {
+      message: `Player does not have a swappable card`,
+    });
+  }
+  const swappableCard = updatedPlayerCards.swappableCard;
+  updatedPlayerCards.swappableCard = null;
+  player.playerCards = updatedPlayerCards;
+  player.actionsRemaining -= 1;
+
+  // Send a log event
+  sendGameLogEvent(io, game.id, {
+    id: (game.gameLogs.length + 1).toString(),
+    timestamp: new Date(),
+    type: "system",
+    message: `Player ${getPlayerNameBySocketId(playerId)} discarded their ${
+      swappableCard?.name
+    } card`,
+    icon: "🗑️",
+  });
+
+  return game;
+}
+
 export {
   createGame,
   deleteGame,
@@ -554,4 +591,5 @@ export {
   generateNoise,
   organiseInventory,
   searchForItems,
+  discardSwappableCard,
 };
