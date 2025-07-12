@@ -60,7 +60,11 @@ const PlayerCards = () => {
         {
           gameId: gameId,
           playerId: currentPlayer.id,
-          playerCards: currentPlayer.playerCards,
+          playerCards: {
+            inReserve: reserveCards,
+            inHand: handCards,
+            swappableCard,
+          },
         },
         (response: SocketResponse) => {
           if (!response.success) {
@@ -69,6 +73,8 @@ const PlayerCards = () => {
         }
       );
     };
+
+    const canDrag = !!swappableCard || selectedAction?.id === "inventory";
 
     return (
       <>
@@ -80,9 +86,7 @@ const PlayerCards = () => {
               ? "bg-gradient-to-b from-red-950/80 to-black/90 border-2 border-red-700/60 w-32 h-40 hover:scale-110"
               : "bg-gradient-to-b from-stone-800/70 to-stone-900/90 border-2 border-red-800/40 w-28 h-36 hover:scale-105"
           }
-          transition-all duration-300 shadow-xl relative overflow-hidden ${
-            selectedAction?.id === "inventory" ? "" : ""
-          }
+          transition-all duration-300 shadow-xl relative overflow-hidden
           ${isDragging ? "opacity-50 scale-105" : ""}
           ${
             isDropTarget && isValidTarget
@@ -94,14 +98,18 @@ const PlayerCards = () => {
               ? "border-red-500/80 bg-red-900/20"
               : ""
           }
-          ${isEmpty ? "cursor-default" : "cursor-grab active:cursor-grabbing"}
+          ${
+            isEmpty || !canDrag
+              ? "cursor-default"
+              : "cursor-grab active:cursor-grabbing"
+          }
           ${
             draggedCard && isEmpty && isValidTarget
               ? "border-blue-500/60 bg-blue-900/10 border-dashed"
               : ""
           }
         `}
-          draggable={!isEmpty}
+          draggable={!isEmpty && canDrag}
           onDragStart={
             card ? (e) => handleDragStart(e, card, cardType, index) : undefined
           }
