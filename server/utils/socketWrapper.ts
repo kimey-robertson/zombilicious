@@ -58,6 +58,12 @@ export function createSocketHandler<T = any>(
           `[${eventName}] Error for ${socket.id}. Response:`,
           response
         );
+        if (!callback || typeof callback !== "function") {
+          console.log(
+            `[${eventName}] No callback for ${socket.id}. Response:`,
+            response
+          );
+        }
         callback(response);
       }
     });
