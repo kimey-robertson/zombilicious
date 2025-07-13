@@ -21,6 +21,7 @@ export const useZoneDetails = (zone: Zone | undefined, cell: Cell) => {
       hDoubleZone: false,
       vDoubleZone: false,
       playerTokensInZone: [],
+      zombieTokensInZone: 0,
       isMovableZone: false,
     };
 
@@ -42,6 +43,16 @@ export const useZoneDetails = (zone: Zone | undefined, cell: Cell) => {
     showPlayerToken(player)
   );
 
+  // Apply the same double zone filtering logic to zombie tokens
+  const shouldShowZombieTokens = () => {
+    if (hDoubleZone || vDoubleZone) {
+      return cell.id.includes(zone?.id.split("/")[0] ?? "");
+    }
+    return true;
+  };
+
+  const zombieTokensInZone = shouldShowZombieTokens() ? zone?.zombies ?? 0 : 0;
+
   const isMovableZone = currentPlayer?.movableZones.find(
     (movableZone) => movableZone.id === zone?.id
   );
@@ -53,6 +64,7 @@ export const useZoneDetails = (zone: Zone | undefined, cell: Cell) => {
     hDoubleZone,
     vDoubleZone,
     playerTokensInZone,
+    zombieTokensInZone,
     isMovableZone,
     canMoveIntoZone,
   };

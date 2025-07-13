@@ -24,6 +24,7 @@ const tutorialMap: Map = {
       tileIds: ["2B"],
       room: false,
       noiseTokens: 0,
+      zombies: 0,
     },
     {
       id: "2B-1",
@@ -31,6 +32,7 @@ const tutorialMap: Map = {
       tileIds: ["2B"],
       room: true,
       noiseTokens: 0,
+      zombies: 0,
     },
     {
       id: "2B-2",
@@ -38,6 +40,7 @@ const tutorialMap: Map = {
       tileIds: ["2B"],
       room: true,
       noiseTokens: 0,
+      zombies: 0,
     },
     {
       id: "2B-3",
@@ -45,6 +48,7 @@ const tutorialMap: Map = {
       tileIds: ["2B"],
       room: false,
       noiseTokens: 0,
+      zombies: 0,
     },
     {
       id: "2B-4",
@@ -52,6 +56,7 @@ const tutorialMap: Map = {
       tileIds: ["2B"],
       room: true,
       noiseTokens: 0,
+      zombies: 0,
     },
     {
       id: "2B-5",
@@ -59,6 +64,7 @@ const tutorialMap: Map = {
       tileIds: ["2B"],
       room: true,
       noiseTokens: 0,
+      zombies: 0,
     },
     {
       id: "2B-6/1B-0",
@@ -66,6 +72,7 @@ const tutorialMap: Map = {
       tileIds: ["2B", "1B"],
       room: false,
       noiseTokens: 0,
+      zombies: 1,
     },
     {
       id: "2B-7/1B-1",
@@ -73,6 +80,7 @@ const tutorialMap: Map = {
       tileIds: ["2B", "1B"],
       room: false,
       noiseTokens: 0,
+      zombies: 0,
     },
     {
       id: "2B-8/1B-2",
@@ -80,6 +88,7 @@ const tutorialMap: Map = {
       tileIds: ["2B", "1B"],
       room: false,
       noiseTokens: 0,
+      zombies: 0,
     },
     {
       id: "1B-3/1B-4",
@@ -87,6 +96,7 @@ const tutorialMap: Map = {
       tileIds: ["1B"],
       room: true,
       noiseTokens: 0,
+      zombies: 0,
     },
     {
       id: "1B-5",
@@ -94,6 +104,7 @@ const tutorialMap: Map = {
       tileIds: ["1B"],
       room: false,
       noiseTokens: 0,
+      zombies: 0,
     },
     {
       id: "1B-6",
@@ -101,6 +112,7 @@ const tutorialMap: Map = {
       tileIds: ["1B"],
       room: true,
       noiseTokens: 0,
+      zombies: 0,
     },
     {
       id: "1B-7",
@@ -108,6 +120,7 @@ const tutorialMap: Map = {
       tileIds: ["1B"],
       room: true,
       noiseTokens: 0,
+      zombies: 0,
     },
     {
       id: "1B-8",
@@ -115,6 +128,7 @@ const tutorialMap: Map = {
       tileIds: ["1B"],
       room: false,
       noiseTokens: 0,
+      zombies: 0,
     },
   ],
   doors: [

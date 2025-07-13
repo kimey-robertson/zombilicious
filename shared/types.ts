@@ -23,6 +23,7 @@ export type Zone = {
   tileIds: string[];
   room: boolean;
   noiseTokens: number;
+  zombies: number;
 };
 
 export type Door = {

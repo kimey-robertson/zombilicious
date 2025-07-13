@@ -75,3 +75,56 @@ export const isVerticalDoubleZone = (
 
   return sameCol && consecutiveRows;
 };
+
+// Calculate positioning for multiple tokens
+export const getTokenTransform = (
+  isHorizontalDoubleZone: boolean,
+  isVerticalDoubleZone: boolean,
+  totalTokens: number,
+  index: number
+) => {
+  console.log("totalTokens", totalTokens);
+  console.log("index", index);
+  // Base transform values
+  let baseX = 120;
+  let baseY = 100;
+
+  // Handle double zone positioning first
+  if (isHorizontalDoubleZone) {
+    baseX = 300; // Move further right for horizontal double zones
+  } else if (isVerticalDoubleZone) {
+    baseY = 300; // Move further down for vertical double zones
+  }
+
+  // Add small offset for multiple tokens (only if more than 1)
+  if (totalTokens > 1) {
+    const offsetAmount = 50; // Small offset in percentage for transform
+
+    if (totalTokens === 2) {
+      // Side by side positioning
+      const offsetX = index === 0 ? -offsetAmount : offsetAmount;
+      baseX = baseX + offsetX;
+    } else if (totalTokens === 3) {
+      // Triangle formation with small offsets
+      const positions = [
+        { x: 0, y: -offsetAmount }, // Top
+        { x: -offsetAmount * 0.7, y: offsetAmount * 0.5 }, // Bottom left
+        { x: offsetAmount * 0.7, y: offsetAmount * 0.5 }, // Bottom right
+      ];
+      const pos = positions[index % 3];
+      baseX = baseX + pos.x;
+      baseY = baseY + pos.y;
+    } else {
+      // Circular formation for 4+ tokens
+      const offsetAngle = (index / totalTokens) * 360;
+      const offsetRadius = offsetAmount;
+      const offsetX = Math.cos((offsetAngle * Math.PI) / 180) * offsetRadius;
+      const offsetY = Math.sin((offsetAngle * Math.PI) / 180) * offsetRadius;
+
+      baseX = baseX + offsetX;
+      baseY = baseY + offsetY;
+    }
+  }
+
+  return `translate(${baseX}%, ${baseY}%)`;
+};

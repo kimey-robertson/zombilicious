@@ -12,7 +12,7 @@ import { useGameStore } from "../../store/useGameStore";
 import { usePlayerStore } from "../../store/usePlayerStore";
 import DoorComponent from "./Door";
 import NoiseToken from "./NoiseToken";
-import PlayerToken from "./PlayerToken";
+import UnitTokens from "./UnitTokens";
 
 type CellProps = {
   cell: Cell;
@@ -29,8 +29,10 @@ const Cell: React.FC<CellProps> = ({ cell, zone, door }) => {
 
   const gameId = useGameStore((state) => state.gameId);
 
-  const { hDoubleZone, vDoubleZone, playerTokensInZone, canMoveIntoZone } =
-    useZoneDetails(zone, cell);
+  const { hDoubleZone, vDoubleZone, canMoveIntoZone } = useZoneDetails(
+    zone,
+    cell
+  );
 
   const { currentPlayer, canPerformAction } = useCurrentPlayer();
 
@@ -78,6 +80,8 @@ const Cell: React.FC<CellProps> = ({ cell, zone, door }) => {
       ? "v-double-zone-bottom"
       : "";
 
+  if (!zone) return null;
+
   return (
     <div
       key={cell.id}
@@ -92,20 +96,8 @@ const Cell: React.FC<CellProps> = ({ cell, zone, door }) => {
           canPerformAction={canPerformAction}
         />
       ) : null}
-      {playerTokensInZone.map((player, index) => (
-        <PlayerToken
-          key={player.id}
-          player={player}
-          isHorizontalDoubleZone={
-            hDoubleZone && cell.id.includes(zone?.id.split("/")[0] ?? "")
-          }
-          isVerticalDoubleZone={
-            vDoubleZone && cell.id.includes(zone?.id.split("/")[0] ?? "")
-          }
-          index={index}
-          totalTokens={playerTokensInZone.length}
-        />
-      ))}
+      <UnitTokens cell={cell} zone={zone} />
+
       {Array.from({ length: zone?.noiseTokens ?? 0 }).map((_, index) => (
         <NoiseToken
           key={index}
