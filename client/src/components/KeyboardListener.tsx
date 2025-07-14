@@ -3,6 +3,7 @@ import { usePlayerStore } from "../store/usePlayerStore";
 
 const KeyboardListener = () => {
   const setPanMode = usePlayerStore((state) => state.setPanMode);
+  const setIsDragging = usePlayerStore((state) => state.setIsDragging);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -16,6 +17,7 @@ const KeyboardListener = () => {
       if (event.code === "Space") {
         event.preventDefault();
         setPanMode(false);
+        setIsDragging(false);
       }
     };
 
