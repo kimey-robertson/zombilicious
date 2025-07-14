@@ -286,7 +286,7 @@ export function calculateZombieMovement(
         directionWithHighestNoise.push(zone);
         highestNoiseLevel = noiseLevel;
       } else if (noiseLevel === highestNoiseLevel) {
-        directionWithHighestNoise.push(visibleZone?.zoneId);
+        directionWithHighestNoise.push(zone);
       }
     }
     if (directionWithHighestNoise.length === 1) {
@@ -301,6 +301,23 @@ export function calculateZombieMovement(
       }
     } else {
       // handle split
+      const zombiesToSplit = zombieZone.zombies;
+      directionWithHighestNoise.forEach((direction, index) => {
+        const remainder = zombiesToSplit % directionWithHighestNoise.length; // 1
+        let split = Math.floor(
+          zombiesToSplit / directionWithHighestNoise.length
+        ); // 3
+        if (index < remainder) split++;
+        const newZone = zoneInDirection(
+          map,
+          zombieZone,
+          direction as Direction
+        );
+        if (newZone) {
+          newZone.zombies = split;
+          zombieZone.zombies -= split;
+        }
+      });
     }
   }
 }

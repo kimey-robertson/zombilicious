@@ -21,7 +21,7 @@ const ZoneInfoPanel: React.FC = () => {
       <h3>Selected Zone: {selectedZone.id}</h3>
       <div className="side-panel-detail">
         🧟 Zombies:
-        {/* <span>{zoneInfo.zombies}</span> */}
+        <span>{selectedZone.zombies}</span>
       </div>
       <div className="side-panel-detail">
         🧑 Survivors:
