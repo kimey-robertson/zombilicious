@@ -201,8 +201,8 @@ function getZoneDirection(
   // If any of the cols are the same, it's a vertical movement
   if (
     fromZoneCoords[0].col === toZoneCoords[0].col ||
-    fromZoneCoords[1].col === toZoneCoords[0].col ||
-    fromZoneCoords[0].col === toZoneCoords[1].col
+    fromZoneCoords[1]?.col === toZoneCoords[0].col ||
+    fromZoneCoords[0].col === toZoneCoords[1]?.col
   ) {
     const maxFromRow = Math.max(...fromZoneCoords.map((zone) => zone.row));
     const maxToRow = Math.max(...toZoneCoords.map((zone) => zone.row));
@@ -214,8 +214,8 @@ function getZoneDirection(
   } else if (
     // If any of the rows are the same, it's a horizontal movement
     fromZoneCoords[0].row === toZoneCoords[0].row ||
-    fromZoneCoords[1].row === toZoneCoords[0].row ||
-    fromZoneCoords[0].row === toZoneCoords[1].row
+    fromZoneCoords[1]?.row === toZoneCoords[0].row ||
+    fromZoneCoords[0].row === toZoneCoords[1]?.row
   ) {
     const maxFromCol = Math.max(...fromZoneCoords.map((zone) => zone.col));
     const maxToCol = Math.max(...toZoneCoords.map((zone) => zone.col));
@@ -243,6 +243,24 @@ function zoneInDirection(
   return foundZoneInDirection;
 }
 
+function moveZombies(
+  map: Map,
+  zombieZone: Zone,
+  direction: Direction,
+  split = 0
+) {
+  const newZone = zoneInDirection(map, zombieZone, direction);
+  if (newZone) {
+    if (split) {
+      newZone.zombies = split;
+      zombieZone.zombies -= split;
+    } else {
+      newZone.zombies = zombieZone.zombies;
+      zombieZone.zombies = 0;
+    }
+  }
+}
+
 export function calculateZombieMovement(
   zombieZone: Zone,
   map: Map,
@@ -263,15 +281,11 @@ export function calculateZombieMovement(
   const numberOfVisibleZones = Object.keys(visibleZonesWithPlayers).length;
 
   if (numberOfVisibleZones === 1) {
-    const newZone = zoneInDirection(
+    moveZombies(
       map,
       zombieZone,
       Object.keys(visibleZonesWithPlayers)[0] as Direction
     );
-    if (newZone) {
-      newZone.zombies = zombieZone.zombies;
-      zombieZone.zombies = 0;
-    }
   } else if (numberOfVisibleZones > 1) {
     let directionWithHighestNoise: string[] = [];
     let highestNoiseLevel = 0;
@@ -289,35 +303,22 @@ export function calculateZombieMovement(
         directionWithHighestNoise.push(zone);
       }
     }
+
     if (directionWithHighestNoise.length === 1) {
-      const newZone = zoneInDirection(
-        map,
-        zombieZone,
-        directionWithHighestNoise[0] as Direction
-      );
-      if (newZone) {
-        newZone.zombies = zombieZone.zombies;
-        zombieZone.zombies = 0;
-      }
+      moveZombies(map, zombieZone, directionWithHighestNoise[0] as Direction);
     } else {
       // handle split
       const zombiesToSplit = zombieZone.zombies;
       directionWithHighestNoise.forEach((direction, index) => {
-        const remainder = zombiesToSplit % directionWithHighestNoise.length; // 1
+        const remainder = zombiesToSplit % directionWithHighestNoise.length;
         let split = Math.floor(
           zombiesToSplit / directionWithHighestNoise.length
-        ); // 3
-        if (index < remainder) split++;
-        const newZone = zoneInDirection(
-          map,
-          zombieZone,
-          direction as Direction
         );
-        if (newZone) {
-          newZone.zombies = split;
-          zombieZone.zombies -= split;
-        }
+        if (index < remainder) split++;
+        moveZombies(map, zombieZone, direction as Direction, split);
       });
     }
+  } else {
+    // Handle follow noise without line of sight
   }
 }
