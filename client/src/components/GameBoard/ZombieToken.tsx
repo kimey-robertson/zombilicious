@@ -20,7 +20,7 @@ const ZombieToken: React.FC<ZombieTokenProps> = ({
           isHorizontalDoubleZone,
           isVerticalDoubleZone,
           totalTokens,
-          index + 10 // Should be whatever the max players is
+          index
         ),
       }}
     >

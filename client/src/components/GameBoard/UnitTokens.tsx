@@ -35,7 +35,7 @@ const UnitTokens: React.FC<UnitTokensProps> = ({ cell, zone }) => {
           key={index}
           isHorizontalDoubleZone={isHorizontalDoubleZone}
           isVerticalDoubleZone={isVerticalDoubleZone}
-          index={index}
+          index={playerTokensInZone.length + index}
           totalTokens={totalTokens}
         />
       ))}

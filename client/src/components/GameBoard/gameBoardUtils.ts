@@ -83,8 +83,6 @@ export const getTokenTransform = (
   totalTokens: number,
   index: number
 ) => {
-  console.log("totalTokens", totalTokens);
-  console.log("index", index);
   // Base transform values
   let baseX = 120;
   let baseY = 100;

@@ -31,6 +31,7 @@ const PlayerToken = ({
           totalTokens,
           index
         ),
+        zIndex: "20",
       }}
     >
       {player.name.slice(0, 2).toLocaleUpperCase()}
