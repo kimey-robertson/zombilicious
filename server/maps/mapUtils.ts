@@ -260,7 +260,9 @@ export function calculateZombieMovement(
     playerZoneIds
   );
 
-  if (Object.keys(visibleZonesWithPlayers).length === 1) {
+  const numberOfVisibleZones = Object.keys(visibleZonesWithPlayers).length;
+
+  if (numberOfVisibleZones === 1) {
     const newZone = zoneInDirection(
       map,
       zombieZone,
@@ -270,6 +272,35 @@ export function calculateZombieMovement(
       newZone.zombies = zombieZone.zombies;
       zombieZone.zombies = 0;
     }
-  }
+  } else if (numberOfVisibleZones > 1) {
+    let directionWithHighestNoise: string[] = [];
+    let highestNoiseLevel = 0;
 
+    for (const zone in visibleZonesWithPlayers) {
+      const visibleZone = visibleZonesWithPlayers[zone as Direction];
+      const noiseLevel = visibleZone?.noise;
+      if (!visibleZone || !noiseLevel) return;
+
+      if (noiseLevel > highestNoiseLevel) {
+        directionWithHighestNoise = [];
+        directionWithHighestNoise.push(zone);
+        highestNoiseLevel = noiseLevel;
+      } else if (noiseLevel === highestNoiseLevel) {
+        directionWithHighestNoise.push(visibleZone?.zoneId);
+      }
+    }
+    if (directionWithHighestNoise.length === 1) {
+      const newZone = zoneInDirection(
+        map,
+        zombieZone,
+        directionWithHighestNoise[0] as Direction
+      );
+      if (newZone) {
+        newZone.zombies = zombieZone.zombies;
+        zombieZone.zombies = 0;
+      }
+    } else {
+      // handle split
+    }
+  }
 }

@@ -7,7 +7,10 @@ import {
 } from "./gameUtils";
 import { tutorialMap } from "../maps/maps";
 import { GameNotFoundError, OperationFailedError } from "../utils/socketErrors";
-import { calculateMovableZones } from "../maps/mapUtils";
+import {
+  calculateMovableZones,
+  calculateZombieMovement,
+} from "../maps/mapUtils";
 import { cards } from "../cards";
 import { getRandomCard } from "../utils/helpers";
 
@@ -353,6 +356,16 @@ function startZombiesTurn(gameId: string, io: Server): Game {
   }
 
   game.isZombiesTurn = true;
+
+  const zonesWithZombies = game.map.zones.filter((zone) => zone.zombies > 0);
+
+  zonesWithZombies.forEach((zone) => {
+    calculateZombieMovement(
+      zone,
+      game.map,
+      game.players.map((player) => player.currentZoneId)
+    );
+  });
 
   sendGameLogEvent(io, gameId, {
     id: (game.gameLogs.length + 1).toString(),
