@@ -1,4 +1,5 @@
 import { Map, Zone } from "../../shared/types";
+import { OperationFailedError } from "../utils/socketErrors";
 
 // Helper function to calculate global coordinates for a cell
 function getGlobalCoordinates(cellId: string, map: Map) {
@@ -92,11 +93,7 @@ export function calculateMovableZones(map: Map, currentZoneId: string): Zone[] {
   const movableZones: Zone[] = [];
 
   // Find the current zone object
-  const currentZoneObj = map.zones.find((zone) => zone.id === currentZoneId);
-  if (!currentZoneObj) {
-    console.log("Current zone not found:", currentZoneId);
-    return movableZones;
-  }
+  const currentZoneObj = getZoneFromId(currentZoneId, map);
 
   // Check all other zones for adjacency
   for (const zone of map.zones) {
@@ -110,4 +107,103 @@ export function calculateMovableZones(map: Map, currentZoneId: string): Zone[] {
   }
 
   return movableZones;
+}
+
+function getZoneFromId(zoneId: string, map: Map): Zone {
+  const foundZone = map.zones.find((zone) => zone.id === zoneId);
+  if (!foundZone) {
+    throw new OperationFailedError("Get zone from id", {
+      message: `Cannot find zone with id: ${zoneId}`,
+    });
+  }
+  return foundZone;
+}
+
+function hasLineOfSight(
+  direction: "up" | "down" | "left" | "right",
+  zombieZone: Zone,
+  playerZone: Zone
+) {
+  let lineOfSight = false;
+}
+
+function getZoneDirection(
+  fromZone: Zone,
+  toZone: Zone,
+  map: Map
+): "up" | "down" | "left" | "right" | undefined {
+  if (!fromZone || !toZone || !map || fromZone.id === toZone.id) return;
+  const fromZoneCoords: { row: number; col: number }[] = [];
+  fromZone.cellIds.forEach((cellId) => {
+    const coords = getGlobalCoordinates(cellId, map);
+    if (!coords) return;
+    return fromZoneCoords.push(coords);
+  });
+  const toZoneCoords: { row: number; col: number }[] = [];
+  toZone.cellIds.forEach((cellId) => {
+    const coords = getGlobalCoordinates(cellId, map);
+    if (!coords) return;
+    return toZoneCoords.push(coords);
+  });
+
+  console.log({ fromZoneCoords, toZoneCoords });
+
+  // If any of the cols are the same, it's a vertical movement
+  if (
+    fromZoneCoords[0].col === toZoneCoords[0].col ||
+    fromZoneCoords[1].col === toZoneCoords[0].col ||
+    fromZoneCoords[0].col === toZoneCoords[1].col
+  ) {
+    const maxFromRow = Math.max(...fromZoneCoords.map((zone) => zone.row));
+    const maxToRow = Math.max(...toZoneCoords.map((zone) => zone.row));
+    if (maxFromRow > maxToRow) {
+      return "up";
+    } else if (maxFromRow < maxToRow) {
+      return "down";
+    }
+  } else if (
+    // If any of the rows are the same, it's a horizontal movement
+    fromZoneCoords[0].row === toZoneCoords[0].row ||
+    fromZoneCoords[1].row === toZoneCoords[0].row ||
+    fromZoneCoords[0].row === toZoneCoords[1].row
+  ) {
+    const maxFromCol = Math.max(...fromZoneCoords.map((zone) => zone.col));
+    const maxToCol = Math.max(...toZoneCoords.map((zone) => zone.col));
+    if (maxFromCol > maxToCol) {
+      return "left";
+    } else if (maxFromCol < maxToCol) {
+      return "right";
+    }
+  }
+}
+
+export function calculateZombieMovement(
+  zombieZone: Zone,
+  map: Map,
+  playerZonesIds: string[]
+) {
+  if (!zombieZone.zombies) return;
+
+  // const initialMovableZones = calculateMovableZones(map, zombieZone.id);
+
+  const direction = getZoneDirection(
+    zombieZone,
+    getZoneFromId(playerZonesIds[0], map),
+    map
+  );
+  console.log("direction:", direction);
+  // const coords0 = getGlobalCoordinates(zone.cellIds[0], map);
+  // const coords1 = getGlobalCoordinates(zone.cellIds[1], map);
+  // const playerZones = playerZonesIds.map((id) => getZoneFromId(id, map));
+  // let playerCoords0;
+  // let playerCoords1;
+  // if (playerZones && playerZones[0]) {
+  //   playerCoords0 = getGlobalCoordinates(playerZones[0].cellIds[0], map);
+  //   playerCoords1 = getGlobalCoordinates(playerZones[0].cellIds[1], map);
+  // }
+
+  // console.log("coords0", coords0);
+  // console.log("coords1", coords1);
+  // console.log("playerCoords0", playerCoords0);
+  // console.log("playerCoords1", playerCoords1);
 }
