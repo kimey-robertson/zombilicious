@@ -1,6 +1,16 @@
 import { Map, Zone } from "../../shared/types";
 import { OperationFailedError } from "../utils/socketErrors";
 
+type Direction = "up" | "down" | "left" | "right";
+
+type ZoneInfo = {
+  distance: number;
+  zoneId: string;
+  noise: number;
+};
+
+type VisibleZonesWithPlayers = Partial<Record<Direction, ZoneInfo>>;
+
 // Helper function to calculate global coordinates for a cell
 function getGlobalCoordinates(cellId: string, map: Map) {
   const tile = map.tiles.find((tile) =>
@@ -120,18 +130,60 @@ function getZoneFromId(zoneId: string, map: Map): Zone {
 }
 
 function hasLineOfSight(
-  direction: "up" | "down" | "left" | "right",
+  map: Map,
   zombieZone: Zone,
-  playerZone: Zone
-) {
-  let lineOfSight = false;
+  playerZoneIds: string[]
+): VisibleZonesWithPlayers {
+  const initialMovableZones = calculateMovableZones(map, zombieZone.id);
+
+  const visibleZonesWithPlayers: VisibleZonesWithPlayers = {};
+
+  initialMovableZones.forEach((movableZone) => {
+    const direction = getZoneDirection(zombieZone, movableZone, map);
+    if (!direction) return;
+
+    let canMoveInDirection = true;
+    let playerFound = false;
+    let distance = 0;
+    let zoneToCheck = movableZone;
+
+    while (canMoveInDirection && !playerFound) {
+      distance++;
+      // Check zone for players
+      const playersInZone = playerZoneIds.filter(
+        (zoneId) => zoneId === zoneToCheck.id
+      );
+      if (playersInZone.length > 0) {
+        // Has line of sight
+        playerFound = true;
+        visibleZonesWithPlayers[direction] = {
+          distance,
+          zoneId: zoneToCheck.id,
+          noise:
+            getZoneFromId(zoneToCheck.id, map).noiseTokens +
+            playersInZone.length,
+        };
+        return;
+      } else {
+        // get next zone in the same direction
+        const nextZone = zoneInDirection(map, zoneToCheck, direction);
+        if (nextZone) {
+          zoneToCheck = nextZone;
+        } else {
+          canMoveInDirection = false;
+          return;
+        }
+      }
+    }
+  });
+  return visibleZonesWithPlayers;
 }
 
 function getZoneDirection(
   fromZone: Zone,
   toZone: Zone,
   map: Map
-): "up" | "down" | "left" | "right" | undefined {
+): Direction | undefined {
   if (!fromZone || !toZone || !map || fromZone.id === toZone.id) return;
   const fromZoneCoords: { row: number; col: number }[] = [];
   fromZone.cellIds.forEach((cellId) => {
@@ -145,8 +197,6 @@ function getZoneDirection(
     if (!coords) return;
     return toZoneCoords.push(coords);
   });
-
-  console.log({ fromZoneCoords, toZoneCoords });
 
   // If any of the cols are the same, it's a vertical movement
   if (
@@ -177,33 +227,49 @@ function getZoneDirection(
   }
 }
 
+function zoneInDirection(
+  map: Map,
+  fromZone: Zone,
+  direction: Direction
+): Zone | undefined {
+  const zones = calculateMovableZones(map, fromZone.id);
+  let foundZoneInDirection = undefined;
+  zones.forEach((zone) => {
+    if (getZoneDirection(fromZone, zone, map) === direction) {
+      foundZoneInDirection = zone;
+      return foundZoneInDirection;
+    }
+  });
+  return foundZoneInDirection;
+}
+
 export function calculateZombieMovement(
   zombieZone: Zone,
   map: Map,
-  playerZonesIds: string[]
+  playerZoneIds: string[]
 ) {
   if (!zombieZone.zombies) return;
 
-  // const initialMovableZones = calculateMovableZones(map, zombieZone.id);
+  if (playerZoneIds.includes(zombieZone.id)) {
+    // handle attack
+  }
 
-  const direction = getZoneDirection(
+  const visibleZonesWithPlayers = hasLineOfSight(
+    map,
     zombieZone,
-    getZoneFromId(playerZonesIds[0], map),
-    map
+    playerZoneIds
   );
-  console.log("direction:", direction);
-  // const coords0 = getGlobalCoordinates(zone.cellIds[0], map);
-  // const coords1 = getGlobalCoordinates(zone.cellIds[1], map);
-  // const playerZones = playerZonesIds.map((id) => getZoneFromId(id, map));
-  // let playerCoords0;
-  // let playerCoords1;
-  // if (playerZones && playerZones[0]) {
-  //   playerCoords0 = getGlobalCoordinates(playerZones[0].cellIds[0], map);
-  //   playerCoords1 = getGlobalCoordinates(playerZones[0].cellIds[1], map);
-  // }
 
-  // console.log("coords0", coords0);
-  // console.log("coords1", coords1);
-  // console.log("playerCoords0", playerCoords0);
-  // console.log("playerCoords1", playerCoords1);
+  if (Object.keys(visibleZonesWithPlayers).length === 1) {
+    const newZone = zoneInDirection(
+      map,
+      zombieZone,
+      Object.keys(visibleZonesWithPlayers)[0] as Direction
+    );
+    if (newZone) {
+      newZone.zombies = zombieZone.zombies;
+      zombieZone.zombies = 0;
+    }
+  }
+
 }
