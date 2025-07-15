@@ -1,5 +1,6 @@
 import { Map, Zone } from "../../shared/types";
 import { OperationFailedError } from "../utils/socketErrors";
+import { Queue } from "../utils/classes";
 
 type Direction = "up" | "down" | "left" | "right";
 
@@ -243,14 +244,18 @@ function zoneInDirection(
   return foundZoneInDirection;
 }
 
-function moveZombies(
+function moveZombiesInDirection(
   map: Map,
   zombieZone: Zone,
   direction: Direction,
   split = 0
 ) {
   const newZone = zoneInDirection(map, zombieZone, direction);
-  if (newZone) {
+  if (!newZone) {
+    throw new OperationFailedError("Move zombies in direction", {
+      message: `Cannot find zone`,
+    });
+  } else {
     if (split) {
       newZone.zombies = split;
       zombieZone.zombies -= split;
@@ -258,6 +263,71 @@ function moveZombies(
       newZone.zombies = zombieZone.zombies;
       zombieZone.zombies = 0;
     }
+  }
+}
+
+function moveZombiesToZoneId(map: Map, fromZone: Zone, toZoneId: string) {
+  const toZone = map.zones.find((zone) => toZoneId === zone.id);
+  if (!toZone) {
+    throw new OperationFailedError("Move zombies to Zone Id", {
+      message: `Cannot find zone with id: ${toZoneId}`,
+    });
+  } else {
+    toZone.zombies = fromZone.zombies;
+    fromZone.zombies = 0;
+  }
+}
+
+function calculatePathToNoisiestZone(
+  map: Map,
+  playerZoneIds: string[],
+  zombieZone: Zone
+) {
+  let highestNoiseLevel = 0;
+  let noisiestZones: Zone[] = [];
+  map.zones.forEach((zone) => {
+    const playersInZone = playerZoneIds.filter((zoneId) => zoneId === zone.id);
+    const noiseInZone = zone.noiseTokens + playersInZone.length;
+    if (noiseInZone > highestNoiseLevel) {
+      noisiestZones = [];
+      noisiestZones.push(zone);
+      highestNoiseLevel = noiseInZone;
+    } else if (noiseInZone === highestNoiseLevel) {
+      noisiestZones.push(zone);
+    }
+  });
+
+  if (noisiestZones.length === 1) {
+    const goal = noisiestZones[0].id;
+    const start = zombieZone.id;
+    const frontier = new Queue<string>();
+    frontier.enqueue(start);
+    const cameFrom: Record<string, string> = {};
+    cameFrom[start] = "";
+
+    while (!frontier.isEmpty()) {
+      const current = frontier.dequeue();
+      if (current) {
+        const movableZones = calculateMovableZones(map, current).map(
+          (zone) => zone.id
+        );
+        movableZones.forEach((movableZone) => {
+          if (!cameFrom.hasOwnProperty(movableZone)) {
+            frontier.enqueue(movableZone);
+            cameFrom[movableZone] = current;
+          }
+        });
+      }
+    }
+
+    let current = goal;
+    const path: string[] = [];
+    while (current !== start) {
+      path.push(current);
+      current = cameFrom[current];
+    }
+    path.reverse();
+    moveZombiesToZoneId(map, zombieZone, path[0]);
   }
 }
 
@@ -281,7 +351,7 @@ export function calculateZombieMovement(
   const numberOfVisibleZones = Object.keys(visibleZonesWithPlayers).length;
 
   if (numberOfVisibleZones === 1) {
-    moveZombies(
+    moveZombiesInDirection(
       map,
       zombieZone,
       Object.keys(visibleZonesWithPlayers)[0] as Direction
@@ -305,7 +375,11 @@ export function calculateZombieMovement(
     }
 
     if (directionWithHighestNoise.length === 1) {
-      moveZombies(map, zombieZone, directionWithHighestNoise[0] as Direction);
+      moveZombiesInDirection(
+        map,
+        zombieZone,
+        directionWithHighestNoise[0] as Direction
+      );
     } else {
       // handle split
       const zombiesToSplit = zombieZone.zombies;
@@ -315,10 +389,12 @@ export function calculateZombieMovement(
           zombiesToSplit / directionWithHighestNoise.length
         );
         if (index < remainder) split++;
-        moveZombies(map, zombieZone, direction as Direction, split);
+        moveZombiesInDirection(map, zombieZone, direction as Direction, split);
       });
     }
-  } else {
+  } else if (numberOfVisibleZones === 0) {
     // Handle follow noise without line of sight
+    console.log("no line of sight");
+    calculatePathToNoisiestZone(map, playerZoneIds, zombieZone);
   }
 }
