@@ -96,7 +96,7 @@ const JoinLobbiesScreen = ({
 
       {lobbies.length === 0 ? (
         <Card className="text-center py-12 bg-[#c7c7c7cc] ">
-          <CardContent>
+          <CardContent className="px-6">
             <div className="text-black font-bold">
               <h3 className="text-lg font-medium mb-2">No lobbies available</h3>
               <p>
@@ -111,7 +111,7 @@ const JoinLobbiesScreen = ({
           {lobbies.map((lobby) => (
             <Card
               key={lobby.id}
-              className="hover:shadow-md transition-shadow bg-[#c7c7c7cc]"
+              className="hover:shadow-md transition-shadow bg-[#c7c7c7cc] py-6"
             >
               <CardHeader>
                 <div className="flex items-start justify-between">

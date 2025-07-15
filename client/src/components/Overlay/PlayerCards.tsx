@@ -76,6 +76,104 @@ const PlayerCards = () => {
 
     const canDrag = !!swappableCard || selectedAction?.id === "inventory";
 
+    const renderCardStats = (card: CardType) => {
+      const hasStats =
+        card.damage ||
+        card.minRange !== undefined ||
+        card.canOpenDoorsWithoutNoise ||
+        card.canOpenDoorsWithNoise ||
+        card.numberOfDice ||
+        card.createsNoiseWhenAttacking !== undefined;
+      if (!hasStats) return null;
+
+      return (
+        <div className={`${isInHand ? "mt-1" : "mt-1"} space-y-0.5`}>
+          {/* Row 1: Damage and Range */}
+          {(card.damage ||
+            card.minRange !== undefined ||
+            card.maxRange !== undefined) && (
+            <div className="flex items-center justify-center gap-1">
+              {card.damage && (
+                <span
+                  className={`${
+                    isInHand ? "text-xs" : "text-xs"
+                  } font-mono text-red-300 bg-red-950/60 px-1 py-0.5 rounded border border-red-800/40`}
+                >
+                  ⚔ {card.damage}
+                </span>
+              )}
+              {(card.minRange !== undefined || card.maxRange !== undefined) && (
+                <span
+                  className={`${
+                    isInHand ? "text-xs" : "text-xs"
+                  } font-mono text-amber-300 bg-amber-950/60 px-1 py-0.5 rounded border border-amber-800/40`}
+                >
+                  📏 {card.minRange ?? 0}
+                  {card.minRange === card.maxRange
+                    ? null
+                    : `→${card.maxRange ?? "∞"}`}
+                </span>
+              )}
+            </div>
+          )}
+
+          {/* Row 2: Dice and Target */}
+          {(card.numberOfDice || card.rollRequired) && (
+            <div className="flex items-center justify-center gap-1">
+              {card.numberOfDice && (
+                <span
+                  className={`${
+                    isInHand ? "text-xs" : "text-xs"
+                  } font-mono text-blue-300 bg-blue-950/60 px-1 py-0.5 rounded border border-blue-800/40`}
+                >
+                  🎲 {card.numberOfDice}
+                </span>
+              )}
+              {card.rollRequired && (
+                <span
+                  className={`${
+                    isInHand ? "text-xs" : "text-xs"
+                  } font-mono text-purple-300 bg-purple-950/60 px-1 py-0.5 rounded border border-purple-800/40`}
+                >
+                  🎯 {card.rollRequired}+
+                </span>
+              )}
+            </div>
+          )}
+
+          {/* Row 3: Attack Silence */}
+          {card.createsNoiseWhenAttacking !== undefined && (
+            <div className="flex items-center justify-center gap-1">
+              <span
+                className={`${isInHand ? "text-xs" : "text-xs"} font-mono ${
+                  !card.createsNoiseWhenAttacking
+                    ? "text-green-300 bg-green-950/60 border-green-800/40"
+                    : "text-orange-300 bg-orange-950/60 border-orange-800/40"
+                } px-1 py-0.5 rounded border`}
+              >
+                🔇 {!card.createsNoiseWhenAttacking ? "Silent" : "Loud"}
+              </span>
+            </div>
+          )}
+
+          {/* Row 4: Door abilities */}
+          {(card.canOpenDoorsWithoutNoise || card.canOpenDoorsWithNoise) && (
+            <div className="flex items-center justify-center gap-1">
+              <span
+                className={`${isInHand ? "text-xs" : "text-xs"} font-mono ${
+                  card.canOpenDoorsWithoutNoise
+                    ? "text-green-300 bg-green-950/60 border-green-800/40"
+                    : "text-yellow-300 bg-yellow-950/60 border-yellow-800/40"
+                } px-1 py-0.5 rounded border`}
+              >
+                🚪 {card.canOpenDoorsWithoutNoise ? "Silent" : "Loud"}
+              </span>
+            </div>
+          )}
+        </div>
+      );
+    };
+
     return (
       <>
         <Card
@@ -121,11 +219,7 @@ const PlayerCards = () => {
           // Prevent default dragOver behavior on empty slots too
           onDragEnter={(e) => e.preventDefault()}
         >
-          <CardContent
-            className={`${
-              isInHand ? "p-4" : "p-3"
-            } text-center flex flex-col justify-between h-full relative`}
-          >
+          <CardContent className="text-center flex flex-col justify-between h-full relative">
             {/* Visual indicator for hand cards */}
             {card && isInHand && (
               <div className="absolute top-1 left-1 w-3 h-3 bg-red-900/40 rounded-full blur-sm" />
@@ -133,12 +227,15 @@ const PlayerCards = () => {
 
             {/* Card content */}
             {card ? (
-              <div
-                className={`${isInHand ? "text-sm" : "text-xs"} font-bold ${
-                  isInHand ? "text-red-200" : "text-stone-300"
-                } font-mono select-none`}
-              >
-                {card.name}
+              <div className="flex flex-col h-full">
+                <div
+                  className={`${isInHand ? "text-sm" : "text-xs"} font-bold ${
+                    isInHand ? "text-red-200" : "text-stone-300"
+                  } font-mono select-none mb-1`}
+                >
+                  {card.name}
+                </div>
+                {renderCardStats(card)}
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center h-full">
