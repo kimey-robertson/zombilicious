@@ -293,6 +293,7 @@ function getShortestPath(
   goalZoneIds: string[],
   startZoneId: string
 ): Record<string, string[]> {
+  // have to add an earyl return, and also factor in if NO valid path is found for example a door is locked
   const paths: Record<string, string[]> = {};
   goalZoneIds.forEach((goal) => {
     const start = startZoneId;
