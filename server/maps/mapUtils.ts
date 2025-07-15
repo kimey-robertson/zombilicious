@@ -266,40 +266,36 @@ function moveZombiesInDirection(
   }
 }
 
-function moveZombiesToZoneId(map: Map, fromZone: Zone, toZoneId: string) {
+function moveZombiesToZoneId(
+  map: Map,
+  fromZone: Zone,
+  toZoneId: string,
+  split: number = 0
+) {
   const toZone = map.zones.find((zone) => toZoneId === zone.id);
   if (!toZone) {
     throw new OperationFailedError("Move zombies to Zone Id", {
       message: `Cannot find zone with id: ${toZoneId}`,
     });
   } else {
-    toZone.zombies = fromZone.zombies;
-    fromZone.zombies = 0;
+    if (split) {
+      toZone.zombies = split;
+      fromZone.zombies -= split;
+    } else {
+      toZone.zombies = fromZone.zombies;
+      fromZone.zombies = 0;
+    }
   }
 }
 
-function calculatePathToNoisiestZone(
+function getShortestPath(
   map: Map,
-  playerZoneIds: string[],
-  zombieZone: Zone
-) {
-  let highestNoiseLevel = 0;
-  let noisiestZones: Zone[] = [];
-  map.zones.forEach((zone) => {
-    const playersInZone = playerZoneIds.filter((zoneId) => zoneId === zone.id);
-    const noiseInZone = zone.noiseTokens + playersInZone.length;
-    if (noiseInZone > highestNoiseLevel) {
-      noisiestZones = [];
-      noisiestZones.push(zone);
-      highestNoiseLevel = noiseInZone;
-    } else if (noiseInZone === highestNoiseLevel) {
-      noisiestZones.push(zone);
-    }
-  });
-
-  if (noisiestZones.length === 1) {
-    const goal = noisiestZones[0].id;
-    const start = zombieZone.id;
+  goalZoneIds: string[],
+  startZoneId: string
+): Record<string, string[]> {
+  const paths: Record<string, string[]> = {};
+  goalZoneIds.forEach((goal) => {
+    const start = startZoneId;
     const frontier = new Queue<string>();
     frontier.enqueue(start);
     const cameFrom: Record<string, string> = {};
@@ -327,7 +323,46 @@ function calculatePathToNoisiestZone(
       current = cameFrom[current];
     }
     path.reverse();
-    moveZombiesToZoneId(map, zombieZone, path[0]);
+    paths[goal] = path;
+  });
+  return paths;
+}
+
+function calculatePathToNoisiestZone(
+  map: Map,
+  playerZoneIds: string[],
+  zombieZone: Zone
+) {
+  let highestNoiseLevel = 0;
+  let noisiestZones: Zone[] = [];
+  map.zones.forEach((zone) => {
+    const playersInZone = playerZoneIds.filter((zoneId) => zoneId === zone.id);
+    const noiseInZone = zone.noiseTokens + playersInZone.length;
+    if (noiseInZone > highestNoiseLevel) {
+      noisiestZones = [];
+      noisiestZones.push(zone);
+      highestNoiseLevel = noiseInZone;
+    } else if (noiseInZone === highestNoiseLevel) {
+      noisiestZones.push(zone);
+    }
+  });
+
+  if (noisiestZones.length === 1) {
+    const goalZoneId = noisiestZones[0].id;
+    const path = getShortestPath(map, [goalZoneId], zombieZone.id);
+    moveZombiesToZoneId(map, zombieZone, path[goalZoneId][0]);
+  } else if (noisiestZones.length > 1) {
+    // handle split
+    const zombiesToSplit = zombieZone.zombies;
+    noisiestZones.forEach((zone, index) => {
+      const remainder = zombiesToSplit % noisiestZones.length;
+      let split = Math.floor(zombiesToSplit / noisiestZones.length);
+      if (index < remainder) split++;
+
+      const goalZoneId = noisiestZones[index].id;
+      const path = getShortestPath(map, [goalZoneId], zombieZone.id);
+      moveZombiesToZoneId(map, zombieZone, path[goalZoneId][0], split);
+    });
   }
 }
 
@@ -351,10 +386,10 @@ export function calculateZombieMovement(
   const numberOfVisibleZones = Object.keys(visibleZonesWithPlayers).length;
 
   if (numberOfVisibleZones === 1) {
-    moveZombiesInDirection(
+    moveZombiesToZoneId(
       map,
       zombieZone,
-      Object.keys(visibleZonesWithPlayers)[0] as Direction
+      Object.values(visibleZonesWithPlayers)[0].zoneId
     );
   } else if (numberOfVisibleZones > 1) {
     let directionWithHighestNoise: string[] = [];
