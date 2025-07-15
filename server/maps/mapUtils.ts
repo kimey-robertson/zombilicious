@@ -28,7 +28,12 @@ function getGlobalCoordinates(cellId: string, map: Map) {
 }
 
 // Helper function to check if there's an open door connecting two zones
-function isDoorBetweenZones(zone1: Zone, zone2: Zone, map: Map): boolean {
+function isDoorBetweenZones(
+  zone1: Zone,
+  zone2: Zone,
+  map: Map,
+  ignoreLockedDoor: boolean = false
+): boolean {
   // Find doors that connect cells from both zones
   for (const door of map.doors) {
     const zone1CellsInDoor = zone1.cellIds.filter((cellId) =>
@@ -39,10 +44,12 @@ function isDoorBetweenZones(zone1: Zone, zone2: Zone, map: Map): boolean {
     );
 
     // If the door connects cells from both zones AND is open, movement is allowed
+
+    const zonesHaveDoor =
+      zone1CellsInDoor.length > 0 && zone2CellsInDoor.length > 0;
     if (
-      zone1CellsInDoor.length > 0 &&
-      zone2CellsInDoor.length > 0 &&
-      door.state === "open"
+      (zonesHaveDoor && door.state === "open") ||
+      (zonesHaveDoor && door.state === "closed" && ignoreLockedDoor)
     ) {
       return true;
     }
@@ -52,7 +59,12 @@ function isDoorBetweenZones(zone1: Zone, zone2: Zone, map: Map): boolean {
 }
 
 // Helper function to check if two zones are adjacent and passable
-function areZonesAdjacent(zone1: Zone, zone2: Zone, map: Map): boolean {
+function areZonesAdjacent(
+  zone1: Zone,
+  zone2: Zone,
+  map: Map,
+  ignoreLockedDoor: boolean = false
+): boolean {
   // Get all global coordinates for cells in both zones
   const zone1Coords = zone1.cellIds
     .map((cellId) => getGlobalCoordinates(cellId, map))
@@ -97,10 +109,14 @@ function areZonesAdjacent(zone1: Zone, zone2: Zone, map: Map): boolean {
   }
 
   // If one is a room and the other isn't, there must be a door between them
-  return isDoorBetweenZones(zone1, zone2, map);
+  return isDoorBetweenZones(zone1, zone2, map, ignoreLockedDoor);
 }
 
-export function calculateMovableZones(map: Map, currentZoneId: string): Zone[] {
+export function calculateMovableZones(
+  map: Map,
+  currentZoneId: string,
+  ignoreLockedDoor: boolean = false
+): Zone[] {
   const movableZones: Zone[] = [];
 
   // Find the current zone object
@@ -112,7 +128,7 @@ export function calculateMovableZones(map: Map, currentZoneId: string): Zone[] {
     if (zone.id === currentZoneId) continue;
 
     // Check if this zone is adjacent to the current zone
-    if (areZonesAdjacent(currentZoneObj, zone, map)) {
+    if (areZonesAdjacent(currentZoneObj, zone, map, ignoreLockedDoor)) {
       movableZones.push(zone);
     }
   }
@@ -272,6 +288,10 @@ function moveZombiesToZoneId(
   toZoneId: string,
   split: number = 0
 ) {
+  const movableZones = calculateMovableZones(map, fromZone.id);
+  const movableZoneIds = movableZones.map((movableZone) => movableZone.id);
+  if (!movableZoneIds.includes(toZoneId)) return;
+
   const toZone = map.zones.find((zone) => toZoneId === zone.id);
   if (!toZone) {
     throw new OperationFailedError("Move zombies to Zone Id", {
@@ -291,10 +311,10 @@ function moveZombiesToZoneId(
 function getShortestPath(
   map: Map,
   goalZoneIds: string[],
-  startZoneId: string
+  startZoneId: string,
+  ignoreLockedDoor: boolean = false
 ): Record<string, string[]> {
-  // have to add an earyl return, and also factor in if NO valid path is found for example a door is locked
-  const paths: Record<string, string[]> = {};
+  let paths: Record<string, string[]> = {};
   goalZoneIds.forEach((goal) => {
     const start = startZoneId;
     const frontier = new Queue<string>();
@@ -305,9 +325,13 @@ function getShortestPath(
     while (!frontier.isEmpty()) {
       const current = frontier.dequeue();
       if (current) {
-        const movableZones = calculateMovableZones(map, current).map(
-          (zone) => zone.id
-        );
+        if (current === goal) break;
+
+        const movableZones = calculateMovableZones(
+          map,
+          current,
+          ignoreLockedDoor
+        ).map((zone) => zone.id);
         movableZones.forEach((movableZone) => {
           if (!cameFrom.hasOwnProperty(movableZone)) {
             frontier.enqueue(movableZone);
@@ -317,14 +341,20 @@ function getShortestPath(
       }
     }
 
-    let current = goal;
-    const path: string[] = [];
-    while (current !== start) {
-      path.push(current);
-      current = cameFrom[current];
+    if (cameFrom[goal]) {
+      let currentZone = goal;
+      const path: string[] = [];
+      while (currentZone !== start) {
+        path.push(currentZone);
+        currentZone = cameFrom[currentZone];
+      }
+      path.reverse();
+      paths[goal] = path;
+    } else {
+      // Run getShortestPath again, this time ignoring locked doors. We stop movement through doors later anyway, so this will essentially just leave the zombies outside the door of the building
+      const pathThroughDoor = getShortestPath(map, [goal], startZoneId, true);
+      paths = pathThroughDoor;
     }
-    path.reverse();
-    paths[goal] = path;
   });
   return paths;
 }
