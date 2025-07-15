@@ -18,6 +18,7 @@ export const useActionButtons = () => {
   const playerCards = usePlayerStore((state) => state.playerCards);
   const selectedAction = usePlayerStore((state) => state.selectedAction);
   const setSelectedAction = usePlayerStore((state) => state.setSelectedAction);
+  const setPlayerCards = usePlayerStore((state) => state.setPlayerCards);
 
   const { currentPlayer, canPerformAction } = useCurrentPlayer();
 
@@ -45,6 +46,11 @@ export const useActionButtons = () => {
 
   const handleActionButtonClick = (action: GameAction) => {
     if (!canPerformAction) return;
+
+    if (action.id !== "inventory") {
+      if (!currentPlayer) return;
+      setPlayerCards(currentPlayer.playerCards);
+    }
 
     if (action.id === "noise") {
       socket.emit(
