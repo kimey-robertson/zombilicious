@@ -112,14 +112,14 @@ export type LogEvent = {
 export type Card = {
   id: string;
   name: string;
-  canOpenDoorsWithoutNoise: boolean | undefined;
-  canOpenDoorsWithNoise: boolean | undefined;
-  createsNoiseWhenAttacking: boolean | undefined;
-  minRange: number | undefined;
-  maxRange: number | undefined;
-  numberOfDice: number | undefined;
-  rollRequired: number | undefined;
-  damage: number | undefined;
+  canOpenDoorsWithoutNoise: boolean;
+  canOpenDoorsWithNoise: boolean;
+  createsNoiseWhenAttacking: boolean;
+  minRange: number;
+  maxRange: number;
+  numberOfDice: number;
+  rollRequired: number;
+  damage: number;
   rarity: CardRarity;
 };
 

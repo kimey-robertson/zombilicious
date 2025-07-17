@@ -6,6 +6,7 @@ import {
   endTurn,
   generateNoise,
   getGameById,
+  meleeAttack,
   movePlayerToZone,
   openDoor,
   organiseInventory,
@@ -264,6 +265,24 @@ export const handleGameEvents = (io: Server, socket: Socket) => {
     }
   );
 
+  const meleeAttackHandler = createSocketHandler<{
+    gameId: string;
+    playerId: string;
+    cardId: string;
+    zoneId: string;
+  }>(
+    "melee-attack",
+    async (io, socket, { gameId, playerId, cardId, zoneId }) => {
+      // Melee attack
+      const game = meleeAttack(gameId, playerId, cardId, zoneId, io);
+
+      // Emit the game updated
+      io.to(gameId).emit("game-updated", game);
+
+      return { success: true };
+    }
+  );
+
   createGameHandler(io, socket);
   voteKickPlayerFromGameHandler(io, socket);
   rejoinGameHandler(io, socket);
@@ -275,4 +294,5 @@ export const handleGameEvents = (io: Server, socket: Socket) => {
   organiseInventoryHandler(io, socket);
   searchForItemsHandler(io, socket);
   discardSwappableCardHandler(io, socket);
-};
+  meleeAttackHandler(io, socket);
+  };

@@ -1,5 +1,5 @@
 import { Server } from "socket.io";
-import { Game, LogEvent } from "../../shared/types";
+import { Card, Game, LogEvent } from "../../shared/types";
 import { games, getGameById, getGameBySocketId } from "./gameManager";
 
 function getPlayerNameBySocketId(socketId: string): string {
@@ -37,10 +37,28 @@ function getAllGames(): Game[] {
   return games;
 }
 
+function rollDice(card: Card): {
+  diceResults: number[];
+  possibleZombiesKilled: number;
+} {
+  const diceResults = [];
+
+  for (let i = 0; i < card.numberOfDice; i++) {
+    diceResults.push(Math.floor(Math.random() * 6) + 1);
+  }
+  return {
+    diceResults,
+    possibleZombiesKilled: diceResults.filter(
+      (dice) => dice >= card.rollRequired
+    ).length,
+  };
+}
+
 export {
   getPlayerNameBySocketId,
   getGamesWithDisconnectedPlayers,
   sendGameLogEvent,
   stopPlayerDisconnectTimer,
   getAllGames,
+  rollDice,
 };

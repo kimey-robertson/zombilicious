@@ -25,6 +25,8 @@ const PlayerCards = () => {
 
   const { currentPlayer, canPerformAction } = useCurrentPlayer();
 
+  const map = useGameStore((state) => state.map);
+
   const {
     draggedCard,
     dragOverTarget,
@@ -174,6 +176,34 @@ const PlayerCards = () => {
       );
     };
 
+    const handleCardClick = () => {
+      if (!canPerformAction || !currentPlayer) return;
+      const currentZone = map.zones.find(
+        (zone) => zone.id === currentPlayer?.currentZoneId
+      );
+      if (
+        selectedAction?.id === "melee" &&
+        card?.maxRange === 0 &&
+        currentZone?.zombies &&
+        currentZone?.zombies > 0
+      ) {
+        socket.emit(
+          "melee-attack",
+          {
+            gameId: gameId,
+            playerId: currentPlayer?.id,
+            cardId: card?.id,
+            zoneId: currentPlayer?.currentZoneId,
+          },
+          (response: SocketResponse) => {
+            if (!response.success) {
+              handleError(response.error);
+            }
+          }
+        );
+      }
+    };
+
     return (
       <>
         <Card
@@ -197,7 +227,10 @@ const PlayerCards = () => {
               : ""
           }
           ${
-            isEmpty || !canDrag
+            (selectedAction?.id === "melee" && card?.maxRange === 0) ||
+            (selectedAction?.id === "ranged" && Number(card?.maxRange) > 0)
+              ? "cursor-pointer"
+              : isEmpty || !canDrag
               ? "cursor-default"
               : "cursor-grab active:cursor-grabbing"
           }
@@ -218,6 +251,7 @@ const PlayerCards = () => {
           onDrop={(e) => handleDrop(e, cardType, index)}
           // Prevent default dragOver behavior on empty slots too
           onDragEnter={(e) => e.preventDefault()}
+          onClick={handleCardClick}
         >
           <CardContent className="text-center flex flex-col justify-between h-full relative">
             {/* Visual indicator for hand cards */}

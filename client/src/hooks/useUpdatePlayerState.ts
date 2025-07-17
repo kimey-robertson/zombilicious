@@ -7,6 +7,7 @@ export const useUpdatePlayerState = () => {
   );
   const setIsMyTurn = usePlayerStore((state) => state.setIsMyTurn);
   const setPlayerCards = usePlayerStore((state) => state.setPlayerCards);
+  const setXP = usePlayerStore((state) => state.setXP);
 
   return (player: Player | undefined) => {
     if (!player) return;
@@ -14,5 +15,6 @@ export const useUpdatePlayerState = () => {
     setActionsRemaining(player.actionsRemaining || 0);
     setIsMyTurn(player.myTurn || false);
     setPlayerCards(player.playerCards);
+    setXP(player.XP || 0);
   };
 };

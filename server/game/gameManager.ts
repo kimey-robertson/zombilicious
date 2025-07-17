@@ -2,6 +2,7 @@ import { Server, Socket } from "socket.io";
 import { Game, Lobby, Player, PlayerCards } from "../../shared/types";
 import {
   getPlayerNameBySocketId,
+  rollDice,
   sendGameLogEvent,
   stopPlayerDisconnectTimer,
 } from "./gameUtils";
@@ -587,6 +588,86 @@ function discardSwappableCard(
   return game;
 }
 
+function meleeAttack(
+  gameId: string,
+  playerId: string,
+  cardId: string,
+  zoneId: string,
+  io: Server
+): Game {
+  const game = getGameById(gameId);
+  const player = game.players.find((player) => player.id === playerId);
+  if (!player) {
+    throw new OperationFailedError("Melee attack", {
+      message: `Player not found in game ${gameId} with id ${playerId}`,
+    });
+  }
+  const card = player.playerCards.inHand.find((card) => card?.id === cardId);
+  if (!card) {
+    throw new OperationFailedError("Melee attack", {
+      message: `Player does not have a card with id ${cardId}`,
+    });
+  }
+  if (card.maxRange !== 0) {
+    throw new OperationFailedError("Melee attack", {
+      message: `Card ${cardId} is not a melee attack`,
+    });
+  }
+  const zone = game.map.zones.find((zone) => zone.id === zoneId);
+  if (!zone) {
+    throw new OperationFailedError("Melee attack", {
+      message: `Zone not found in game ${gameId} with id ${zoneId}`,
+    });
+  }
+  if (zone.zombies === 0) {
+    throw new OperationFailedError("Melee attack", {
+      message: `Zone ${zoneId} has no zombies`,
+    });
+  }
+  const { possibleZombiesKilled, diceResults } = rollDice(card);
+  let actualZombiesKilled = 0;
+  if (possibleZombiesKilled > zone.zombies) {
+    actualZombiesKilled = zone.zombies;
+    zone.zombies = 0;
+  } else {
+    actualZombiesKilled = possibleZombiesKilled;
+    zone.zombies -= possibleZombiesKilled;
+  }
+  player.actionsRemaining -= 1;
+  player.XP += actualZombiesKilled;
+
+  // Send a log event
+  if (actualZombiesKilled > 0) {
+    sendGameLogEvent(io, game.id, {
+      id: (game.gameLogs.length + 1).toString(),
+      timestamp: new Date(),
+      type: "combat",
+      message: `Player ${getPlayerNameBySocketId(
+        playerId
+      )} rolled ${diceResults.join(
+        ", "
+      )} and killed ${actualZombiesKilled} zombie${
+        actualZombiesKilled > 1 ? "s" : ""
+      } in zone ${zoneId} with a ${card.name}`,
+      icon: "💥",
+    });
+  } else {
+    sendGameLogEvent(io, game.id, {
+      id: (game.gameLogs.length + 1).toString(),
+      timestamp: new Date(),
+      type: "combat",
+      message: `Player ${getPlayerNameBySocketId(
+        playerId
+      )} rolled ${diceResults.join(
+        ", "
+      )} and failed to kill any zombies in zone ${zoneId} with a ${card.name}`,
+      icon: "💥",
+    });
+  }
+
+  return game;
+}
+
 export {
   createGame,
   deleteGame,
@@ -605,4 +686,5 @@ export {
   organiseInventory,
   searchForItems,
   discardSwappableCard,
+  meleeAttack,
 };
