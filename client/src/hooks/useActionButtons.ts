@@ -47,7 +47,11 @@ export const useActionButtons = () => {
         (currentZone?.zombies === 0 ||
           !currentPlayer?.playerCards.inHand.some(
             (card) => card?.maxRange === 0
-          )))
+          ))) ||
+      (actionId === "ranged" &&
+        !currentPlayer?.playerCards.inHand.some(
+          (card) => card && card.minRange > 0
+        ))
     );
   };
 
