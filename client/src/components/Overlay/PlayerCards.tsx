@@ -20,6 +20,12 @@ const PlayerCards = () => {
   const setPlayerCards = usePlayerStore((state) => state.setPlayerCards);
   const selectedAction = usePlayerStore((state) => state.selectedAction);
   const setSelectedAction = usePlayerStore((state) => state.setSelectedAction);
+  const selectedCardForRanged = usePlayerStore(
+    (state) => state.selectedCardForRanged
+  );
+  const setSelectedCardForRanged = usePlayerStore(
+    (state) => state.setSelectedCardForRanged
+  );
 
   const gameId = useGameStore((state) => state.gameId);
 
@@ -201,6 +207,26 @@ const PlayerCards = () => {
             }
           }
         );
+      } else if (selectedAction?.id === "ranged" && card && card.maxRange > 0) {
+        if (!selectedCardForRanged) {
+          setSelectedCardForRanged(card);
+          socket.emit(
+            "get-ranged-attack-zones",
+            {
+              gameId: gameId,
+              playerId: currentPlayer.id,
+              cardId: card.id,
+              zone: currentZone,
+            },
+            (response: SocketResponse) => {
+              if (!response.success) {
+                handleError(response.error);
+              }
+            }
+          );
+        } else {
+          setSelectedCardForRanged(undefined);
+        }
       }
     };
 
@@ -239,6 +265,7 @@ const PlayerCards = () => {
               ? "border-blue-500/60 bg-blue-900/10 border-dashed"
               : ""
           }
+          ${selectedCardForRanged?.id === card?.id && "scale-110 animate-pulse"}
         `}
           draggable={!isEmpty && canDrag}
           onDragStart={

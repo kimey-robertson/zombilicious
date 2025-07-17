@@ -48,4 +48,7 @@ export const usePlayerStore = create<PlayerStore>((set) => ({
   setIsMyTurn: (isMyTurn) => set({ isMyTurn }),
   selectedAction: undefined,
   setSelectedAction: (selectedAction) => set({ selectedAction }),
+  selectedCardForRanged: undefined,
+  setSelectedCardForRanged: (selectedCardForRanged) =>
+    set({ selectedCardForRanged }),
 }));

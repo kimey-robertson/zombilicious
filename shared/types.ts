@@ -121,6 +121,7 @@ export type Card = {
   rollRequired: number;
   damage: number;
   rarity: CardRarity;
+  possibleRangedAttackZones?: Zone[];
 };
 
 export type CardRarity = "common" | "uncommon" | "rare" | "epic" | "legendary";

@@ -1,11 +1,12 @@
 import { Server, Socket } from "socket.io";
-import { Lobby, PlayerCards } from "../../shared/types";
+import { Lobby, PlayerCards, Zone } from "../../shared/types";
 import {
   createGame,
   discardSwappableCard,
   endTurn,
   generateNoise,
   getGameById,
+  getRangedAttackZones,
   meleeAttack,
   movePlayerToZone,
   openDoor,
@@ -283,6 +284,24 @@ export const handleGameEvents = (io: Server, socket: Socket) => {
     }
   );
 
+  const getRangedAttackZonesHandler = createSocketHandler<{
+    gameId: string;
+    playerId: string;
+    cardId: string;
+    zone: Zone;
+  }>(
+    "get-ranged-attack-zones",
+    async (io, socket, { gameId, playerId, cardId, zone }) => {
+      // Get the ranged attack zones
+      const game = getRangedAttackZones(gameId, playerId, cardId, zone, io);
+
+      // Emit the game updated
+      io.to(gameId).emit("game-updated", game);
+
+      return { success: true };
+    }
+  );
+
   createGameHandler(io, socket);
   voteKickPlayerFromGameHandler(io, socket);
   rejoinGameHandler(io, socket);
@@ -295,4 +314,5 @@ export const handleGameEvents = (io: Server, socket: Socket) => {
   searchForItemsHandler(io, socket);
   discardSwappableCardHandler(io, socket);
   meleeAttackHandler(io, socket);
-  };
+  getRangedAttackZonesHandler(io, socket);
+};

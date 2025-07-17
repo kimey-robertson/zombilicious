@@ -1,4 +1,4 @@
-import { Map, Zone } from "../../shared/types";
+import { Card, Map, Zone } from "../../shared/types";
 import { OperationFailedError } from "../utils/socketErrors";
 import { Queue } from "../utils/classes";
 
@@ -468,4 +468,30 @@ export function calculateZombieMovement(
       calculatePathToNoisiestZone(map, playerZoneIds, zombieZone);
     }
   }
+}
+
+export function calculateRangedAttackZones(
+  card: Card,
+  zone: Zone,
+  map: Map
+): Zone[] {
+  const possibleRangedAttackZones: Zone[] = [];
+
+  if (card.minRange === 0) possibleRangedAttackZones.push(zone);
+
+  ["up", "down", "left", "right"].forEach((direction) => {
+    let currentZone = zone;
+    for (let i = 0; i < card.maxRange; i++) {
+      const nextZoneInDirection = zoneInDirection(
+        map,
+        currentZone,
+        direction as Direction
+      );
+      if (!nextZoneInDirection) break;
+      possibleRangedAttackZones.push(nextZoneInDirection);
+      if (nextZoneInDirection.room) break;
+      currentZone = nextZoneInDirection;
+    }
+  });
+  return possibleRangedAttackZones;
 }

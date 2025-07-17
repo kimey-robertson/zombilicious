@@ -1,5 +1,5 @@
 import { Server, Socket } from "socket.io";
-import { Game, Lobby, Player, PlayerCards } from "../../shared/types";
+import { Game, Lobby, Player, PlayerCards, Zone } from "../../shared/types";
 import {
   getPlayerNameBySocketId,
   rollDice,
@@ -10,6 +10,7 @@ import { tutorialMap } from "../maps/maps";
 import { GameNotFoundError, OperationFailedError } from "../utils/socketErrors";
 import {
   calculateMovableZones,
+  calculateRangedAttackZones,
   calculateZombieMovement,
 } from "../maps/mapUtils";
 import { cards } from "../cards";
@@ -46,7 +47,7 @@ function createGame(lobby: Lobby, io: Server): Game {
       XP: 0,
       playerCards: {
         inReserve: [null, null, null],
-        inHand: [null, null],
+        inHand: [cards[4], null],
         swappableCard: null,
       },
       currentZoneId: chosenMap.startingZone,
@@ -668,6 +669,41 @@ function meleeAttack(
   return game;
 }
 
+function getRangedAttackZones(
+  gameId: string,
+  playerId: string,
+  cardId: string,
+  zone: Zone,
+  io: Server
+): Game {
+  const game = getGameById(gameId);
+  const player = game.players.find((player) => player.id === playerId);
+  if (!player) {
+    throw new OperationFailedError("Get ranged attack zones", {
+      message: `Player not found in game ${gameId} with id ${playerId}`,
+    });
+  }
+  const card = player.playerCards.inHand.find((card) => card?.id === cardId);
+  if (!card) {
+    throw new OperationFailedError("Get ranged attack zones", {
+      message: `Player does not have a card with id ${cardId}`,
+    });
+  }
+  if (card.maxRange === 0) {
+    throw new OperationFailedError("Get ranged attack zones", {
+      message: `Card ${cardId} is not a ranged attack`,
+    });
+  }
+  const possibleRangedAttackZones = calculateRangedAttackZones(
+    card,
+    zone,
+    game.map
+  );
+
+  card.possibleRangedAttackZones = possibleRangedAttackZones;
+  return game;
+}
+
 export {
   createGame,
   deleteGame,
@@ -687,4 +723,5 @@ export {
   searchForItems,
   discardSwappableCard,
   meleeAttack,
+  getRangedAttackZones,
 };

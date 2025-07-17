@@ -7,6 +7,7 @@ import {
   LogEvent,
   Map,
   PlayerCards,
+  Card,
 } from "../../../shared/types";
 import { GameAction } from "../components/Overlay/ActionButtons";
 
@@ -42,6 +43,8 @@ export type PlayerStore = {
   setIsMyTurn: (isMyTurn: boolean) => void;
   selectedAction: GameAction | undefined;
   setSelectedAction: (selectedAction: GameAction | undefined) => void;
+  selectedCardForRanged: Card | undefined;
+  setSelectedCardForRanged: (selectedCardForRanged: Card | undefined) => void;
 };
 
 export type LobbyStore = {
