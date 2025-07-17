@@ -3,6 +3,7 @@ import { usePlayerStore } from "../store/usePlayerStore";
 
 export const useCurrentPlayer = () => {
   const players = useGameStore((state) => state.players);
+  const map = useGameStore((state) => state.map);
 
   const playerId = usePlayerStore((state) => state.playerId);
   const actionsRemaining = usePlayerStore((state) => state.actionsRemaining);
@@ -12,5 +13,9 @@ export const useCurrentPlayer = () => {
 
   const canPerformAction = actionsRemaining > 0 && isMyTurn;
 
-  return { currentPlayer, canPerformAction };
+  const currentZone = map.zones.find(
+    (zone) => zone.id === currentPlayer?.currentZoneId
+  );
+
+  return { currentPlayer, canPerformAction, currentZone };
 };

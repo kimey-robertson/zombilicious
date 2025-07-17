@@ -20,27 +20,34 @@ export const useActionButtons = () => {
   const setSelectedAction = usePlayerStore((state) => state.setSelectedAction);
   const setPlayerCards = usePlayerStore((state) => state.setPlayerCards);
 
-  const { currentPlayer, canPerformAction } = useCurrentPlayer();
+  const { currentPlayer, canPerformAction, currentZone } = useCurrentPlayer();
 
-  const isCurrentPlayerNextToDoor = map.doors.some(
+  const isCurrentPlayerNextToClosedDoor = map.doors.some(
     (door) =>
-      currentPlayer?.currentZoneId.includes(door.cellIds[0]) ||
-      currentPlayer?.currentZoneId.includes(door.cellIds[1])
+      (currentPlayer?.currentZoneId.includes(door.cellIds[0]) ||
+        currentPlayer?.currentZoneId.includes(door.cellIds[1])) &&
+      door.state === "closed"
   );
 
   const buttonDisabled = (actionId: ActionType) => {
     return (
       !canPerformAction ||
-      (actionId === "search" && currentPlayer?.searchedThisTurn) ||
+      (actionId === "search" &&
+        (currentPlayer?.searchedThisTurn || !currentZone?.room)) ||
       (actionId === "door" &&
-        (!isCurrentPlayerNextToDoor ||
+        (!isCurrentPlayerNextToClosedDoor ||
           !currentPlayer?.playerCards.inHand.some(
             (card) =>
               card?.canOpenDoorsWithNoise || card?.canOpenDoorsWithoutNoise
           ))) ||
       (actionId === "inventory" &&
         playerCards.inHand.length === 0 &&
-        playerCards.inReserve.length === 0)
+        playerCards.inReserve.length === 0) ||
+      (actionId === "melee" &&
+        (currentZone?.zombies === 0 ||
+          !currentPlayer?.playerCards.inHand.some(
+            (card) => card?.maxRange === 0
+          )))
     );
   };
 
