@@ -296,55 +296,57 @@
   border-radius: 1px;
 }
 
-/* .grid-cell:hover {
-    background-color: #f1f1f157;
-    border-radius: 10px;
-    margin: 0.75rem;
-  } */
-
-/* .grid-cell-inner {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid #13c543;
-    height: 100%;
-    width: 100%;
-    position: relative;
-  } */
-
-/* I'll keep this as a maybe for the future */
-
-/* .grid-cell:hover {
- background-color: #f1f1f157;
-  border-radius: 10px;
-  margin: 0.75rem; 
-}
-
-.grid-cell:nth-child(8) {
- border-radius: 10px 10px 0 0;
-  margin-bottom: 0;
+/* Ranged Attack Zone */
+.ranged-attack-zone {
   position: relative;
-  height: 185%;
-  padding: 1.5rem;
-  border-radius: 10px;
-  margin: 0.75rem;
 }
-.grid-cell:nth-child(8):hover {
+
+.ranged-attack-zone::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ff666670;
+  animation: ranged-attack-zone-pulse 1s infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+
+@keyframes ranged-attack-zone-pulse {
+  0% {
+    background-color: #ff999970;
+  }
+  50% {
+    background-color: #ffccccb8;
+  }
+  100% {
+    background-color: #ff999970;
+  }
+}
+
+.ranged-attack-zone.single-zone::before {
+  margin: 1rem;
+  border-radius: 10px;
+}
+
+.ranged-attack-zone.h-double-zone-left::before {
+  margin: 1rem 0 1rem 1rem;
+  border-radius: 10px 0 0 10px;
+}
+
+.ranged-attack-zone.h-double-zone-right::before {
+  margin: 1rem 1rem 1rem 0;
+  border-radius: 0 10px 10px 0;
+}
+
+.ranged-attack-zone.v-double-zone-top::before {
+  margin: 1rem 1rem 0 1rem;
   border-radius: 10px 10px 0 0;
-  margin-bottom: 0;
-  background-color: #f1f1f157;
 }
 
-.grid-cell:nth-child(2):hover {
-  background-color: none;
-} 
-
-.grid-cell-inner {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-   border: 1px solid #13c543; 
-  height: 100%;
-  width: 100%;
-  position: relative;
-} */
+.ranged-attack-zone.v-double-zone-bottom::before {
+  margin: 0 1rem 1rem 1rem;
+  border-radius: 0 0 10px 10px;
+}

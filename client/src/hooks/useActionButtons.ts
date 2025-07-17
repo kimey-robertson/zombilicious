@@ -19,6 +19,9 @@ export const useActionButtons = () => {
   const selectedAction = usePlayerStore((state) => state.selectedAction);
   const setSelectedAction = usePlayerStore((state) => state.setSelectedAction);
   const setPlayerCards = usePlayerStore((state) => state.setPlayerCards);
+  const setSelectedCardForRanged = usePlayerStore(
+    (state) => state.setSelectedCardForRanged
+  );
 
   const { currentPlayer, canPerformAction, currentZone } = useCurrentPlayer();
 
@@ -36,7 +39,7 @@ export const useActionButtons = () => {
         (currentPlayer?.searchedThisTurn || !currentZone?.room)) ||
       (actionId === "door" &&
         (!isCurrentPlayerNextToClosedDoor ||
-          !currentPlayer?.playerCards.inHand.some(
+          !playerCards.inHand.some(
             (card) =>
               card?.canOpenDoorsWithNoise || card?.canOpenDoorsWithoutNoise
           ))) ||
@@ -45,22 +48,22 @@ export const useActionButtons = () => {
         playerCards.inReserve.length === 0) ||
       (actionId === "melee" &&
         (currentZone?.zombies === 0 ||
-          !currentPlayer?.playerCards.inHand.some(
-            (card) => card?.maxRange === 0
-          ))) ||
+          !playerCards.inHand.some((card) => card?.maxRange === 0))) ||
       (actionId === "ranged" &&
-        !currentPlayer?.playerCards.inHand.some(
-          (card) => card && card.minRange > 0
-        ))
+        !playerCards.inHand.some((card) => card && card.minRange > 0))
     );
   };
 
   const handleActionButtonClick = (action: GameAction) => {
     if (!canPerformAction) return;
-
+    
     if (action.id !== "inventory") {
       if (!currentPlayer) return;
       setPlayerCards(currentPlayer.playerCards);
+    }
+
+    if (action.id === "ranged") {
+      setSelectedCardForRanged(undefined);
     }
 
     if (action.id === "noise") {

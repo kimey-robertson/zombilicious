@@ -29,10 +29,8 @@ const Cell: React.FC<CellProps> = ({ cell, zone, door }) => {
 
   const gameId = useGameStore((state) => state.gameId);
 
-  const { hDoubleZone, vDoubleZone, canMoveIntoZone } = useZoneDetails(
-    zone,
-    cell
-  );
+  const { hDoubleZone, vDoubleZone, canMoveIntoZone, isRangedAttackZone } =
+    useZoneDetails(zone, cell);
 
   const { currentPlayer, canPerformAction } = useCurrentPlayer();
 
@@ -61,8 +59,11 @@ const Cell: React.FC<CellProps> = ({ cell, zone, door }) => {
 
   // This is to get the correct looking pulse animation with margin and border radius
   const movableZoneClass = canMoveIntoZone ? "movable-zone" : "";
+  const rangedAttackZoneClass = isRangedAttackZone ? "ranged-attack-zone" : "";
   const singleZoneClass =
-    canMoveIntoZone && !hDoubleZone && !vDoubleZone ? "single-zone" : "";
+    (canMoveIntoZone || isRangedAttackZone) && !hDoubleZone && !vDoubleZone
+      ? "single-zone"
+      : "";
   const hDoubleZoneClassLeft =
     hDoubleZone && cell.id.includes(zone?.id.split("/")[0] ?? "")
       ? "h-double-zone-left"
@@ -85,7 +86,7 @@ const Cell: React.FC<CellProps> = ({ cell, zone, door }) => {
   return (
     <div
       key={cell.id}
-      className={`grid-cell ${movableZoneClass} ${singleZoneClass} ${hDoubleZoneClassLeft} ${hDoubleZoneClassRight} ${vDoubleZoneClassTop} ${vDoubleZoneClassBottom}`}
+      className={`grid-cell ${movableZoneClass} ${singleZoneClass} ${hDoubleZoneClassLeft} ${hDoubleZoneClassRight} ${vDoubleZoneClassTop} ${vDoubleZoneClassBottom} ${rangedAttackZoneClass}`}
       onClick={handleClick}
     >
       {door ? (

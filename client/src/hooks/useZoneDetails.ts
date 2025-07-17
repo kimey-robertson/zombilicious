@@ -12,6 +12,9 @@ export const useZoneDetails = (zone: Zone | undefined, cell: Cell) => {
   const map = useGameStore((state) => state.map);
 
   const selectedAction = usePlayerStore((state) => state.selectedAction);
+  const selectedCardForRanged = usePlayerStore(
+    (state) => state.selectedCardForRanged
+  );
 
   const { currentPlayer, canPerformAction } = useCurrentPlayer();
 
@@ -60,6 +63,13 @@ export const useZoneDetails = (zone: Zone | undefined, cell: Cell) => {
   const canMoveIntoZone =
     isMovableZone && selectedAction?.id === "move" && canPerformAction;
 
+  const isRangedAttackZone =
+    selectedAction?.id === "ranged" &&
+    selectedCardForRanged &&
+    selectedCardForRanged.possibleRangedAttackZones?.find(
+      (possibleRangedAttackZone) => possibleRangedAttackZone.id === zone?.id
+    );
+
   return {
     hDoubleZone,
     vDoubleZone,
@@ -67,5 +77,6 @@ export const useZoneDetails = (zone: Zone | undefined, cell: Cell) => {
     zombieTokensInZone,
     isMovableZone,
     canMoveIntoZone,
+    isRangedAttackZone
   };
 };

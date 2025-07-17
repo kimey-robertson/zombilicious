@@ -182,7 +182,7 @@ const PlayerCards = () => {
       );
     };
 
-    const handleCardClick = () => {
+    const handleCardClick = (isInHand: boolean) => {
       if (!canPerformAction || !currentPlayer) return;
       const currentZone = map.zones.find(
         (zone) => zone.id === currentPlayer?.currentZoneId
@@ -208,7 +208,10 @@ const PlayerCards = () => {
           }
         );
       } else if (selectedAction?.id === "ranged" && card && card.maxRange > 0) {
-        if (!selectedCardForRanged) {
+        if (
+          (!selectedCardForRanged || selectedCardForRanged.id !== card.id) &&
+          isInHand
+        ) {
           setSelectedCardForRanged(card);
           socket.emit(
             "get-ranged-attack-zones",
@@ -265,7 +268,14 @@ const PlayerCards = () => {
               ? "border-blue-500/60 bg-blue-900/10 border-dashed"
               : ""
           }
-          ${selectedCardForRanged?.id === card?.id && "scale-110 animate-pulse"}
+          ${
+            selectedAction?.id === "ranged" &&
+            selectedCardForRanged &&
+            card &&
+            selectedCardForRanged.id === card.id
+              ? "scale-110 animate-pulse"
+              : ""
+          }
         `}
           draggable={!isEmpty && canDrag}
           onDragStart={
@@ -278,7 +288,7 @@ const PlayerCards = () => {
           onDrop={(e) => handleDrop(e, cardType, index)}
           // Prevent default dragOver behavior on empty slots too
           onDragEnter={(e) => e.preventDefault()}
-          onClick={handleCardClick}
+          onClick={() => handleCardClick(isInHand)}
         >
           <CardContent className="text-center flex flex-col justify-between h-full relative">
             {/* Visual indicator for hand cards */}
