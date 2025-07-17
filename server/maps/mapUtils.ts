@@ -273,10 +273,10 @@ function moveZombiesInDirection(
     });
   } else {
     if (split) {
-      newZone.zombies = split;
+      newZone.zombies += split;
       zombieZone.zombies -= split;
     } else {
-      newZone.zombies = zombieZone.zombies;
+      newZone.zombies += zombieZone.zombies;
       zombieZone.zombies = 0;
     }
   }
@@ -299,10 +299,10 @@ function moveZombiesToZoneId(
     });
   } else {
     if (split) {
-      toZone.zombies = split;
+      toZone.zombies += split;
       fromZone.zombies -= split;
     } else {
-      toZone.zombies = fromZone.zombies;
+      toZone.zombies += fromZone.zombies;
       fromZone.zombies = 0;
     }
   }
@@ -406,61 +406,66 @@ export function calculateZombieMovement(
 
   if (playerZoneIds.includes(zombieZone.id)) {
     // handle attack
-  }
-
-  const visibleZonesWithPlayers = hasLineOfSight(
-    map,
-    zombieZone,
-    playerZoneIds
-  );
-
-  const numberOfVisibleZones = Object.keys(visibleZonesWithPlayers).length;
-
-  if (numberOfVisibleZones === 1) {
-    moveZombiesToZoneId(
+  } else {
+    const visibleZonesWithPlayers = hasLineOfSight(
       map,
       zombieZone,
-      Object.values(visibleZonesWithPlayers)[0].zoneId
+      playerZoneIds
     );
-  } else if (numberOfVisibleZones > 1) {
-    let directionWithHighestNoise: string[] = [];
-    let highestNoiseLevel = 0;
 
-    for (const zone in visibleZonesWithPlayers) {
-      const visibleZone = visibleZonesWithPlayers[zone as Direction];
-      const noiseLevel = visibleZone?.noise;
-      if (!visibleZone || !noiseLevel) return;
+    const numberOfVisibleZones = Object.keys(visibleZonesWithPlayers).length;
 
-      if (noiseLevel > highestNoiseLevel) {
-        directionWithHighestNoise = [];
-        directionWithHighestNoise.push(zone);
-        highestNoiseLevel = noiseLevel;
-      } else if (noiseLevel === highestNoiseLevel) {
-        directionWithHighestNoise.push(zone);
-      }
-    }
-
-    if (directionWithHighestNoise.length === 1) {
-      moveZombiesInDirection(
+    if (numberOfVisibleZones === 1) {
+      moveZombiesToZoneId(
         map,
         zombieZone,
-        directionWithHighestNoise[0] as Direction
+        Object.values(visibleZonesWithPlayers)[0].zoneId
       );
-    } else {
-      // handle split
-      const zombiesToSplit = zombieZone.zombies;
-      directionWithHighestNoise.forEach((direction, index) => {
-        const remainder = zombiesToSplit % directionWithHighestNoise.length;
-        let split = Math.floor(
-          zombiesToSplit / directionWithHighestNoise.length
+    } else if (numberOfVisibleZones > 1) {
+      let directionWithHighestNoise: string[] = [];
+      let highestNoiseLevel = 0;
+
+      for (const zone in visibleZonesWithPlayers) {
+        const visibleZone = visibleZonesWithPlayers[zone as Direction];
+        const noiseLevel = visibleZone?.noise;
+        if (!visibleZone || !noiseLevel) return;
+
+        if (noiseLevel > highestNoiseLevel) {
+          directionWithHighestNoise = [];
+          directionWithHighestNoise.push(zone);
+          highestNoiseLevel = noiseLevel;
+        } else if (noiseLevel === highestNoiseLevel) {
+          directionWithHighestNoise.push(zone);
+        }
+      }
+
+      if (directionWithHighestNoise.length === 1) {
+        moveZombiesInDirection(
+          map,
+          zombieZone,
+          directionWithHighestNoise[0] as Direction
         );
-        if (index < remainder) split++;
-        moveZombiesInDirection(map, zombieZone, direction as Direction, split);
-      });
+      } else {
+        // handle split
+        const zombiesToSplit = zombieZone.zombies;
+        directionWithHighestNoise.forEach((direction, index) => {
+          const remainder = zombiesToSplit % directionWithHighestNoise.length;
+          let split = Math.floor(
+            zombiesToSplit / directionWithHighestNoise.length
+          );
+          if (index < remainder) split++;
+          moveZombiesInDirection(
+            map,
+            zombieZone,
+            direction as Direction,
+            split
+          );
+        });
+      }
+    } else if (numberOfVisibleZones === 0) {
+      // Handle follow noise without line of sight
+      console.log("no line of sight");
+      calculatePathToNoisiestZone(map, playerZoneIds, zombieZone);
     }
-  } else if (numberOfVisibleZones === 0) {
-    // Handle follow noise without line of sight
-    console.log("no line of sight");
-    calculatePathToNoisiestZone(map, playerZoneIds, zombieZone);
   }
 }
