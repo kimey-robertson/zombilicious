@@ -163,9 +163,26 @@ function hasLineOfSight(
     let playerFound = false;
     let distance = 0;
     let zoneToCheck = movableZone;
+    let hasEnteredRoom = zombieZone.room; // Track if we've entered a room
 
     while (canMoveInDirection && !playerFound) {
       distance++;
+
+      // Check if we're entering a room from outside
+      if (!hasEnteredRoom && zoneToCheck.room) {
+        hasEnteredRoom = true;
+      }
+
+      // Apply line of sight distance restrictions
+      if (hasEnteredRoom) {
+        // Inside rooms: line of sight only works one zone away
+        if (distance > 1) {
+          canMoveInDirection = false;
+          return;
+        }
+      }
+      // Outside rooms have no distance limit (continue normally)
+
       // Check zone for players
       const playersInZone = playerZoneIds.filter(
         (zoneId) => zoneId === zoneToCheck.id
@@ -185,6 +202,15 @@ function hasLineOfSight(
         // get next zone in the same direction
         const nextZone = zoneInDirection(map, zoneToCheck, direction);
         if (nextZone) {
+          // Check if we can move to the next zone (door restrictions for room transitions)
+          if (!hasEnteredRoom && nextZone.room) {
+            // Moving from outside to inside - check if door is open
+            if (!areZonesAdjacent(zoneToCheck, nextZone, map, false)) {
+              // Door is closed, can't see through
+              canMoveInDirection = false;
+              return;
+            }
+          }
           zoneToCheck = nextZone;
         } else {
           canMoveInDirection = false;
@@ -290,7 +316,13 @@ function moveZombiesToZoneId(
 ) {
   const movableZones = calculateMovableZones(map, fromZone.id);
   const movableZoneIds = movableZones.map((movableZone) => movableZone.id);
-  if (!movableZoneIds.includes(toZoneId)) return;
+  console.log(`Zombie in ${fromZone.id} can move to zones:`, movableZoneIds);
+  console.log(`Trying to move to zone: ${toZoneId}`);
+
+  if (!movableZoneIds.includes(toZoneId)) {
+    console.log(`Movement blocked! ${toZoneId} not in movable zones`);
+    return;
+  }
 
   const toZone = map.zones.find((zone) => toZoneId === zone.id);
   if (!toZone) {
@@ -298,6 +330,11 @@ function moveZombiesToZoneId(
       message: `Cannot find zone with id: ${toZoneId}`,
     });
   } else {
+    console.log(
+      `Successfully moving ${split || fromZone.zombies} zombies from ${
+        fromZone.id
+      } to ${toZoneId}`
+    );
     if (split) {
       toZone.zombies += split;
       fromZone.zombies -= split;
@@ -378,10 +415,22 @@ function calculatePathToNoisiestZone(
     }
   });
 
+  console.log(`Noisiest zones: ${noisiestZones.map((zone) => zone.id)}`);
+
   if (noisiestZones.length === 1) {
     const goalZoneId = noisiestZones[0].id;
     const path = getShortestPath(map, [goalZoneId], zombieZone.id);
-    moveZombiesToZoneId(map, zombieZone, path[goalZoneId][0]);
+    console.log(
+      `Zombie in ${zombieZone.id} trying to path to ${goalZoneId}`,
+      path[goalZoneId]
+    );
+    if (path[goalZoneId] && path[goalZoneId].length > 0) {
+      console.log(`Moving to first step: ${path[goalZoneId][0]}`);
+      console.log(`Full path: ${path[goalZoneId]}`);
+      moveZombiesToZoneId(map, zombieZone, path[goalZoneId][0]);
+    } else {
+      console.log(`No valid path found to ${goalZoneId}`);
+    }
   } else if (noisiestZones.length > 1) {
     // handle split
     const zombiesToSplit = zombieZone.zombies;
@@ -392,7 +441,9 @@ function calculatePathToNoisiestZone(
 
       const goalZoneId = noisiestZones[index].id;
       const path = getShortestPath(map, [goalZoneId], zombieZone.id);
-      moveZombiesToZoneId(map, zombieZone, path[goalZoneId][0], split);
+      if (path[goalZoneId] && path[goalZoneId].length > 0) {
+        moveZombiesToZoneId(map, zombieZone, path[goalZoneId][0], split);
+      }
     });
   }
 }
@@ -416,10 +467,11 @@ export function calculateZombieMovement(
     const numberOfVisibleZones = Object.keys(visibleZonesWithPlayers).length;
 
     if (numberOfVisibleZones === 1) {
-      moveZombiesToZoneId(
+      console.log("One visible zone", visibleZonesWithPlayers);
+      moveZombiesInDirection(
         map,
         zombieZone,
-        Object.values(visibleZonesWithPlayers)[0].zoneId
+        Object.keys(visibleZonesWithPlayers)[0] as Direction
       );
     } else if (numberOfVisibleZones > 1) {
       let directionWithHighestNoise: string[] = [];
