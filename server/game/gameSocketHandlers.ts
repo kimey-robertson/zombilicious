@@ -7,7 +7,7 @@ import {
   generateNoise,
   getGameById,
   getRangedAttackZones,
-  meleeAttack,
+  attackZombies,
   movePlayerToZone,
   openDoor,
   organiseInventory,
@@ -275,7 +275,7 @@ export const handleGameEvents = (io: Server, socket: Socket) => {
     "melee-attack",
     async (io, socket, { gameId, playerId, cardId, zoneId }) => {
       // Melee attack
-      const game = meleeAttack(gameId, playerId, cardId, zoneId, io);
+      const game = attackZombies(gameId, playerId, cardId, zoneId, io, "melee");
 
       // Emit the game updated
       io.to(gameId).emit("game-updated", game);
@@ -302,6 +302,31 @@ export const handleGameEvents = (io: Server, socket: Socket) => {
     }
   );
 
+  const rangedAttackHandler = createSocketHandler<{
+    gameId: string;
+    playerId: string;
+    cardId: string;
+    zoneId: string;
+  }>(
+    "ranged-attack",
+    async (io, socket, { gameId, playerId, cardId, zoneId }) => {
+      // Ranged attack
+      const game = attackZombies(
+        gameId,
+        playerId,
+        cardId,
+        zoneId,
+        io,
+        "ranged"
+      );
+
+      // Emit the game updated
+      io.to(gameId).emit("game-updated", game);
+
+      return { success: true };
+    }
+  );
+
   createGameHandler(io, socket);
   voteKickPlayerFromGameHandler(io, socket);
   rejoinGameHandler(io, socket);
@@ -315,4 +340,5 @@ export const handleGameEvents = (io: Server, socket: Socket) => {
   discardSwappableCardHandler(io, socket);
   meleeAttackHandler(io, socket);
   getRangedAttackZonesHandler(io, socket);
+  rangedAttackHandler(io, socket);
 };

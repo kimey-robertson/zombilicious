@@ -589,39 +589,45 @@ function discardSwappableCard(
   return game;
 }
 
-function meleeAttack(
+function attackZombies(
   gameId: string,
   playerId: string,
   cardId: string,
   zoneId: string,
-  io: Server
+  io: Server,
+  type: "melee" | "ranged"
 ): Game {
   const game = getGameById(gameId);
   const player = game.players.find((player) => player.id === playerId);
   if (!player) {
-    throw new OperationFailedError("Melee attack", {
+    throw new OperationFailedError("Attack zombies", {
       message: `Player not found in game ${gameId} with id ${playerId}`,
     });
   }
   const card = player.playerCards.inHand.find((card) => card?.id === cardId);
   if (!card) {
-    throw new OperationFailedError("Melee attack", {
+    throw new OperationFailedError("Attack zombies", {
       message: `Player does not have a card with id ${cardId}`,
     });
   }
-  if (card.maxRange !== 0) {
-    throw new OperationFailedError("Melee attack", {
+  if (card.maxRange !== 0 && type === "melee") {
+    throw new OperationFailedError("Attack zombies", {
       message: `Card ${cardId} is not a melee attack`,
+    });
+  }
+  if (card.maxRange === 0 && type === "ranged") {
+    throw new OperationFailedError("Attack zombies", {
+      message: `Card ${cardId} is not a ranged attack`,
     });
   }
   const zone = game.map.zones.find((zone) => zone.id === zoneId);
   if (!zone) {
-    throw new OperationFailedError("Melee attack", {
+    throw new OperationFailedError("Attack zombies", {
       message: `Zone not found in game ${gameId} with id ${zoneId}`,
     });
   }
   if (zone.zombies === 0) {
-    throw new OperationFailedError("Melee attack", {
+    throw new OperationFailedError("Attack zombies", {
       message: `Zone ${zoneId} has no zombies`,
     });
   }
@@ -722,6 +728,6 @@ export {
   organiseInventory,
   searchForItems,
   discardSwappableCard,
-  meleeAttack,
+  attackZombies,
   getRangedAttackZones,
 };

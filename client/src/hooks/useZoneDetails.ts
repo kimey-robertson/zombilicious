@@ -66,6 +66,7 @@ export const useZoneDetails = (zone: Zone | undefined, cell: Cell) => {
 
   const isRangedAttackZone =
     selectedAction?.id === "ranged" &&
+    canPerformAction &&
     selectedCardForRanged &&
     playerCards.inHand
       .find((card) => card?.id === selectedCardForRanged.id)

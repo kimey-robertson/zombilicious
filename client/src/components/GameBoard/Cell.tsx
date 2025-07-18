@@ -26,6 +26,9 @@ const Cell: React.FC<CellProps> = ({ cell, zone, door }) => {
 
   const setSelectedZone = usePlayerStore((state) => state.setSelectedZone);
   const panMode = usePlayerStore((state) => state.panMode);
+  const selectedCardForRanged = usePlayerStore(
+    (state) => state.selectedCardForRanged
+  );
 
   const gameId = useGameStore((state) => state.gameId);
 
@@ -46,6 +49,22 @@ const Cell: React.FC<CellProps> = ({ cell, zone, door }) => {
           playerId: currentPlayer?.id ?? "",
           fromZoneId: currentPlayer?.currentZoneId,
           toZoneId: zone?.id,
+        },
+        (response: SocketResponse) => {
+          if (!response.success) {
+            handleError(response?.error);
+            return;
+          }
+        }
+      );
+    } else if (isRangedAttackZone) {
+      socket.emit(
+        "ranged-attack",
+        {
+          gameId: gameId,
+          playerId: currentPlayer?.id ?? "",
+          cardId: selectedCardForRanged?.id,
+          zoneId: zone?.id,
         },
         (response: SocketResponse) => {
           if (!response.success) {
