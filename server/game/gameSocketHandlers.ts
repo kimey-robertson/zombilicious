@@ -5,7 +5,6 @@ import {
   discardSwappableCard,
   endTurn,
   generateNoise,
-  getGameById,
   getRangedAttackZones,
   attackZombies,
   movePlayerToZone,
@@ -126,40 +125,6 @@ export const handleGameEvents = (io: Server, socket: Socket) => {
     async (io, socket, { gameId, playerId, fromZoneId, toZoneId }) => {
       // Move the player to the zone
       const game = movePlayerToZone(gameId, playerId, fromZoneId, toZoneId, io);
-
-      // Emit the game updated
-      io.to(gameId).emit("game-updated", game);
-
-      return { success: true };
-    }
-  );
-
-  // Temporary but can probably use similar logic later
-  const skipZombiesTurnHandler = createSocketHandler<{ gameId: string }>(
-    "skip-zombies-turn",
-    async (io, socket, { gameId }) => {
-      // Skip the zombies turn
-      const game = getGameById(gameId);
-
-      game.players[0].myTurn = true;
-      game.isZombiesTurn = false;
-      game.map.zones.forEach((zone) => {
-        zone.noiseTokens = 0;
-      });
-
-      game.players.forEach((player) => {
-        player.actionsRemaining = player.totalActions;
-        player.searchedThisTurn = false;
-      });
-
-      // Send a log event
-      sendGameLogEvent(io, game.id, {
-        id: (game.gameLogs.length + 1).toString(),
-        timestamp: new Date(),
-        type: "system",
-        message: `It's now player ${game.players[0].name}'s turn`,
-        icon: "🔥",
-      });
 
       // Emit the game updated
       io.to(gameId).emit("game-updated", game);
@@ -332,7 +297,6 @@ export const handleGameEvents = (io: Server, socket: Socket) => {
   rejoinGameHandler(io, socket);
   endTurnHandler(io, socket);
   movePlayerToZoneHandler(io, socket);
-  skipZombiesTurnHandler(io, socket);
   openDoorHandler(io, socket);
   makeNoiseHandler(io, socket);
   organiseInventoryHandler(io, socket);

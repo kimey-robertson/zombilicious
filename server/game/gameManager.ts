@@ -12,6 +12,7 @@ import {
   calculateMovableZones,
   calculateRangedAttackZones,
   calculateZombieMovement,
+  spawnZombies,
 } from "../maps/mapUtils";
 import { cards } from "../cards";
 import { getRandomCard } from "../utils/helpers";
@@ -359,16 +360,6 @@ function startZombiesTurn(gameId: string, io: Server): Game {
 
   game.isZombiesTurn = true;
 
-  const zonesWithZombies = game.map.zones.filter((zone) => zone.zombies > 0);
-
-  zonesWithZombies.forEach((zone) => {
-    calculateZombieMovement(
-      zone,
-      game.map,
-      game.players.map((player) => player.currentZoneId)
-    );
-  });
-
   sendGameLogEvent(io, gameId, {
     id: (game.gameLogs.length + 1).toString(),
     timestamp: new Date(),
@@ -376,6 +367,85 @@ function startZombiesTurn(gameId: string, io: Server): Game {
     message: `It's now the zombies turn!`,
     icon: "🧟",
   });
+
+  const zonesWithZombies = game.map.zones.filter((zone) => zone.zombies > 0);
+
+  // Delay the zombie movement message by 1 second
+  setTimeout(() => {
+    sendGameLogEvent(io, gameId, {
+      id: (game.gameLogs.length + 1).toString(),
+      timestamp: new Date(),
+      type: "system",
+      message: `Zombies are now moving...`,
+      icon: "🧟",
+    });
+
+    // Move zombies immediately after the message
+    zonesWithZombies.forEach((zone) => {
+      calculateZombieMovement(
+        zone,
+        game.map,
+        game.players.map((player) => player.currentZoneId)
+      );
+    });
+
+    // Emit game update after zombie movement
+    io.to(gameId).emit("game-updated", game);
+
+    // Delay zombie spawning by another second
+    setTimeout(() => {
+      // Check if any zones have a zombie spawn token
+      const zonesWithSpawnToken = game.map.zones.filter(
+        (zone) => zone.hasZombieSpawn
+      );
+      if (zonesWithSpawnToken.length > 0) {
+        zonesWithSpawnToken.forEach((zone) => {
+          const zombiesToAdd = spawnZombies(zone);
+          if (zombiesToAdd > 0) {
+            sendGameLogEvent(io, gameId, {
+              id: (game.gameLogs.length + 1).toString(),
+              timestamp: new Date(),
+              type: "system",
+              message: `${zombiesToAdd} zombie${
+                zombiesToAdd > 1 ? "s" : ""
+              } spawned in zone ${zone.id}`,
+              icon: "🧟",
+            });
+          } else {
+            sendGameLogEvent(io, gameId, {
+              id: (game.gameLogs.length + 1).toString(),
+              timestamp: new Date(),
+              type: "system",
+              message: `No zombies spawned in zone ${zone.id}. Lucky you!`,
+              icon: "🧟",
+            });
+          }
+        });
+      }
+
+      // Final game update after spawning
+      io.to(gameId).emit("game-updated", game);
+
+      // End zombie turn and start next player turn
+      game.isZombiesTurn = false;
+      game.players[0].myTurn = true;
+      game.map.zones.forEach((zone) => (zone.noiseTokens = 0));
+      game.players.forEach((player) => {
+        player.actionsRemaining = player.totalActions;
+        player.searchedThisTurn = false;
+      });
+
+      sendGameLogEvent(io, game.id, {
+        id: (game.gameLogs.length + 1).toString(),
+        timestamp: new Date(),
+        type: "system",
+        message: `It's now player ${game.players[0].name}'s turn`,
+        icon: "🔥",
+      });
+
+      io.to(gameId).emit("game-updated", game);
+    }, 2000);
+  }, 2000);
 
   return game;
 }

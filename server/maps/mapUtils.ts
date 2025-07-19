@@ -547,3 +547,19 @@ export function calculateRangedAttackZones(
   });
   return possibleRangedAttackZones;
 }
+
+export function spawnZombies(zone: Zone): number {
+  // Randomly add between 0-2 zombies. with 1 being the most likely
+  const random = Math.random();
+  let zombiesToAdd = 1; // Default to 1 (most likely)
+
+  if (random < 0.25) {
+    zombiesToAdd = 0; // 25% chance for 0
+  } else if (random >= 0.75) {
+    zombiesToAdd = 2; // 25% chance for 2
+  }
+  // 50% chance for 1 (the remaining probability)
+
+  zone.zombies += zombiesToAdd;
+  return zombiesToAdd;
+}
