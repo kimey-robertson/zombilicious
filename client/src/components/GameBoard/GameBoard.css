@@ -350,3 +350,33 @@
   margin: 0 1rem 1rem 1rem;
   border-radius: 0 0 10px 10px;
 }
+
+/* Zombie Spawn Token */
+.zombie-spawn-token {
+  position: relative;
+  top: 3px;
+  z-index: 30;
+  pointer-events: none;
+  display: flex;
+  justify-content: center;
+}
+
+.spawn-indicator {
+  width: 80px;
+  height: 22.5px;
+  border-radius: 7px;
+  background: linear-gradient(145deg, #8b0000, #660000);
+  border: 1px solid #440000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.6),
+    inset 0 1px 1px rgba(255, 100, 100, 0.2);
+}
+
+.spawn-symbol {
+  font-size: 1.7rem;
+  color: #ffcccc;
+  text-shadow: 0 0 2px rgba(255, 0, 0, 0.8);
+  margin-bottom: 4px;
+}

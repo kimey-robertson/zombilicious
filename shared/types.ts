@@ -24,6 +24,7 @@ export type Zone = {
   room: boolean;
   noiseTokens: number;
   zombies: number;
+  hasZombieSpawn: boolean;
 };
 
 export type Door = {

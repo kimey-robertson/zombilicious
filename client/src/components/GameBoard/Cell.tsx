@@ -13,6 +13,7 @@ import { usePlayerStore } from "../../store/usePlayerStore";
 import DoorComponent from "./Door";
 import NoiseToken from "./NoiseToken";
 import UnitTokens from "./UnitTokens";
+import ZombieSpawnToken from "./ZombieSpawnToken";
 
 type CellProps = {
   cell: Cell;
@@ -128,6 +129,8 @@ const Cell: React.FC<CellProps> = ({ cell, zone, door }) => {
           }
         />
       ))}
+
+      {zone.hasZombieSpawn && <ZombieSpawnToken />}
     </div>
   );
 };
