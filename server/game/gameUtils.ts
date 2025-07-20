@@ -1,5 +1,5 @@
 import { Server } from "socket.io";
-import { Card, Game, LogEvent } from "../../shared/types";
+import { Card, Game, LogEvent, Player } from "../../shared/types";
 import { games, getGameById, getGameBySocketId } from "./gameManager";
 
 function getPlayerNameBySocketId(socketId: string): string {
@@ -70,6 +70,17 @@ function rollDice(card: Card): {
   };
 }
 
+function getNextPlayer(game: Game, playerIndex: number): Player | undefined {
+  let nextPlayer: Player | undefined;
+  for (let i = 0; i < game.players.length; i++) {
+    if (game.players[i].alive && i === playerIndex + 1) {
+      nextPlayer = game.players[i];
+      break;
+    }
+  }
+  return nextPlayer;
+}
+
 export {
   getPlayerNameBySocketId,
   getGamesWithDisconnectedPlayers,
@@ -77,4 +88,5 @@ export {
   stopPlayerDisconnectTimer,
   getAllGames,
   rollDice,
+  getNextPlayer,
 };

@@ -13,6 +13,8 @@ import {
   rejoinGame,
   searchForItems,
   voteKickPlayerFromGame,
+  removePlayerFromGame,
+  deleteGame,
 } from "./gameManager";
 import {
   getGamesWithDisconnectedPlayers,
@@ -292,6 +294,23 @@ export const handleGameEvents = (io: Server, socket: Socket) => {
     }
   );
 
+  const deadPlayerLeaveGameHandler = createSocketHandler<{
+    gameId: string;
+    playerId: string;
+  }>("dead-player-leave-game", async (io, socket, { gameId, playerId }) => {
+    // Dead player leave game
+    const game = removePlayerFromGame(gameId, playerId, io, "dead");
+
+    if (game.players.length === 0) {
+      deleteGame(gameId);
+    }
+
+    // Emit the game updated
+    io.to(gameId).emit("game-updated", game);
+
+    return { success: true };
+  });
+
   createGameHandler(io, socket);
   voteKickPlayerFromGameHandler(io, socket);
   rejoinGameHandler(io, socket);
@@ -305,4 +324,5 @@ export const handleGameEvents = (io: Server, socket: Socket) => {
   meleeAttackHandler(io, socket);
   getRangedAttackZonesHandler(io, socket);
   rangedAttackHandler(io, socket);
+  deadPlayerLeaveGameHandler(io, socket);
 };

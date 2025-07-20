@@ -10,7 +10,7 @@ const Players = () => {
         PLAYERS
       </h3>
       <div className="space-y-3">
-        {players.map((player) => {
+        {players.filter((player) => player.alive).map((player) => {
           const colorClass = getPlayerColor(player.id);
 
           return (

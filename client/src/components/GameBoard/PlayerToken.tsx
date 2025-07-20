@@ -17,7 +17,7 @@ const PlayerToken = ({
   index = 0,
   totalTokens = 1,
 }: PlayerTokenProps) => {
-  if (!player) return null;
+  if (!player || !player.alive) return null;
 
   return (
     <div

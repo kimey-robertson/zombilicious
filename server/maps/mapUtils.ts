@@ -454,7 +454,7 @@ function handleZombieAttack(
   players: Player[]
 ): { messages?: string[]; isGameLost: boolean } {
   const playersInZone = players.filter((player) =>
-    playerZoneIds.includes(player.currentZoneId)
+    player.currentZoneId === zombieZone.id
   );
   if (playersInZone.length > 0) {
     let messages: string[] = [];

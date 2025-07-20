@@ -1,6 +1,7 @@
 import { Server, Socket } from "socket.io";
 import { Game, Lobby, Player, PlayerCards, Zone } from "../../shared/types";
 import {
+  getNextPlayer,
   getPlayerNameBySocketId,
   rollDice,
   sendGameLogEvent,
@@ -161,6 +162,8 @@ function removePlayerFromGame(
       ? `has been voted to be kicked from game`
       : reason === "chose-to-leave"
       ? `has chosen to abandon you..`
+      : reason === "dead"
+      ? `has died and left the game`
       : `has left the game`;
 
   // Send the game log event
@@ -344,7 +347,8 @@ function endTurn(gameId: string, io: Server): Game {
     game.players[playerIndex].myTurn = false;
   }
 
-  const nextPlayer = game.players[playerIndex + 1];
+  const nextPlayer = getNextPlayer(game, playerIndex);
+
   if (nextPlayer) {
     game = updatePlayerTurn(game, nextPlayer, io);
   } else {
@@ -494,7 +498,11 @@ function startZombiesTurn(gameId: string, io: Server): Game {
 
       // End zombie turn and start next player turn
       game.isZombiesTurn = false;
-      game.players[0].myTurn = true;
+      const nextPlayer = getNextPlayer(game, 0);
+      if (nextPlayer) {
+        nextPlayer.myTurn = true;
+      }
+      console.log({ game, nextPlayer });
       game.map.zones.forEach((zone) => (zone.noiseTokens = 0));
       game.players.forEach((player) => {
         player.actionsRemaining = player.totalActions;
@@ -505,7 +513,7 @@ function startZombiesTurn(gameId: string, io: Server): Game {
         id: (game.gameLogs.length + 1).toString(),
         timestamp: new Date(),
         type: "system",
-        message: `It's now player ${game.players[0].name}'s turn`,
+        message: `It's now player ${nextPlayer?.name}'s turn`,
         icon: "🔥",
       });
 
