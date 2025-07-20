@@ -373,8 +373,17 @@ function startZombiesTurn(gameId: string, io: Server): Game {
 
   const zonesWithZombies = game.map.zones.filter((zone) => zone.zombies > 0);
 
-  // Delay the zombie movement message by 1 second
+  // Delay the zombie movement message by 2 seconds
   setTimeout(() => {
+    // Re-fetch the game to ensure it still exists
+    game = games.find((g) => g.id === gameId) as Game;
+    if (!game) {
+      console.log(
+        `[startZombiesTurn] Game ${gameId} no longer exists, cancelling zombie turn`
+      );
+      return;
+    }
+
     sendGameLogEvent(io, gameId, {
       id: (game.gameLogs.length + 1).toString(),
       timestamp: new Date(),
@@ -416,14 +425,23 @@ function startZombiesTurn(gameId: string, io: Server): Game {
     // Early return if the game is lost
     if (game.status === "lost") {
       io.to(gameId).emit("game-updated", game);
-      return game;
+      return;
     }
 
     // Emit game update after zombie movement
     io.to(gameId).emit("game-updated", game);
 
-    // Delay zombie spawning by another second
+    // Delay zombie spawning by another 2 seconds
     setTimeout(() => {
+      // Re-fetch the game again to ensure it still exists
+      game = games.find((g) => g.id === gameId) as Game;
+      if (!game) {
+        console.log(
+          `[startZombiesTurn] Game ${gameId} no longer exists, cancelling zombie spawning`
+        );
+        return;
+      }
+
       // Check if any zones have a zombie spawn token
       const zonesWithSpawnToken = game.map.zones.filter(
         (zone) => zone.hasZombieSpawn

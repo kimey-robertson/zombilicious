@@ -23,13 +23,29 @@ function sendGameLogEvent(
   gameId: string,
   logEvent: LogEvent
 ): void {
-  const game = getGameById(gameId);
+  // Check if the game still exists before trying to access it
+  // This prevents crashes when async operations (like timeouts) try to log events
+  // for games that have been deleted
+  const game = games.find((game) => game.id === gameId);
+  if (!game) {
+    // Game has been deleted, safely ignore the log event
+    console.log(`[sendGameLogEvent] Game ${gameId} not found, skipping log event: ${logEvent.message}`);
+    return;
+  }
+  
   io.to(gameId).emit("log-event", logEvent);
   game.gameLogs.push(logEvent);
 }
 
 function stopPlayerDisconnectTimer(gameId: string, playerId: string): void {
-  const game = getGameById(gameId);
+  // Check if the game still exists before trying to access it
+  // This prevents crashes when trying to stop timers for deleted games
+  const game = games.find((game) => game.id === gameId);
+  if (!game) {
+    console.log(`[stopPlayerDisconnectTimer] Game ${gameId} not found, unable to stop timer for player ${playerId}`);
+    return;
+  }
+  
   game.disconnectedPlayers[playerId]?.stopDisconnectTimer?.();
 }
 
