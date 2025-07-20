@@ -394,10 +394,6 @@ function startZombiesTurn(gameId: string, io: Server): Game {
         game.status
       );
 
-      if (result.isGameLost) {
-        game.status = "lost";
-      }
-
       if (result.messages) {
         result.messages.forEach((message) => {
           sendGameLogEvent(io, gameId, {
@@ -405,13 +401,16 @@ function startZombiesTurn(gameId: string, io: Server): Game {
             timestamp: new Date(),
             type: "system",
             message,
-            icon: "🧟"
+            icon: "🧟",
           });
         });
       }
 
-      // Break early if game is lost to prevent further zombie actions
-      if (game.status === "lost") break;
+      if (result.isGameLost) {
+        game.status = "lost";
+        deleteGame(gameId);
+        break;
+      }
     }
 
     // Early return if the game is lost
