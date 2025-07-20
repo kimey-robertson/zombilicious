@@ -8,6 +8,7 @@ import {
   Map,
   PlayerCards,
   Card,
+  GameStatus,
 } from "../../../shared/types";
 import { GameAction } from "../components/Overlay/ActionButtons";
 
@@ -61,8 +62,8 @@ export type GameStore = {
   setGameId: (gameId: string) => void;
   players: Player[];
   setPlayers: (players: Player[]) => void;
-  status: "active" | "paused";
-  setStatus: (status: "active" | "paused") => void;
+  status: GameStatus;
+  setStatus: (status: GameStatus) => void;
   disconnectedPlayers: { [key: string]: DisconnectedPlayer };
   setDisconnectedPlayers: (disconnectedPlayers: {
     [key: string]: DisconnectedPlayer;

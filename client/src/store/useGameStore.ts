@@ -1,7 +1,7 @@
 import { create } from "zustand";
 
 import type { GameStore } from "./storeTypes";
-import { DisconnectedPlayer, Player } from "../../../shared/types";
+import { DisconnectedPlayer, GameStatus, Player } from "../../../shared/types";
 
 export const useGameStore = create<GameStore>((set) => ({
   gameId: "",
@@ -9,7 +9,7 @@ export const useGameStore = create<GameStore>((set) => ({
   players: [],
   setPlayers: (players: Player[]) => set({ players }),
   status: "active",
-  setStatus: (status: "active" | "paused") => set({ status }),
+  setStatus: (status: GameStatus) => set({ status }),
   disconnectedPlayers: {},
   setDisconnectedPlayers: (disconnectedPlayers: {
     [key: string]: DisconnectedPlayer;

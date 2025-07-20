@@ -1,4 +1,4 @@
-import { Card, Map, Zone } from "../../shared/types";
+import { Card, GameStatus, Map, Player, Zone } from "../../shared/types";
 import { OperationFailedError } from "../utils/socketErrors";
 import { Queue } from "../utils/classes";
 
@@ -448,15 +448,70 @@ function calculatePathToNoisiestZone(
   }
 }
 
-export function calculateZombieMovement(
+function handleZombieAttack(
+  zombieZone: Zone,
+  playerZoneIds: string[],
+  players: Player[]
+): { messages?: string[]; isGameLost: boolean } {
+  const playersInZone = players.filter((player) =>
+    playerZoneIds.includes(player.currentZoneId)
+  );
+  if (playersInZone.length > 0) {
+    let messages: string[] = [];
+    let isGameLost = false;
+
+    // Randomly hit a player
+    for (let i = 0; i < zombieZone.zombies; i++) {
+      const alivePlayers = playersInZone.filter((player) => player.alive);
+      if (alivePlayers.length === 0) break;
+
+      const player =
+        alivePlayers[Math.floor(Math.random() * alivePlayers.length)];
+      console.log(
+        `Zombie in ${zombieZone.id} attacking player in ${player.id}`
+      );
+      player.currentHealth -= 1;
+      messages.push(
+        `Zombie in ${zombieZone.id} did 1 damage to player ${player.name}`
+      );
+
+      if (player.currentHealth <= 0) {
+        player.alive = false;
+        messages.push(`Player ${player.name} has been killed by zombies`);
+        if (!players.some((player) => player.alive)) {
+          isGameLost = true;
+          messages.push("All players have been killed by zombies. Game over!");
+          break;
+        }
+      }
+    }
+    return { messages, isGameLost };
+  }
+  return { isGameLost: false };
+}
+
+export function performZombieAction(
   zombieZone: Zone,
   map: Map,
-  playerZoneIds: string[]
-) {
-  if (!zombieZone.zombies) return;
+  players: Player[],
+  gameStatus: GameStatus
+): { messages?: string[]; isGameLost: boolean } {
+  if (!zombieZone.zombies || gameStatus === "lost")
+    return { isGameLost: false };
+
+  console.log({ players });
+  const playerZoneIds = players
+    .filter((player) => player.alive)
+    .map((player) => player.currentZoneId);
+
+  if (!playerZoneIds) return { isGameLost: false };
+
+  console.log({ playerZoneIds });
 
   if (playerZoneIds.includes(zombieZone.id)) {
     // handle attack
+    const result = handleZombieAttack(zombieZone, playerZoneIds, players);
+    return result;
   } else {
     const visibleZonesWithPlayers = hasLineOfSight(
       map,
@@ -480,7 +535,7 @@ export function calculateZombieMovement(
       for (const zone in visibleZonesWithPlayers) {
         const visibleZone = visibleZonesWithPlayers[zone as Direction];
         const noiseLevel = visibleZone?.noise;
-        if (!visibleZone || !noiseLevel) return;
+        if (!visibleZone || !noiseLevel) return { isGameLost: false };
 
         if (noiseLevel > highestNoiseLevel) {
           directionWithHighestNoise = [];
@@ -519,6 +574,8 @@ export function calculateZombieMovement(
       console.log("no line of sight");
       calculatePathToNoisiestZone(map, playerZoneIds, zombieZone);
     }
+
+    return { isGameLost: false };
   }
 }
 

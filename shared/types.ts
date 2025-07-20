@@ -55,6 +55,9 @@ export type Player = {
   currentZoneId: string;
   movableZones: Zone[];
   searchedThisTurn: boolean;
+  totalHealth: number;
+  currentHealth: number;
+  alive: boolean;
 };
 
 export type PlayerCards = {
@@ -88,12 +91,14 @@ export type Game = {
   id: string;
   name: string;
   players: Player[];
-  status: "active" | "paused";
+  status: GameStatus;
   disconnectedPlayers: { [socketId: string]: DisconnectedPlayer };
   gameLogs: LogEvent[];
   map: Map;
   isZombiesTurn: boolean;
 };
+
+export type GameStatus = "active" | "paused" | "lost";
 
 export type LogEvent = {
   id: string;

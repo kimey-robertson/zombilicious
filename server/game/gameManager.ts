@@ -11,7 +11,7 @@ import { GameNotFoundError, OperationFailedError } from "../utils/socketErrors";
 import {
   calculateMovableZones,
   calculateRangedAttackZones,
-  calculateZombieMovement,
+  performZombieAction,
   spawnZombies,
 } from "../maps/mapUtils";
 import { cards } from "../cards";
@@ -54,6 +54,9 @@ function createGame(lobby: Lobby, io: Server): Game {
       currentZoneId: chosenMap.startingZone,
       movableZones: calculateMovableZones(chosenMap, chosenMap.startingZone),
       searchedThisTurn: false,
+      totalHealth: 2,
+      currentHealth: 2,
+      alive: true,
     })),
     status: "active",
     disconnectedPlayers: {},
@@ -376,18 +379,46 @@ function startZombiesTurn(gameId: string, io: Server): Game {
       id: (game.gameLogs.length + 1).toString(),
       timestamp: new Date(),
       type: "system",
-      message: `Zombies are now moving...`,
+      message: `Zombies are now attacking & moving...`,
       icon: "🧟",
     });
 
     // Move zombies immediately after the message
-    zonesWithZombies.forEach((zone) => {
-      calculateZombieMovement(
+    for (const zone of zonesWithZombies) {
+      if (game.status === "lost") break;
+
+      const result = performZombieAction(
         zone,
         game.map,
-        game.players.map((player) => player.currentZoneId)
+        game.players,
+        game.status
       );
-    });
+
+      if (result.isGameLost) {
+        game.status = "lost";
+      }
+
+      if (result.messages) {
+        result.messages.forEach((message) => {
+          sendGameLogEvent(io, gameId, {
+            id: (game.gameLogs.length + 1).toString(),
+            timestamp: new Date(),
+            type: "system",
+            message,
+            icon: "🧟"
+          });
+        });
+      }
+
+      // Break early if game is lost to prevent further zombie actions
+      if (game.status === "lost") break;
+    }
+
+    // Early return if the game is lost
+    if (game.status === "lost") {
+      io.to(gameId).emit("game-updated", game);
+      return game;
+    }
 
     // Emit game update after zombie movement
     io.to(gameId).emit("game-updated", game);
