@@ -371,7 +371,10 @@ function startZombiesTurn(gameId: string, io: Server): Game {
     icon: "🧟",
   });
 
-  const zonesWithZombies = game.map.zones.filter((zone) => zone.zombies > 0);
+  // Create a snapshot of zones with their zombie counts at the start of the turn
+  const zombieSnapshot = game.map.zones
+    .filter((zone) => zone.zombies > 0)
+    .map((zone) => ({ zoneId: zone.id, zombieCount: zone.zombies }));
 
   // Delay the zombie movement message by 2 seconds
   setTimeout(() => {
@@ -393,15 +396,30 @@ function startZombiesTurn(gameId: string, io: Server): Game {
     });
 
     // Move zombies immediately after the message
-    for (const zone of zonesWithZombies) {
+    for (const snapshot of zombieSnapshot) {
       if (game.status === "lost") break;
 
+      // Find the current zone object
+      const currentZone = game.map.zones.find((z) => z.id === snapshot.zoneId);
+      if (!currentZone || currentZone.zombies === 0) continue;
+
+      // Temporarily set the zone's zombie count to the original count for this turn
+      const originalZombieCount = currentZone.zombies;
+      currentZone.zombies = Math.min(snapshot.zombieCount, originalZombieCount);
+
       const result = performZombieAction(
-        zone,
+        currentZone,
         game.map,
         game.players,
         game.status
       );
+
+      // Calculate how many zombies actually moved/died and adjust the zone count accordingly
+      const zombiesAfterAction = currentZone.zombies;
+      const zombiesThatMoved = snapshot.zombieCount - zombiesAfterAction;
+
+      // Restore the correct count: original count minus the ones that moved from this zone's original population
+      currentZone.zombies = originalZombieCount - zombiesThatMoved;
 
       if (result.messages) {
         result.messages.forEach((message) => {
