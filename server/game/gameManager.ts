@@ -521,6 +521,7 @@ function startZombiesTurn(gameId: string, io: Server): Game {
       game.players.forEach((player) => {
         player.actionsRemaining = player.totalActions;
         player.searchedThisTurn = false;
+        player.canMoveThisTurn = true;
       });
 
       sendGameLogEvent(io, game.id, {
