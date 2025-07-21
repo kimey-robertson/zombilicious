@@ -498,11 +498,10 @@ function startZombiesTurn(gameId: string, io: Server): Game {
 
       // End zombie turn and start next player turn
       game.isZombiesTurn = false;
-      const nextPlayer = getNextPlayer(game, 0);
+      const nextPlayer = getNextPlayer(game, 0, true);
       if (nextPlayer) {
         nextPlayer.myTurn = true;
       }
-      console.log({ game, nextPlayer });
       game.map.zones.forEach((zone) => (zone.noiseTokens = 0));
       game.players.forEach((player) => {
         player.actionsRemaining = player.totalActions;

@@ -29,10 +29,12 @@ function sendGameLogEvent(
   const game = games.find((game) => game.id === gameId);
   if (!game) {
     // Game has been deleted, safely ignore the log event
-    console.log(`[sendGameLogEvent] Game ${gameId} not found, skipping log event: ${logEvent.message}`);
+    console.log(
+      `[sendGameLogEvent] Game ${gameId} not found, skipping log event: ${logEvent.message}`
+    );
     return;
   }
-  
+
   io.to(gameId).emit("log-event", logEvent);
   game.gameLogs.push(logEvent);
 }
@@ -42,10 +44,12 @@ function stopPlayerDisconnectTimer(gameId: string, playerId: string): void {
   // This prevents crashes when trying to stop timers for deleted games
   const game = games.find((game) => game.id === gameId);
   if (!game) {
-    console.log(`[stopPlayerDisconnectTimer] Game ${gameId} not found, unable to stop timer for player ${playerId}`);
+    console.log(
+      `[stopPlayerDisconnectTimer] Game ${gameId} not found, unable to stop timer for player ${playerId}`
+    );
     return;
   }
-  
+
   game.disconnectedPlayers[playerId]?.stopDisconnectTimer?.();
 }
 
@@ -70,8 +74,16 @@ function rollDice(card: Card): {
   };
 }
 
-function getNextPlayer(game: Game, playerIndex: number): Player | undefined {
+function getNextPlayer(
+  game: Game,
+  playerIndex: number,
+  afterZombiesTurn: boolean = false
+): Player | undefined {
   let nextPlayer: Player | undefined;
+  if (game.players.length === 0) return undefined;
+  if (afterZombiesTurn) {
+    return game.players[0];
+  }
   for (let i = 0; i < game.players.length; i++) {
     if (game.players[i].alive && i === playerIndex + 1) {
       nextPlayer = game.players[i];

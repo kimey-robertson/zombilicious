@@ -63,8 +63,32 @@ const ActionsRemaining = () => {
           )}
         </div>
       </div>
+
+      {/* Health Bar */}
+      <div className="text-center space-y-2">
+        <h5 className="text-red-400 font-bold tracking-wider text-sm font-mono">
+          HEALTH
+        </h5>
+        <div className="flex justify-center gap-1">
+          {Array.from({ length: currentPlayer?.totalHealth || 2 }, (_, i) => (
+            <div
+              key={i}
+              className={`w-10 h-5 rounded-full border-2 transition-all duration-300 ${
+                i < (currentPlayer?.currentHealth || 0)
+                  ? "bg-gradient-to-br from-red-800 via-red-900 to-red-950 border-red-900/80 shadow-lg shadow-red-900/50"
+                  : "bg-gradient-to-br from-zinc-900 via-stone-950 to-black border-zinc-800/60 shadow-inner"
+              }`}
+            />
+          ))}
+        </div>
+        <div className="text-xs font-mono text-red-400/80">
+          {currentPlayer?.currentHealth || 0} /{" "}
+          {currentPlayer?.totalHealth || 2}
+        </div>
+      </div>
+
       {isMyTurn ? (
-        <div className="flex justify-center items-center mt-10">
+        <div className="flex justify-center items-center mt-4">
           <Button
             onClick={handleEndTurn}
             variant="destructive"
