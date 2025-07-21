@@ -26,6 +26,7 @@ const tutorialMap: Map = {
       noiseTokens: 0,
       zombies: 1,
       hasZombieSpawn: true,
+      hasObjectiveToken: false,
     },
     {
       id: "2B-1",
@@ -35,6 +36,7 @@ const tutorialMap: Map = {
       noiseTokens: 0,
       zombies: 0,
       hasZombieSpawn: false,
+      hasObjectiveToken: false,
     },
     {
       id: "2B-2",
@@ -44,6 +46,7 @@ const tutorialMap: Map = {
       noiseTokens: 0,
       zombies: 0,
       hasZombieSpawn: false,
+      hasObjectiveToken: true,
     },
     {
       id: "2B-3",
@@ -53,6 +56,7 @@ const tutorialMap: Map = {
       noiseTokens: 0,
       zombies: 1,
       hasZombieSpawn: false,
+      hasObjectiveToken: false,
     },
     {
       id: "2B-4",
@@ -62,6 +66,7 @@ const tutorialMap: Map = {
       noiseTokens: 0,
       zombies: 0,
       hasZombieSpawn: false,
+      hasObjectiveToken: false,
     },
     {
       id: "2B-5",
@@ -71,6 +76,7 @@ const tutorialMap: Map = {
       noiseTokens: 0,
       zombies: 0,
       hasZombieSpawn: false,
+      hasObjectiveToken: false,
     },
     {
       id: "2B-6/1B-0",
@@ -80,6 +86,7 @@ const tutorialMap: Map = {
       noiseTokens: 0,
       zombies: 0,
       hasZombieSpawn: false,
+      hasObjectiveToken: false,
     },
     {
       id: "2B-7/1B-1",
@@ -89,6 +96,7 @@ const tutorialMap: Map = {
       noiseTokens: 0,
       zombies: 0,
       hasZombieSpawn: false,
+      hasObjectiveToken: false,
     },
     {
       id: "2B-8/1B-2",
@@ -98,6 +106,7 @@ const tutorialMap: Map = {
       noiseTokens: 0,
       zombies: 2,
       hasZombieSpawn: false,
+      hasObjectiveToken: false,
     },
     {
       id: "1B-3/1B-4",
@@ -107,6 +116,7 @@ const tutorialMap: Map = {
       noiseTokens: 0,
       zombies: 0,
       hasZombieSpawn: false,
+      hasObjectiveToken: false,
     },
     {
       id: "1B-5",
@@ -116,6 +126,7 @@ const tutorialMap: Map = {
       noiseTokens: 0,
       zombies: 0,
       hasZombieSpawn: false,
+      hasObjectiveToken: false,
     },
     {
       id: "1B-6",
@@ -125,6 +136,7 @@ const tutorialMap: Map = {
       noiseTokens: 0,
       zombies: 0,
       hasZombieSpawn: false,
+      hasObjectiveToken: false,
     },
     {
       id: "1B-7",
@@ -134,6 +146,7 @@ const tutorialMap: Map = {
       noiseTokens: 0,
       zombies: 0,
       hasZombieSpawn: false,
+      hasObjectiveToken: false,
     },
     {
       id: "1B-8",
@@ -143,6 +156,7 @@ const tutorialMap: Map = {
       noiseTokens: 0,
       zombies: 0,
       hasZombieSpawn: false,
+      hasObjectiveToken: false,
     },
   ],
   doors: [
@@ -164,6 +178,11 @@ const tutorialMap: Map = {
     },
   ],
   startingZone: "2B-6/1B-0",
+  winCondition: {
+    type: "objective",
+    goal: 1,
+    current: 0,
+  },
 };
 
 export { tutorialMap };

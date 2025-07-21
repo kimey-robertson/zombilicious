@@ -34,6 +34,11 @@ export const useGameStore = create<GameStore>((set) => ({
     zones: [],
     doors: [],
     startingZone: "",
+    winCondition: {
+      type: "objective",
+      goal: 0,
+      current: 0,
+    },
   },
   setMap: (map) => set({ map }),
   isZombiesTurn: false,

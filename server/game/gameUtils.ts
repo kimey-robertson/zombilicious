@@ -93,6 +93,13 @@ function getNextPlayer(
   return nextPlayer;
 }
 
+function checkWinCondition(game: Game): boolean {
+  if (game.map.winCondition.type === "objective") {
+    return game.map.winCondition.current >= game.map.winCondition.goal;
+  }
+  return false;
+}
+
 export {
   getPlayerNameBySocketId,
   getGamesWithDisconnectedPlayers,
@@ -101,4 +108,5 @@ export {
   getAllGames,
   rollDice,
   getNextPlayer,
+  checkWinCondition,
 };

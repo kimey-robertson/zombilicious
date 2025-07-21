@@ -12,6 +12,7 @@ import { useGameStore } from "../../store/useGameStore";
 import { usePlayerStore } from "../../store/usePlayerStore";
 import DoorComponent from "./Door";
 import NoiseToken from "./NoiseToken";
+import ObjectiveToken from "./ObjectiveToken";
 import UnitTokens from "./UnitTokens";
 import ZombieSpawnToken from "./ZombieSpawnToken";
 
@@ -131,6 +132,7 @@ const Cell: React.FC<CellProps> = ({ cell, zone, door }) => {
       ))}
 
       {zone.hasZombieSpawn && <ZombieSpawnToken />}
+      {zone.hasObjectiveToken && <ObjectiveToken />}
     </div>
   );
 };

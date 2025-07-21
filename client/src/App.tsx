@@ -6,6 +6,7 @@ import { useGameStore } from "./store/useGameStore";
 import GameWrapper from "./components/GameWrapper";
 import DevMode from "./components/DevMode/DevMode";
 import GameOverPopup from "./components/Overlay/GameOverPopup";
+import GameWonPopup from "./components/Overlay/GameWonPopup";
 
 function App() {
   useGameSockets();
@@ -18,7 +19,7 @@ function App() {
       <DevMode />
       {gameId ? <GameWrapper /> : <Home />}
       <GameOverPopup />
-
+      <GameWonPopup />
     </>
   );
 }

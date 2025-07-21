@@ -15,6 +15,7 @@ import {
   voteKickPlayerFromGame,
   removePlayerFromGame,
   deleteGame,
+  takeObjectiveToken,
 } from "./gameManager";
 import {
   getGamesWithDisconnectedPlayers,
@@ -311,6 +312,39 @@ export const handleGameEvents = (io: Server, socket: Socket) => {
     return { success: true };
   });
 
+  const takeObjectiveTokenHandler = createSocketHandler<{
+    gameId: string;
+    zoneId: string;
+    playerId: string;
+  }>(
+    "take-objective-token",
+    async (io, socket, { gameId, zoneId, playerId }) => {
+      // Take the objective token
+      const game = takeObjectiveToken(gameId, zoneId, playerId);
+
+      // Send a log event
+      sendGameLogEvent(io, game.id, {
+        id: (game.gameLogs.length + 1).toString(),
+        timestamp: new Date(),
+        type: "system",
+        message: `Player ${getPlayerNameBySocketId(
+          playerId
+        )} took the objective token ${
+          game.status === "won" ? "and won the game!" : ""
+        }`,
+        icon: "🏆",
+      });
+
+      // Emit the game updated
+      io.to(gameId).emit("game-updated", game);
+
+      // Delete the game
+      deleteGame(gameId);
+
+      return { success: true };
+    }
+  );
+
   createGameHandler(io, socket);
   voteKickPlayerFromGameHandler(io, socket);
   rejoinGameHandler(io, socket);
@@ -325,4 +359,5 @@ export const handleGameEvents = (io: Server, socket: Socket) => {
   getRangedAttackZonesHandler(io, socket);
   rangedAttackHandler(io, socket);
   deadPlayerLeaveGameHandler(io, socket);
+  takeObjectiveTokenHandler(io, socket);
 };

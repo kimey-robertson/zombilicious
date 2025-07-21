@@ -1,6 +1,7 @@
 import { Server, Socket } from "socket.io";
 import { Game, Lobby, Player, PlayerCards, Zone } from "../../shared/types";
 import {
+  checkWinCondition,
   getNextPlayer,
   getPlayerNameBySocketId,
   rollDice,
@@ -867,6 +868,40 @@ function getRangedAttackZones(
   return game;
 }
 
+function takeObjectiveToken(
+  gameId: string,
+  zoneId: string,
+  playerId: string
+): Game {
+  const game = getGameById(gameId);
+  const zone = game.map.zones.find((zone) => zone.id === zoneId);
+  if (!zone) {
+    throw new OperationFailedError("Take objective token", {
+      message: `Zone not found in game ${gameId} with id ${zoneId}`,
+    });
+  }
+  if (!zone.hasObjectiveToken) {
+    throw new OperationFailedError("Take objective token", {
+      message: `Zone ${zoneId} does not have an objective token`,
+    });
+  }
+  const player = game.players.find((player) => player.id === playerId);
+  if (!player) {
+    throw new OperationFailedError("Take objective token", {
+      message: `Player not found in game ${gameId} with id ${playerId}`,
+    });
+  }
+  zone.hasObjectiveToken = false;
+  player.actionsRemaining -= 1;
+  player.XP += 5;
+  game.map.winCondition.current += 1;
+
+  if (checkWinCondition(game)) {
+    game.status = "won";
+  }
+
+  return game;
+}
 export {
   createGame,
   deleteGame,
@@ -887,4 +922,5 @@ export {
   discardSwappableCard,
   attackZombies,
   getRangedAttackZones,
+  takeObjectiveToken,
 };

@@ -25,6 +25,7 @@ export type Zone = {
   noiseTokens: number;
   zombies: number;
   hasZombieSpawn: boolean;
+  hasObjectiveToken: boolean;
 };
 
 export type Door = {
@@ -42,6 +43,11 @@ export type Map = {
   zones: Zone[];
   doors: Door[];
   startingZone: string;
+  winCondition: {
+    type: "objective";
+    goal: number;
+    current: number;
+  };
 };
 
 export type Player = {
@@ -99,7 +105,7 @@ export type Game = {
   isZombiesTurn: boolean;
 };
 
-export type GameStatus = "active" | "paused" | "lost";
+export type GameStatus = "active" | "paused" | "lost" | "won";
 
 export type LogEvent = {
   id: string;
@@ -140,7 +146,7 @@ export type ActionType =
   | "inventory"
   | "melee"
   | "ranged"
-  | "take"
+  | "objective"
   | "noise";
 
 export type SocketError = {

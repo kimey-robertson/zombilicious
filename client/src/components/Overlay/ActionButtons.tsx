@@ -26,7 +26,7 @@ const ActionButtons = () => {
     { id: "inventory", icon: FiPackage, label: "Inventory" },
     { id: "melee", icon: LuAxe, label: "Melee" },
     { id: "ranged", icon: GiSawedOffShotgun, label: "Ranged" },
-    { id: "take", icon: FaRegHand, label: "Take Object" },
+    { id: "objective", icon: FaRegHand, label: "Take Objective" },
     { id: "noise", icon: BsVolumeUp, label: "Make Noise" },
   ];
 

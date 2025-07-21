@@ -50,13 +50,14 @@ export const useActionButtons = () => {
         (currentZone?.zombies === 0 ||
           !playerCards.inHand.some((card) => card?.maxRange === 0))) ||
       (actionId === "ranged" &&
-        !playerCards.inHand.some((card) => card && card.minRange > 0))
+        !playerCards.inHand.some((card) => card && card.minRange > 0)) ||
+      (actionId === "objective" && !currentZone?.hasObjectiveToken)
     );
   };
 
   const handleActionButtonClick = (action: GameAction) => {
     if (!canPerformAction) return;
-    
+
     if (action.id !== "inventory") {
       if (!currentPlayer) return;
       setPlayerCards(currentPlayer.playerCards);
@@ -99,6 +100,22 @@ export const useActionButtons = () => {
       if (!zone.room) return;
       socket.emit(
         "search-for-items",
+        {
+          gameId,
+          zoneId: currentPlayer?.currentZoneId ?? "",
+          playerId: currentPlayer?.id ?? "",
+        },
+        (response: SocketResponse) => {
+          if (!response.success) {
+            handleError(response.error);
+          } else {
+            setSelectedAction(undefined);
+          }
+        }
+      );
+    } else if (action.id === "objective") {
+      socket.emit(
+        "take-objective-token",
         {
           gameId,
           zoneId: currentPlayer?.currentZoneId ?? "",
