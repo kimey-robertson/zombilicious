@@ -450,11 +450,10 @@ function calculatePathToNoisiestZone(
 
 function handleZombieAttack(
   zombieZone: Zone,
-  playerZoneIds: string[],
   players: Player[]
 ): { messages?: string[]; isGameLost: boolean } {
-  const playersInZone = players.filter((player) =>
-    player.currentZoneId === zombieZone.id
+  const playersInZone = players.filter(
+    (player) => player.currentZoneId === zombieZone.id
   );
   if (playersInZone.length > 0) {
     let messages: string[] = [];
@@ -467,13 +466,33 @@ function handleZombieAttack(
 
       const player =
         alivePlayers[Math.floor(Math.random() * alivePlayers.length)];
-      console.log(
-        `Zombie in ${zombieZone.id} attacking player in ${player.id}`
-      );
+
       player.currentHealth -= 1;
-      messages.push(
-        `Zombie in ${zombieZone.id} did 1 damage to player ${player.name}`
-      );
+
+      const allCards = [
+        ...player.playerCards.inHand.filter((card) => card !== null),
+        ...player.playerCards.inReserve.filter((card) => card !== null),
+      ];
+      const randomCard = allCards[Math.floor(Math.random() * allCards.length)];
+      
+      if (randomCard) {
+        if (player.playerCards.inHand.includes(randomCard)) {
+          player.playerCards.inHand[
+            player.playerCards.inHand.indexOf(randomCard)
+          ] = null;
+        } else if (player.playerCards.inReserve.includes(randomCard)) {
+          player.playerCards.inReserve[
+            player.playerCards.inReserve.indexOf(randomCard)
+          ] = null;
+        }
+        messages.push(
+          `Zombie in ${zombieZone.id} did 1 damage to player ${player.name} and made them drop their ${randomCard.name}`
+        );
+      } else {
+        messages.push(
+          `Zombie in ${zombieZone.id} did 1 damage to player ${player.name}`
+        );
+      }
 
       if (player.currentHealth <= 0) {
         player.alive = false;
@@ -510,7 +529,7 @@ export function performZombieAction(
 
   if (playerZoneIds.includes(zombieZone.id)) {
     // handle attack
-    const result = handleZombieAttack(zombieZone, playerZoneIds, players);
+    const result = handleZombieAttack(zombieZone, players);
     return result;
   } else {
     const visibleZonesWithPlayers = hasLineOfSight(
