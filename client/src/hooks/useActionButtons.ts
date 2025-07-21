@@ -50,7 +50,7 @@ export const useActionButtons = () => {
         (currentZone?.zombies === 0 ||
           !playerCards.inHand.some((card) => card?.maxRange === 0))) ||
       (actionId === "ranged" &&
-        !playerCards.inHand.some((card) => card && card.minRange > 0)) ||
+        !playerCards.inHand.some((card) => card && card.maxRange > 0)) ||
       (actionId === "objective" && !currentZone?.hasObjectiveToken)
     );
   };

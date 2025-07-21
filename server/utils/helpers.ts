@@ -40,8 +40,8 @@ function countDownTimer(onTick: (time: string) => void) {
 }
 
 const rarityWeights = {
-  common: 8,
-  uncommon: 5,
+  common: 5,
+  uncommon: 4,
   rare: 3,
   epic: 2,
   legendary: 1,

@@ -51,7 +51,7 @@ function createGame(lobby: Lobby, io: Server): Game {
       XP: 0,
       playerCards: {
         inReserve: [null, null, null],
-        inHand: [cards[4], null],
+        inHand: [cards[2], null],
         swappableCard: null,
       },
       currentZoneId: chosenMap.startingZone,
@@ -755,7 +755,7 @@ function attackZombies(
   io: Server,
   type: "melee" | "ranged"
 ): Game {
-  const game = getGameById(gameId);
+  let game = getGameById(gameId);
   const player = game.players.find((player) => player.id === playerId);
   if (!player) {
     throw new OperationFailedError("Attack zombies", {
@@ -800,6 +800,10 @@ function attackZombies(
   }
   player.actionsRemaining -= 1;
   player.XP += actualZombiesKilled;
+
+  if (card.createsNoiseWhenAttacking) {
+    game = generateNoise(gameId, player.currentZoneId, playerId);
+  }
 
   // Send a log event
   if (actualZombiesKilled > 0) {
