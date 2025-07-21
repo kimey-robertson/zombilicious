@@ -62,7 +62,10 @@ export const useZoneDetails = (zone: Zone | undefined, cell: Cell) => {
   );
 
   const canMoveIntoZone =
-    isMovableZone && selectedAction?.id === "move" && canPerformAction;
+    isMovableZone &&
+    selectedAction?.id === "move" &&
+    canPerformAction &&
+    currentPlayer?.canMoveThisTurn;
 
   const isRangedAttackZone =
     selectedAction?.id === "ranged" &&

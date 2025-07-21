@@ -58,6 +58,7 @@ export type Player = {
   totalHealth: number;
   currentHealth: number;
   alive: boolean;
+  canMoveThisTurn: boolean;
 };
 
 export type PlayerCards = {

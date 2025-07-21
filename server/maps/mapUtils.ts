@@ -136,7 +136,7 @@ export function calculateMovableZones(
   return movableZones;
 }
 
-function getZoneFromId(zoneId: string, map: Map): Zone {
+export function getZoneFromId(zoneId: string, map: Map): Zone {
   const foundZone = map.zones.find((zone) => zone.id === zoneId);
   if (!foundZone) {
     throw new OperationFailedError("Get zone from id", {

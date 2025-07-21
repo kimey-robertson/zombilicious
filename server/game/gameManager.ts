@@ -12,6 +12,7 @@ import { GameNotFoundError, OperationFailedError } from "../utils/socketErrors";
 import {
   calculateMovableZones,
   calculateRangedAttackZones,
+  getZoneFromId,
   performZombieAction,
   spawnZombies,
 } from "../maps/mapUtils";
@@ -58,6 +59,7 @@ function createGame(lobby: Lobby, io: Server): Game {
       totalHealth: 2,
       currentHealth: 2,
       alive: true,
+      canMoveThisTurn: true,
     })),
     status: "active",
     disconnectedPlayers: {},
@@ -294,6 +296,12 @@ function movePlayerToZone(
     });
   }
 
+  if (!player.canMoveThisTurn) {
+    throw new OperationFailedError("Move player to zone", {
+      message: `Player ${player.name} cannot move this turn`,
+    });
+  }
+
   // Check if the zone is a valid zone
   const zone = game.map.zones.find((zone) => zone.id === toZoneId);
   if (!zone) {
@@ -321,11 +329,17 @@ function movePlayerToZone(
   // Update the player's current zone
   currentPlayer.currentZoneId = toZoneId;
 
+  if (getZoneFromId(toZoneId, game.map).zombies > 0) {
+    player.canMoveThisTurn = false;
+  }
+
   // Update the player's movable zones
   player.movableZones = calculateMovableZones(game.map, toZoneId);
 
+  const zombiesInZone = getZoneFromId(fromZoneId, game.map).zombies;
+
   // Update the player's actions remaining
-  player.actionsRemaining -= 1;
+  player.actionsRemaining -= 1 + zombiesInZone;
 
   // Send a log event
   sendGameLogEvent(io, gameId, {
