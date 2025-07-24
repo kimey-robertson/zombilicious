@@ -1,4 +1,4 @@
-import { Card, GameStatus, Map, Player, Zone } from "../../shared/types";
+import { Card, Door, GameStatus, Map, Player, Zone } from "../../shared/types";
 import { OperationFailedError } from "../utils/socketErrors";
 import { Queue } from "../utils/classes";
 
@@ -474,7 +474,6 @@ function handleZombieAttack(
         ...player.playerCards.inReserve.filter((card) => card !== null),
       ];
       const randomCard = allCards[Math.floor(Math.random() * allCards.length)];
-      
       if (randomCard) {
         if (player.playerCards.inHand.includes(randomCard)) {
           player.playerCards.inHand[
@@ -638,4 +637,76 @@ export function spawnZombies(zone: Zone): number {
 
   zone.zombies += zombiesToAdd;
   return zombiesToAdd;
+}
+
+export function doorIsOpen(map: Map, doorId: string): boolean {
+  const doorToCheck = map.doors.find((door) => door.id === doorId);
+  if (doorToCheck?.state === "open") return true;
+  return false;
+}
+
+export function checkIfBuildingHasBeenAccessed(
+  map: Map,
+  currentZoneId: string | undefined,
+  openedDoor: Door
+): void {
+  console.log({ currentZoneId, openedDoor });
+  if (!currentZoneId) return;
+  if (openedDoor.state === "closed") return;
+
+  const currentZone = getZoneFromId(currentZoneId, map);
+  console.log({ currentZone });
+  if (currentZone.room) return;
+
+  console.log("pass early returns");
+
+  const startZoneId = openedDoor.zoneIds.filter(
+    (zoneId) => zoneId !== currentZone.id
+  )[0];
+  const start = getZoneFromId(startZoneId, map);
+  let accessed = false;
+
+  const frontier = new Queue<Zone>();
+  frontier.enqueue(start);
+  const reached = new Set<Zone>();
+  reached.add(start);
+
+  while (!frontier.isEmpty()) {
+    const current = frontier.dequeue();
+    if (current) {
+      if (current === start) continue;
+      const movableZones = calculateMovableZones(map, current.id, false);
+      if (
+        movableZones.some((movableZone) => !movableZone.room) ||
+        movableZones.some((movableZone) =>
+          movableZone.doorIds.some((doorId) => doorIsOpen(map, doorId))
+        )
+      ) {
+        console.log(
+          "already accessed, is room:",
+          movableZones.some((movableZone) => !movableZone.room)
+        );
+        console.log(
+          "already accessed by another door:",
+          movableZones.some((movableZone) =>
+            movableZone.doorIds.some((doorId) => doorIsOpen(map, doorId))
+          )
+        );
+
+        accessed = true;
+        break;
+      }
+      movableZones.forEach((movableZone) => {
+        if (!reached.has(movableZone)) {
+          frontier.enqueue(movableZone);
+          reached.add(current);
+        }
+      });
+    }
+  }
+
+  if (!accessed) {
+    // spawn zombies
+    console.log("zombies should spawn");
+  }
 }

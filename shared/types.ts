@@ -26,6 +26,7 @@ export type Zone = {
   zombies: number;
   hasZombieSpawn: boolean;
   hasObjectiveToken: boolean;
+  doorIds: string[];
 };
 
 export type Door = {

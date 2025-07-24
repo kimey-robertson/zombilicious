@@ -27,6 +27,7 @@ const tutorialMap: Map = {
       zombies: 0,
       hasZombieSpawn: true,
       hasObjectiveToken: false,
+      doorIds: [],
     },
     {
       id: "2B-1",
@@ -37,6 +38,7 @@ const tutorialMap: Map = {
       zombies: 0,
       hasZombieSpawn: false,
       hasObjectiveToken: false,
+      doorIds: [],
     },
     {
       id: "2B-2",
@@ -47,6 +49,7 @@ const tutorialMap: Map = {
       zombies: 0,
       hasZombieSpawn: false,
       hasObjectiveToken: true,
+      doorIds: [],
     },
     {
       id: "2B-3",
@@ -57,6 +60,7 @@ const tutorialMap: Map = {
       zombies: 1,
       hasZombieSpawn: false,
       hasObjectiveToken: false,
+      doorIds: [],
     },
     {
       id: "2B-4",
@@ -67,6 +71,7 @@ const tutorialMap: Map = {
       zombies: 0,
       hasZombieSpawn: false,
       hasObjectiveToken: false,
+      doorIds: ["2B-4/2B-7"],
     },
     {
       id: "2B-5",
@@ -77,6 +82,7 @@ const tutorialMap: Map = {
       zombies: 0,
       hasZombieSpawn: false,
       hasObjectiveToken: false,
+      doorIds: [],
     },
     {
       id: "2B-6/1B-0",
@@ -87,6 +93,7 @@ const tutorialMap: Map = {
       zombies: 0,
       hasZombieSpawn: false,
       hasObjectiveToken: false,
+      doorIds: [],
     },
     {
       id: "2B-7/1B-1",
@@ -97,6 +104,7 @@ const tutorialMap: Map = {
       zombies: 0,
       hasZombieSpawn: false,
       hasObjectiveToken: false,
+      doorIds: ["2B-4/2B-7"],
     },
     {
       id: "2B-8/1B-2",
@@ -107,6 +115,7 @@ const tutorialMap: Map = {
       zombies: 0,
       hasZombieSpawn: false,
       hasObjectiveToken: false,
+      doorIds: [],
     },
     {
       id: "1B-3/1B-4",
@@ -117,6 +126,7 @@ const tutorialMap: Map = {
       zombies: 0,
       hasZombieSpawn: false,
       hasObjectiveToken: false,
+      doorIds: [],
     },
     {
       id: "1B-5",
@@ -127,6 +137,7 @@ const tutorialMap: Map = {
       zombies: 1,
       hasZombieSpawn: false,
       hasObjectiveToken: false,
+      doorIds: [],
     },
     {
       id: "1B-6",
@@ -137,6 +148,7 @@ const tutorialMap: Map = {
       zombies: 0,
       hasZombieSpawn: false,
       hasObjectiveToken: false,
+      doorIds: [],
     },
     {
       id: "1B-7",
@@ -147,6 +159,7 @@ const tutorialMap: Map = {
       zombies: 0,
       hasZombieSpawn: false,
       hasObjectiveToken: false,
+      doorIds: ["1B-7/1B-8"],
     },
     {
       id: "1B-8",
@@ -157,6 +170,7 @@ const tutorialMap: Map = {
       zombies: 0,
       hasZombieSpawn: false,
       hasObjectiveToken: false,
+      doorIds: ["1B-7/1B-8"],
     },
   ],
   doors: [

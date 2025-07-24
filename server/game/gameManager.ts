@@ -13,6 +13,7 @@ import { GameNotFoundError, OperationFailedError } from "../utils/socketErrors";
 import {
   calculateMovableZones,
   calculateRangedAttackZones,
+  checkIfBuildingHasBeenAccessed,
   getZoneFromId,
   performZombieAction,
   spawnZombies,
@@ -556,10 +557,10 @@ function openDoor(gameId: string, playerId: string, doorId: string): Game {
     });
   }
 
-  const playerCurrentZone = game.players.find(
+  const playerCurrentZoneId = game.players.find(
     (player) => player.id === playerId
   )?.currentZoneId;
-  if (!door.zoneIds.some((zoneId) => zoneId === playerCurrentZone)) {
+  if (!door.zoneIds.some((zoneId) => zoneId === playerCurrentZoneId)) {
     throw new OperationFailedError("Open door", {
       message: `Player is not in the same zone as the door ${doorId}`,
     });
@@ -594,6 +595,8 @@ function openDoor(gameId: string, playerId: string, doorId: string): Game {
   game.players.forEach((player) => {
     player.movableZones = calculateMovableZones(game.map, player.currentZoneId);
   });
+
+  checkIfBuildingHasBeenAccessed(game.map, playerCurrentZoneId, door);
 
   return game;
 }
