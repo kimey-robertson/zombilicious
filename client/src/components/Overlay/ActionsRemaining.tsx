@@ -24,7 +24,8 @@ const ActionsRemaining = () => {
     if (currentPlayer?.playerCards.swappableCard) {
       return handleError({
         code: "OPERATION_FAILED",
-        message: "You must discard your extra card before ending your turn",
+        message:
+          "You must discard your extra card, or confirm current cards before ending your turn",
       });
     }
 
