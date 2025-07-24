@@ -1,58 +1,144 @@
-# 🧟 Zombilicious Web Game Plan
+# 🧟 Zombilicious
 
-This is subject to change.
+A web-based multiplayer zombie survival game featuring real-time turn-based gameplay, tile-based board mechanics, and comprehensive lobby system.
 
-## 🎯 Goal
 
-Create a web-based multiplayer zombie survival game with a tile-based draggable/pannable board, fixed UI elements and real-time turn-based gameplay.
 
----
+## 🎮 What is Zombilicious?
 
-## 📁 Project Structure
+Zombilicious is a tactical zombie survival game where players cooperate to survive waves of undead. Features include:
 
-```bash
-├── client/ # React front-end
-│ ├── components/ # Board, tokens, UI, etc.
-│ ├── store/ # State management (Zustand)
-│ ├── assets/ # Tile images, tokens
-│ └── App.tsx
-├── server/ # Node.js backend (Socket.IO)
-│ ├── gameManager.ts # Turn logic, game state
-│ └── index.ts
-├── shared/ # Shared types/interfaces
-├── railway.json # Deployment config
-└── README.md
-```
+- **Real-time multiplayer** with up to 4 players
+- **Turn-based tactical gameplay** with 8 different action types
+- **Tile-based board** with pan/zoom controls and interactive zones
+- **Advanced zombie AI** with pathfinding and line-of-sight mechanics
+- **Inventory management** with drag-and-drop card system
+- **Lobby system** with reconnection and vote-kick features
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- Node.js (v18 or higher)
+- npm or yarn
+
+### Installation
+
+1. **Clone the repository**
+
+   ```bash
+   git clone https://github.com/kimey-robertson/zombilicious.git
+   cd zombilicious
+   ```
+
+2. **Install dependencies**
+
+   ```bash
+   # Install server dependencies
+   npm install
+
+   # Install client dependencies
+   cd client
+   npm install
+   cd ..
+   ```
+
+3. **Start development servers**
+
+   ```bash
+   # Terminal 1: Start the server (runs on port 8000)
+   npm start
+
+   # Terminal 2: Start the client (runs on port 5173)
+   cd client
+   npm run dev
+   ```
+
+4. **Open your browser**
+   - Navigate to `http://localhost:5173`
+   - Create or join a game lobby
+   - Start playing!
 
 ## 📦 Tech Stack
 
-| Feature          | Stack/Tool          | Notes                 |
-| ---------------- | ------------------- | --------------------- |
-| UI rendering     | React + CSS Grid    | Might use Konva later |
-| State management | Zustand             |
-| Multiplayer sync | Socket.IO           |
-| Backend runtime  | Node.js             |
-| Game logic       | Custom JS game loop |
-| Hosting          | Railway             |
-| Deployment       | Git + Railway CI/CD |
+| Component               | Technology                               |
+| ----------------------- | ---------------------------------------- |
+| Frontend                | React 19, TypeScript, Vite, Tailwind CSS |
+| Backend                 | Node.js, Express, Socket.IO              |
+| State Management        | Zustand                                  |
+| Real-time Communication | Socket.IO                                |
+| Deployment              | Railway                                  |
 
-## 🧠 Core Concepts
+## 🏗️ Project Structure
 
-### 1. Tile-Based Board
+```
+zombilicious/
+├── client/                 # React frontend
+│   ├── src/
+│   │   ├── components/     # UI components
+│   │   ├── store/         # State management
+│   │   ├── hooks/         # Custom React hooks
+│   │   └── assets/        # Game assets
+├── server/                # Node.js backend
+│   ├── game/             # Game logic & mechanics
+│   ├── lobby/            # Lobby management
+│   ├── maps/             # Game maps & AI
+│   └── utils/            # Utilities & helpers
+├── shared/               # Shared TypeScript types
+└── DOCUMENTATION.md      # Comprehensive documentation
+```
 
-- Rendered with CSS Grid
-- Each tile: 3x3 cells + rooms. Zones are formed by the cells and rooms, and may span multiple tiles.
-- Supports panning and zooming. Hold space to pan, and scroll to zoom.
+## 🎯 Game Features
 
-### 2. Survivors and Zombies
+### Core Gameplay
 
-- Each token has a unique ID, name, and stats
-- Survivors have 3 actions per turn
-- Actions can be used to move, attack, or search for items
-- Zombies move automatically during their turn
+- **8 Action Types**: Search, Move, Door, Inventory, Melee, Ranged, Take Objective, Make Noise
+- **Turn-based Combat**: Dice-based damage system with multiple weapon types
+- **Health System**: 2-hit survival with item loss on damage
+- **Win Conditions**: Collect objective tokens to victory
 
-### 3. Game State
+### Multiplayer Features
 
-- Game state is stored in Zustand.
-- There are 2 state stores, one for the game state, which is shared between all players and synced to the server, and one for the player state, which is unique to each player.
-- Game state is synced between server and clients using Socket.IO
+- **Lobby System**: Create/join games with real-time updates
+- **Disconnection Handling**: 10-minute grace period with reconnection
+- **Vote Kick**: Democratic player removal system
+- **Real-time Sync**: All game events synchronized across players
+
+### Technical Features
+
+- **Responsive Design**: Works on desktop and mobile
+- **Error Handling**: Comprehensive error system with user feedback
+- **Development Mode**: Debug tools and testing utilities
+
+## 🎮 How to Play
+
+1. **Enter your player name** and create or join a lobby
+2. **Wait for players** (2-4 players) and ready up
+3. **Take turns** using your 3 actions per turn:
+   - Move between zones
+   - Search for items in buildings
+   - Fight zombies with melee or ranged weapons
+   - Open doors and collect objectives
+4. **Survive the zombie hordes** and collect objective tokens to win!
+
+## 📖 Documentation
+
+For comprehensive documentation including:
+
+- Complete API reference
+- Game mechanics deep-dive
+- Architecture details
+
+See **[DOCUMENTATION.md](./DOCUMENTATION.md)**
+
+## 🚀 Deployment
+
+The game is configured for Railway deployment with automatic build and deployment.
+
+
+
+---
+
+**Ready to survive the zombie apocalypse?** 🧟‍♂️
+
+Start a game at [zombilicious.up.railway.app](https://zombilicious.up.railway.app) or run locally following the setup instructions above!
