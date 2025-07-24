@@ -40,9 +40,12 @@ export const useActionButtons = () => {
 
   const buttonDisabled = (actionId: ActionType) => {
     return (
-      !canPerformAction || isOrganisingInventoryAfterSearch ||
+      !canPerformAction ||
+      isOrganisingInventoryAfterSearch ||
       (actionId === "search" &&
-        (currentPlayer?.searchedThisTurn || !currentZone?.room)) ||
+        (currentPlayer?.searchedThisTurn ||
+          !currentZone?.room ||
+          currentZone?.zombies > 0)) ||
       (actionId === "door" &&
         (!isCurrentPlayerNextToClosedDoor ||
           !playerCards.inHand.some(
@@ -103,7 +106,7 @@ export const useActionButtons = () => {
           message: "Zone not found",
         });
       }
-      if (!zone.room) return;
+      if (!zone.room || zone.zombies > 0) return;
       socket.emit(
         "search-for-items",
         {

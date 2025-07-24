@@ -681,6 +681,12 @@ function searchForItems(
       message: `Player has already searched this turn`,
     });
   }
+
+  if (zone.zombies > 0) {
+    throw new OperationFailedError("Search for items", {
+      message: `You can't search in a zone with zombies`,
+    });
+  }
   const card = getRandomCard();
 
   player.playerCards.swappableCard = card;
