@@ -68,7 +68,11 @@ const PlayerCards = () => {
     const isValidTarget = isValidDropTarget(cardType, index);
 
     const handleDiscardSwappableCard = () => {
-      if (!canPerformAction || !currentPlayer || !swappableCard) return;
+      const canPerformActionIfAction =
+        canPerformAction ||
+        (selectedAction?.id !== "inventory" && currentPlayer?.myTurn);
+
+      if (!canPerformActionIfAction || !currentPlayer || !swappableCard) return;
       socket.emit(
         "discard-swappable-card",
         {
@@ -79,6 +83,7 @@ const PlayerCards = () => {
             inHand: handCards,
             swappableCard,
           },
+          asAction: selectedAction?.id === "inventory",
         },
         (response: SocketResponse) => {
           if (!response.success) {
@@ -364,7 +369,7 @@ const PlayerCards = () => {
     const canPerformActionIfAction =
       canPerformAction ||
       (selectedAction?.id !== "inventory" && currentPlayer?.myTurn);
-      
+
     if (!canPerformActionIfAction || !currentPlayer) return;
     socket.emit(
       "organise-inventory",

@@ -711,6 +711,7 @@ function discardSwappableCard(
   gameId: string,
   playerId: string,
   updatedPlayerCards: PlayerCards,
+  asAction: boolean,
   io: Server
 ): Game {
   const game = getGameById(gameId);
@@ -728,7 +729,7 @@ function discardSwappableCard(
   const swappableCard = updatedPlayerCards.swappableCard;
   updatedPlayerCards.swappableCard = null;
   player.playerCards = updatedPlayerCards;
-  player.actionsRemaining -= 1;
+  if (asAction) player.actionsRemaining -= 1;
 
   // Send a log event
   sendGameLogEvent(io, game.id, {

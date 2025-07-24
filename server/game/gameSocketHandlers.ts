@@ -222,11 +222,12 @@ export const handleGameEvents = (io: Server, socket: Socket) => {
     gameId: string;
     playerId: string;
     playerCards: PlayerCards;
+    asAction: boolean;
   }>(
     "discard-swappable-card",
-    async (io, socket, { gameId, playerId, playerCards }) => {
+    async (io, socket, { gameId, playerId, playerCards, asAction }) => {
       // Discard the swappable card
-      const game = discardSwappableCard(gameId, playerId, playerCards, io);
+      const game = discardSwappableCard(gameId, playerId, playerCards, asAction, io);
 
       // Emit the game updated
       io.to(gameId).emit("game-updated", game);
