@@ -37,7 +37,7 @@
 - **Real-time Communication**: Socket.IO with separate lobby/game channels
 - **UI Libraries**: React Hot Toast, React Icons
 - **Build Tool**: Vite with hot reload
-- **Deployment**: Railway (planned)
+- **Deployment**: Railway
 
 ### Current Status
 
@@ -45,27 +45,30 @@
 
 - Full lobby system with real-time updates
 - Game creation and management
-- Player disconnection/reconnection handling
+- Player disconnection/reconnection handling with 10-minute timers
 - Vote kick system for disconnected players
 - Tile-based game board with zones
 - Pan/zoom/rotate board controls
 - **Complete action system with 8 action types**
 - **Turn-based gameplay with zombie AI**
-- **Combat system (melee and ranged)**
+- **Combat system (melee and ranged) with dice rolling**
 - **Inventory management with drag & drop**
-- **Player health and death mechanics**
-- **Experience point system**
+- **Player health and death mechanics with item dropping**
+- **Experience point system with real-time tracking**
 - **Win/loss conditions with objective collection**
-- **Comprehensive token system**
-- **Real-time game event logging**
-- Development mode with debugging tools
+- **Comprehensive token system with visual positioning**
+- **Real-time game event logging with categorized events**
+- **Advanced zombie pathfinding and line-of-sight system**
+- **Building access detection and zombie spawning**
+- **Comprehensive error handling with typed socket errors**
+- Development mode with card testing and debugging tools
 
 🚧 **In Progress:**
 
-- Additional map content
-- More cards/items
-- Characters to choose from
-- More maps
+- Additional map content and layouts
+- More item varieties and rarities
+- Character selection system
+- Enhanced zombie types
 
 ---
 
@@ -251,11 +254,42 @@ zombilicious/
 ### Advanced Features
 
 - **Room Management**: Automatic Socket.IO room joining/leaving
-- **Disconnection Handling**: 10-minute countdown timers
-- **Vote System**: Democratic player removal
-- **Reconnection**: Persistent player IDs in localStorage
-- **Error Handling**: Comprehensive callback-based error responses with typed errors
-- **Event Logging**: Real-time game event broadcasting
+- **Disconnection Handling**: 10-minute countdown timers with vote-kick fallback
+- **Vote System**: Democratic player removal requiring unanimous votes
+- **Reconnection**: Persistent player IDs in localStorage with automatic popup
+- **Error Handling**: Comprehensive callback-based error responses with typed socket errors
+- **Event Logging**: Real-time game event broadcasting with categorized messages
+- **Zombie AI**: Advanced pathfinding with line-of-sight and noise-following behavior
+
+#### Zombie AI System
+
+- **Line of Sight**: Sophisticated sight calculation through zones and rooms
+- **Pathfinding**: A\* algorithm implementation for optimal zombie movement
+- **Noise Following**: Zombies attracted to player-generated noise
+- **Split Movement**: Zombies divide when multiple equally attractive targets exist
+- **Door Interaction**: Zombies attempt to path through buildings when doors open
+
+#### Card System
+
+- **Drag & Drop**: Full inventory management with swapping and empty slot handling
+- **Rarity System**: Common, Uncommon, Rare, Epic, Legendary item classifications
+- **Combat Mechanics**: Dice-based damage calculation with weapon-specific stats
+- **Door Tools**: Silent vs. loud door opening mechanics
+- **Range System**: Melee (0 range) and ranged (1-3 zones) weapon classifications
+
+#### Health & Death System
+
+- **2-Hit Point System**: Players start with 2 health, die at 0
+- **Item Loss**: Random card drops when taking damage
+- **Death Penalties**: Dead players can observe or leave game
+- **Zombie Attacks**: Multiple zombies can attack in single turn
+
+#### Building System
+
+- **Room Detection**: Indoor vs. outdoor zone classification
+- **Door Mechanics**: Closed doors require tools to open
+- **Building Access**: First-time building access triggers zombie spawning
+- **Search Restrictions**: Only indoor zones can be searched for items
 
 ---
 
@@ -707,6 +741,35 @@ Door {
 - **Pathfinding**: Complex routing around obstacles
 - **Split Behavior**: Multiple targets cause zombie splitting
 
+### Advanced Game Mechanics
+
+#### Turn Management
+
+- **Player Phase**: Each player gets 3 actions per turn
+- **Action Costs**: Variable costs (movement in zombie zones costs extra)
+- **Zombie Phase**: Automated zombie turn after all players complete
+- **Turn Skipping**: Dead and disconnected players automatically skipped
+
+#### Advanced Combat
+
+- **Dice Rolling**: Weapon-specific dice mechanics (numberOfDice, rollRequired)
+- **Range Validation**: Server-side validation of attack ranges and line-of-sight
+- **Noise Generation**: Ranged weapons automatically create noise tokens
+
+#### Sophisticated Search System
+
+- **Room Requirement**: Only searchable in indoor zones without zombies
+- **Once Per Turn**: Prevents search spam with turn-based restrictions
+- **Weighted Randomization**: Rarity-based card generation system
+- **Inventory Integration**: Automatic placement or swappable card system
+
+#### Advanced Movement
+
+- **Zone Validation**: Server-side validation of legal moves
+- **Door Dependencies**: Movement restricted by door states
+- **Zombie Penalties**: Extra action costs when leaving zombie-occupied zones
+- **Movement Restrictions**: Can't move after entering zombie zone in same turn
+
 ---
 
 ## <a id="development-features"></a> 🛠️ Development Features
@@ -745,22 +808,15 @@ Door {
 - **Shared Types**: Type definitions in `/shared/types.ts`
 - **Component Organization**: Feature-based component structure
 - **Error Handling**: Comprehensive error system with typed errors
+- **Socket Wrapper**: Centralized error handling for all socket events
 
-### Error Handling System
+#### Performance & Security
 
-#### Client-Side Errors
-
-- **Toast Notifications**: User-friendly error messages
-- **Hook Integration**: `useHandleError` for consistent handling
-- **Validation**: Client-side input validation
-- **Graceful Degradation**: Fallbacks for failed operations
-
-#### Server-Side Errors
-
-- **Typed Errors**: Custom error classes with codes
-- **Socket Wrapper**: Centralized error handling for all events
-- **Logging**: Comprehensive server-side logging
-- **Callback System**: Error responses to client callbacks
+- **Singleton Socket**: Single connection per client with reconnection logic
+- **State Batching**: Zustand automatic batching for performance
+- **Hardware Acceleration**: CSS transforms for smooth board manipulation
+- **Input Validation**: Server-side validation for all game actions
+- **Type Safety**: Complete TypeScript coverage preventing runtime errors
 
 ---
 
@@ -782,44 +838,18 @@ Door {
 
 ### Deployment Architecture
 
-#### Current Setup
+#### Railway Configuration
 
-- **Development**: Local development with hot reload
-- **Production**: Planned Railway deployment
-- **Static Assets**: Tile images and other assets
-- **Environment**: PORT variable configuration
+- **Build Command**: Automated client build and server preparation
+- **Start Command**: Production server startup with proper routing
+- **Environment**: PORT variable with fallback to 8000
+- **Static Serving**: Express serves client build with SPA routing support
 
-### Performance Optimizations
+#### Development Setup
 
-#### Client-Side
-
-- **Singleton Socket**: Single connection per client
-- **State Batching**: Zustand automatic batching
-- **Hardware Acceleration**: CSS transforms for board movement
-- **Dynamic Loading**: Lazy loading of tile images
-- **Component Optimization**: Memoization where appropriate
-
-#### Server-Side
-
-- **Room Management**: Efficient Socket.IO room handling
-- **Memory Management**: Proper cleanup of disconnected players
-- **Event Batching**: Efficient broadcast patterns
-- **Game State Management**: In-memory game storage with cleanup
-
-### Security & Validation
-
-#### Input Validation
-
-- **Server-Side**: All inputs validated before processing
-- **Type Safety**: TypeScript interfaces for all data
-- **Error Handling**: Comprehensive error responses
-- **Action Validation**: Game rule enforcement on server
-
-#### Network Security
-
-- **CORS**: Currently permissive for development
-- **Rate Limiting**: Planned for production
-- **Authentication**: Basic socket-based authentication
+- **Local Development**: Hot reload for both client and server
+- **Asset Serving**: Dynamic tile image loading during development
+- **Socket Configuration**: Different endpoints for development vs. production
 
 ---
 
@@ -858,10 +888,10 @@ Door {
 
 ### Deployment & Scaling - Maybe
 
-- [ ] **Railway Deployment**: Production deployment setup
-- [ ] **Database Integration**: Persistent player data
-- [ ] **Monitoring**: Performance and error tracking
-- [ ] **Load Testing**: Multi-game server performance
+- [ ] **Database Integration**: Persistent player data storage
+- [ ] **Performance Monitoring**: Error tracking and analytics
+- [ ] **Load Testing**: Multi-game server performance validation
+- [ ] **CDN Integration**: Asset delivery optimization
 
 ---
 
@@ -902,4 +932,6 @@ Door {
 ---
 
 Documentation created on 02/07/2025  
-**V2.0 05/07/2025** - Major update reflecting complete game implementation
+**V1.1 04/07/2025**
+**V1.2 21/07/2025** - Major update reflecting complete game implementation  
+**V3.0 24/01/2025** - Comprehensive update with latest tech stack, advanced zombie AI, sophisticated game mechanics, and production-ready deployment configuration
