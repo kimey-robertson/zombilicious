@@ -361,7 +361,11 @@ const PlayerCards = () => {
   };
 
   const handleOrganiseInventory = () => {
-    if (!canPerformAction || !currentPlayer) return;
+    const canPerformActionIfAction =
+      canPerformAction ||
+      (selectedAction?.id !== "inventory" && currentPlayer?.myTurn);
+      
+    if (!canPerformActionIfAction || !currentPlayer) return;
     socket.emit(
       "organise-inventory",
       {
