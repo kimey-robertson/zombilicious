@@ -650,15 +650,11 @@ export function checkIfBuildingHasBeenAccessed(
   currentZoneId: string | undefined,
   openedDoor: Door
 ): void {
-  console.log({ currentZoneId, openedDoor });
   if (!currentZoneId) return;
   if (openedDoor.state === "closed") return;
 
   const currentZone = getZoneFromId(currentZoneId, map);
-  console.log({ currentZone });
   if (currentZone.room) return;
-
-  console.log("pass early returns");
 
   const startZoneId = openedDoor.zoneIds.filter(
     (zoneId) => zoneId !== currentZone.id
@@ -674,32 +670,31 @@ export function checkIfBuildingHasBeenAccessed(
   while (!frontier.isEmpty()) {
     const current = frontier.dequeue();
     if (current) {
-      if (current === start) continue;
       const movableZones = calculateMovableZones(map, current.id, false);
-      if (
-        movableZones.some((movableZone) => !movableZone.room) ||
-        movableZones.some((movableZone) =>
-          movableZone.doorIds.some((doorId) => doorIsOpen(map, doorId))
-        )
-      ) {
-        console.log(
-          "already accessed, is room:",
-          movableZones.some((movableZone) => !movableZone.room)
-        );
-        console.log(
-          "already accessed by another door:",
-          movableZones.some((movableZone) =>
-            movableZone.doorIds.some((doorId) => doorIsOpen(map, doorId))
-          )
-        );
 
+      const movableZonesWithoutOutsideZone = movableZones.filter(
+        (movableZone) => {
+          return movableZone.id !== currentZoneId;
+        }
+      );
+      if (
+        current.id !== start.id &&
+        (movableZonesWithoutOutsideZone.some(
+          (movableZone) => !movableZone.room
+        ) ||
+          movableZonesWithoutOutsideZone.some((movableZone) =>
+            movableZone.doorIds.some(
+              (doorId) => doorIsOpen(map, doorId) && openedDoor.id !== doorId
+            )
+          ))
+      ) {
         accessed = true;
         break;
       }
-      movableZones.forEach((movableZone) => {
+      movableZonesWithoutOutsideZone.forEach((movableZone) => {
         if (!reached.has(movableZone)) {
           frontier.enqueue(movableZone);
-          reached.add(current);
+          reached.add(movableZone);
         }
       });
     }
@@ -707,6 +702,8 @@ export function checkIfBuildingHasBeenAccessed(
 
   if (!accessed) {
     // spawn zombies
-    console.log("zombies should spawn");
+    reached.forEach((zone) => {
+      spawnZombies(zone);
+    });
   }
 }

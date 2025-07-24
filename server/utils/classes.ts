@@ -12,4 +12,8 @@ export class Queue<T> {
   isEmpty(): boolean {
     return this.items.length === 0;
   }
+
+  inspect(): T[] {
+    return this.items;
+  }
 }
