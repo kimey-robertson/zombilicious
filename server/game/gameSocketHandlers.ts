@@ -190,11 +190,12 @@ export const handleGameEvents = (io: Server, socket: Socket) => {
     gameId: string;
     playerId: string;
     playerCards: PlayerCards;
+    asAction: boolean;
   }>(
     "organise-inventory",
-    async (io, socket, { gameId, playerId, playerCards }) => {
+    async (io, socket, { gameId, playerId, playerCards, asAction }) => {
       // Organise the inventory
-      const game = organiseInventory(gameId, playerId, playerCards, true);
+      const game = organiseInventory(gameId, playerId, playerCards, asAction);
 
       // Emit the game updated
       io.to(gameId).emit("game-updated", game);

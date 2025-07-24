@@ -12,6 +12,7 @@ import { useHandleError } from "../../hooks/useHandleError";
 const PlayerCards = () => {
   const socket = getSocket();
   const handleError = useHandleError();
+
   const reserveCards = usePlayerStore((state) => state.playerCards.inReserve);
   const handCards = usePlayerStore((state) => state.playerCards.inHand);
   const swappableCard = usePlayerStore(
@@ -26,12 +27,17 @@ const PlayerCards = () => {
   const setSelectedCardForRanged = usePlayerStore(
     (state) => state.setSelectedCardForRanged
   );
+  const setIsOrganisingInventoryAfterSearch = usePlayerStore(
+    (state) => state.setIsOrganisingInventoryAfterSearch
+  );
+  const isOrganisingInventoryAfterSearch = usePlayerStore(
+    (state) => state.isOrganisingInventoryAfterSearch
+  );
 
   const gameId = useGameStore((state) => state.gameId);
+  const map = useGameStore((state) => state.map);
 
   const { currentPlayer, canPerformAction } = useCurrentPlayer();
-
-  const map = useGameStore((state) => state.map);
 
   const {
     draggedCard,
@@ -77,6 +83,8 @@ const PlayerCards = () => {
         (response: SocketResponse) => {
           if (!response.success) {
             handleError(response.error);
+          } else {
+            setIsOrganisingInventoryAfterSearch(false);
           }
         }
       );
@@ -363,10 +371,13 @@ const PlayerCards = () => {
           inReserve: reserveCards,
           inHand: handCards,
         },
+        asAction: selectedAction?.id === "inventory",
       },
       (response: SocketResponse) => {
         if (!response.success) {
           handleError(response.error);
+        } else {
+          setIsOrganisingInventoryAfterSearch(false);
         }
       }
     );
@@ -409,18 +420,21 @@ const PlayerCards = () => {
             const card = handCards[index];
             return renderCard(card, "hand", index, true);
           })}
-          {selectedAction?.id === "inventory" && (
+          {selectedAction?.id === "inventory" ||
+          isOrganisingInventoryAfterSearch ? (
             <div className="absolute m-0 gap-0">
               <div className="absolute top-10 left-40 w-10 h-10">
                 <Button onClick={handleOrganiseInventory} className="mb-1 p-0">
                   <FaCheck />
                 </Button>
-                <Button onClick={handleCancelOrganiseInventory}>
-                  <FaTimes />
-                </Button>
+                {selectedAction?.id === "inventory" ? (
+                  <Button onClick={handleCancelOrganiseInventory}>
+                    <FaTimes />
+                  </Button>
+                ) : null}
               </div>
             </div>
-          )}
+          ) : null}
         </div>
       </div>
     </div>

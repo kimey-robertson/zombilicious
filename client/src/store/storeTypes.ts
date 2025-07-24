@@ -46,6 +46,10 @@ export type PlayerStore = {
   setSelectedAction: (selectedAction: GameAction | undefined) => void;
   selectedCardForRanged: Card | undefined;
   setSelectedCardForRanged: (selectedCardForRanged: Card | undefined) => void;
+  isOrganisingInventoryAfterSearch: boolean;
+  setIsOrganisingInventoryAfterSearch: (
+    isOrganisingInventoryAfterSearch: boolean
+  ) => void;
 };
 
 export type LobbyStore = {

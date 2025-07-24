@@ -51,4 +51,7 @@ export const usePlayerStore = create<PlayerStore>((set) => ({
   selectedCardForRanged: undefined,
   setSelectedCardForRanged: (selectedCardForRanged) =>
     set({ selectedCardForRanged }),
+  isOrganisingInventoryAfterSearch: false,
+  setIsOrganisingInventoryAfterSearch: (isOrganisingInventoryAfterSearch) =>
+    set({ isOrganisingInventoryAfterSearch }),
 }));

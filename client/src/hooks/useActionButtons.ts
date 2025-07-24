@@ -22,6 +22,12 @@ export const useActionButtons = () => {
   const setSelectedCardForRanged = usePlayerStore(
     (state) => state.setSelectedCardForRanged
   );
+  const setIsOrganisingInventoryAfterSearch = usePlayerStore(
+    (state) => state.setIsOrganisingInventoryAfterSearch
+  );
+  const isOrganisingInventoryAfterSearch = usePlayerStore(
+    (state) => state.isOrganisingInventoryAfterSearch
+  );
 
   const { currentPlayer, canPerformAction, currentZone } = useCurrentPlayer();
 
@@ -34,7 +40,7 @@ export const useActionButtons = () => {
 
   const buttonDisabled = (actionId: ActionType) => {
     return (
-      !canPerformAction ||
+      !canPerformAction || isOrganisingInventoryAfterSearch ||
       (actionId === "search" &&
         (currentPlayer?.searchedThisTurn || !currentZone?.room)) ||
       (actionId === "door" &&
@@ -110,6 +116,7 @@ export const useActionButtons = () => {
             handleError(response.error);
           } else {
             setSelectedAction(undefined);
+            setIsOrganisingInventoryAfterSearch(true);
           }
         }
       );

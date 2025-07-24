@@ -680,20 +680,7 @@ function searchForItems(
   }
   const card = getRandomCard();
 
-  const emptyInHandSlot = player.playerCards.inHand.findIndex(
-    (card) => card == null
-  );
-  const emptyInReserveSlot = player.playerCards.inReserve.findIndex(
-    (card) => card == null
-  );
-  if (emptyInHandSlot !== -1) {
-    player.playerCards.inHand[emptyInHandSlot] = card;
-  } else if (emptyInReserveSlot !== -1) {
-    player.playerCards.inReserve[emptyInReserveSlot] = card;
-  } else {
-    player.playerCards.swappableCard = card;
-  }
-
+  player.playerCards.swappableCard = card;
   player.searchedThisTurn = true;
   player.actionsRemaining -= 1;
 
