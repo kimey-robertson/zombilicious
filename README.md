@@ -2,8 +2,6 @@
 
 A web-based multiplayer zombie survival game featuring real-time turn-based gameplay, tile-based board mechanics, and comprehensive lobby system.
 
-
-
 ## 🎮 What is Zombilicious?
 
 Zombilicious is a tactical zombie survival game where players cooperate to survive waves of undead. Features include:
@@ -135,10 +133,8 @@ See **[DOCUMENTATION.md](./DOCUMENTATION.md)**
 
 The game is configured for Railway deployment with automatic build and deployment.
 
-
-
 ---
 
 **Ready to survive the zombie apocalypse?** 🧟‍♂️
 
-Start a game at [zombilicious.up.railway.app](https://zombilicious.up.railway.app) or run locally following the setup instructions above!
+Start a game at [zombilicious-production.up.railway.app](https://zombilicious-production.up.railway.app/) or run locally following the setup instructions above!
